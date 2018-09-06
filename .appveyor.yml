@@ -35,7 +35,7 @@ install:
 
 build_script:
     # ñêðèïò ñáîðêè ïðîåêòà:
-    - cl /c /nologo /O2 /Wall /Tc *.cpp
+    - cl /c /nologo /O2 /Wall /TC *.cpp
     - link testLab0.obj testDriver.obj /out:testLab0.exe
     - link testLab10.obj testDriver.obj /out:testLab10.exe
     - link testLab11.obj testDriver.obj /out:testLab11.exe
