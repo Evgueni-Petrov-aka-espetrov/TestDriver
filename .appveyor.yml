@@ -1,40 +1,40 @@
-image: Visual Studio 2015   # на этом VM-образе установлены все Visual Studio с 2008 по 2015
+image: Visual Studio 2015   # Г­Г  ГЅГІГ®Г¬ VM-Г®ГЎГ°Г Г§ГҐ ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­Г» ГўГ±ГҐ Visual Studio Г± 2008 ГЇГ® 2015
 
 init:
-    # секция инициализации, исполняется до клонирования проекта
-    # скорее всего, строчка ниже необязательна (так должно быть по умолчанию),
-    # вместе с тем, она присутствует в официальных примерах, так что пусть будет:
+    # Г±ГҐГЄГ¶ГЁГї ГЁГ­ГЁГ¶ГЁГ Г«ГЁГ§Г Г¶ГЁГЁ, ГЁГ±ГЇГ®Г«Г­ГїГҐГІГ±Гї Г¤Г® ГЄГ«Г®Г­ГЁГ°Г®ГўГ Г­ГЁГї ГЇГ°Г®ГҐГЄГІГ 
+    # Г±ГЄГ®Г°ГҐГҐ ГўГ±ГҐГЈГ®, Г±ГІГ°Г®Г·ГЄГ  Г­ГЁГ¦ГҐ Г­ГҐГ®ГЎГїГ§Г ГІГҐГ«ГјГ­Г  (ГІГ ГЄ Г¤Г®Г«Г¦Г­Г® ГЎГ»ГІГј ГЇГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ),
+    # ГўГ¬ГҐГ±ГІГҐ Г± ГІГҐГ¬, Г®Г­Г  ГЇГ°ГЁГ±ГіГІГ±ГІГўГіГҐГІ Гў Г®ГґГЁГ¶ГЁГ Г«ГјГ­Г»Гµ ГЇГ°ГЁГ¬ГҐГ°Г Гµ, ГІГ ГЄ Г·ГІГ® ГЇГіГ±ГІГј ГЎГіГ¤ГҐГІ:
     - git config --global core.autocrlf input
 
-clone_folder: c:\projects\my-prj # выбираем локальную директорию для клонирования
-shallow_clone: true              # копируем только последний коммит, без истории (git clone --depth 1)
+clone_folder: c:\projects\my-prj # ГўГ»ГЎГЁГ°Г ГҐГ¬ Г«Г®ГЄГ Г«ГјГ­ГіГѕ Г¤ГЁГ°ГҐГЄГІГ®Г°ГЁГѕ Г¤Г«Гї ГЄГ«Г®Г­ГЁГ°Г®ГўГ Г­ГЁГї
+shallow_clone: true              # ГЄГ®ГЇГЁГ°ГіГҐГ¬ ГІГ®Г«ГјГЄГ® ГЇГ®Г±Г«ГҐГ¤Г­ГЁГ© ГЄГ®Г¬Г¬ГЁГІ, ГЎГҐГ§ ГЁГ±ГІГ®Г°ГЁГЁ (git clone --depth 1)
 
 matrix:
-    fast_finish: false           # не останавливаемся после возникновения ошибки в каком-то из заданий
+    fast_finish: false           # Г­ГҐ Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГ¬Г±Гї ГЇГ®Г±Г«ГҐ ГўГ®Г§Г­ГЁГЄГ­Г®ГўГҐГ­ГЁГї Г®ГёГЁГЎГЄГЁ Гў ГЄГ ГЄГ®Г¬-ГІГ® ГЁГ§ Г§Г Г¤Г Г­ГЁГ©
 
 platform:
-    # будем гонять CI на amd64 и x86...
-    - x64
+    # ГЎГіГ¤ГҐГ¬ ГЈГ®Г­ГїГІГј CI Г­Г  amd64 ГЁ x86...
+#    - x64
     - x86
 
 # configuration:
-#    # ... и в дебажной, и в релизной конфигурациях ...
+#    # ... ГЁ Гў Г¤ГҐГЎГ Г¦Г­Г®Г©, ГЁ Гў Г°ГҐГ«ГЁГ§Г­Г®Г© ГЄГ®Г­ГґГЁГЈГіГ°Г Г¶ГЁГїГµ ...
 #    - Debug
 #    - Release
 
-environment:
-    matrix:
-        # ... на трёх студиях (2010, 2012, 2015)
-        - TOOLCHAIN: msvc10
-        - TOOLCHAIN: msvc12
-        - TOOLCHAIN: msvc14
+#environment:
+#    matrix:
+#        # ... Г­Г  ГІГ°ВёГµ Г±ГІГіГ¤ГЁГїГµ (2010, 2012, 2015)
+#        - TOOLCHAIN: msvc10
+#        - TOOLCHAIN: msvc12
+#        - TOOLCHAIN: msvc14
 
 install:
-    # скрипт настройки среды и установки зависимостей:
-    - call ci\appveyor\set-env.bat %TOOLCHAIN% %PLATFORM%
+    # Г±ГЄГ°ГЁГЇГІ Г­Г Г±ГІГ°Г®Г©ГЄГЁ Г±Г°ГҐГ¤Г» ГЁ ГіГ±ГІГ Г­Г®ГўГЄГЁ Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГҐГ©:
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
 
 build_script:
-    # скрипт сборки проекта:
+    # Г±ГЄГ°ГЁГЇГІ Г±ГЎГ®Г°ГЄГЁ ГЇГ°Г®ГҐГЄГІГ :
     - cl /c /nologo /O2 /Wall /Tc *.cpp
     - link testLab0.obj testDriver.obj /out:testLab0.exe
     - link testLab10.obj testDriver.obj /out:testLab10.exe
@@ -49,7 +49,7 @@ build_script:
     - link testLab9.obj testDriver.obj /out:testLab9.exe
 
 test_script:
-    # скрипт тестирования проекта:
+    # Г±ГЄГ°ГЁГЇГІ ГІГҐГ±ГІГЁГ°Г®ГўГ Г­ГЁГї ГЇГ°Г®ГҐГЄГІГ :
     - testLab0.exe lab0.exe
     - testLab10.exe lab10.exe
     - testLab11.exe lab11.exe
@@ -67,7 +67,7 @@ test_script:
 #      name: package_name
 
 #deploy:
-#    # выкладываем tagged-коммиты на GitHub Releases:
+#    # ГўГ»ГЄГ«Г Г¤Г»ГўГ ГҐГ¬ tagged-ГЄГ®Г¬Г¬ГЁГІГ» Г­Г  GitHub Releases:
 #    description: '$(APPVEYOR_REPO_TAG_NAME)'
 #    provider: GitHub
 #
