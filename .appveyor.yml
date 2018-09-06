@@ -72,10 +72,10 @@ test_script:
 #    provider: GitHub
 #
 #    auth_token:
-        secure: <encrypted-github-token>
-
-    artifact: package_name
-    force_update: true
-
-    on:
-        appveyor_repo_tag: true
+#        secure: <encrypted-github-token>
+#
+#    artifact: package_name
+#    force_update: true
+#
+#    on:
+#        appveyor_repo_tag: true
