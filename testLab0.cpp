@@ -33,7 +33,9 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"10 2\n0.8\n", "0.110011001100"},
     {"16 15\nfEdCbA987654\n", "225e406dad6c9"},
     {"2 15\n1\n", "1"},
-    {"2 15\n0\n", "0"} // 29
+    {"2 15\n0\n", "0"},
+    {"2 15\n0.(0)\n", "bad input"},
+    {"2 15\n1=0\n", "bad input"} // 31
 };
 
 static int feederN(void)
@@ -78,6 +80,8 @@ static int checkerN(void)
 }
 
 const struct labFeedAndCheck labTests[] = {
+    {feederN, checkerN},
+    {feederN, checkerN},
     {feederN, checkerN},
     {feederN, checkerN},
     {feederN, checkerN},
