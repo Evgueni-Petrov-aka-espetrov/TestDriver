@@ -123,7 +123,7 @@ static int feederBig1(void)
             error |= fwrite(zipped, 1, fib(c), in) < fib(c);
         }
     } else { // ask to decompress compressed data
-        const char *c, *const lastZipped = zipped+lenZipped;
+        const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
         for (c = zipped; !error && c != lastZipped; c++) 
             error |= fwrite(c, 1, 1, in) < 1;
@@ -149,7 +149,7 @@ static int checkerBig1(void)
         for (c = 1; c < big1N; c++)
             bits += fib(c)*(big1N-c);
         lenZipped = fread(zipped, 1, (bits+7)/8+4+(10*big1N+7)/8+1+100, out);
-printf("want <= %d got >= %d\n",(bits+7)/8+4+(10*big1N+7)/8, lenZipped);
+        printf("want <= %d got >= %zu\n",(bits+7)/8+4+(10*big1N+7)/8, lenZipped);
         if (lenZipped > (bits+7)/8+4+(10*big1N+7)/8) {
             passed = 1;
             printf("output is too long -- ");
@@ -207,7 +207,7 @@ static int feederBig2(void)
             error |= fwrite(&c, 1, 1, in) < 1;
         }
     } else { // ask to decompress compressed data
-        const char *c, *const lastZipped = zipped+lenZipped;
+        const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
         for (c = zipped; !error && c != lastZipped; c++) 
             error |= fwrite(c, 1, 1, in) < 1;
@@ -277,7 +277,7 @@ static int feederBig3(void)
             error |= fwrite(&c, 1, 1, in) < 1;
         }
     } else { // ask to decompress compressed data
-        const char *c, *const lastZipped = zipped+lenZipped;
+        const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
         for (c = zipped; !error && c != lastZipped; c++) 
             error |= fwrite(c, 1, 1, in) < 1;
