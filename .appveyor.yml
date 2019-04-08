@@ -1,40 +1,40 @@
-image: Visual Studio 2015   # íà ýòîì VM-îáðàçå óñòàíîâëåíû âñå Visual Studio ñ 2008 ïî 2015
+image: Visual Studio 2015   # на этом VM-образе установлены все Visual Studio с 2008 по 2015
 
 init:
-    # ñåêöèÿ èíèöèàëèçàöèè, èñïîëíÿåòñÿ äî êëîíèðîâàíèÿ ïðîåêòà
-    # ñêîðåå âñåãî, ñòðî÷êà íèæå íåîáÿçàòåëüíà (òàê äîëæíî áûòü ïî óìîë÷àíèþ),
-    # âìåñòå ñ òåì, îíà ïðèñóòñòâóåò â îôèöèàëüíûõ ïðèìåðàõ, òàê ÷òî ïóñòü áóäåò:
+    # секция инициализации, исполняется до клонирования проекта
+    # скорее всего, строчка ниже необязательна (так должно быть по умолчанию),
+    # вместе с тем, она присутствует в официальных примерах, так что пусть будет:
     - git config --global core.autocrlf input
 
-clone_folder: c:\projects\my-prj # âûáèðàåì ëîêàëüíóþ äèðåêòîðèþ äëÿ êëîíèðîâàíèÿ
-shallow_clone: true              # êîïèðóåì òîëüêî ïîñëåäíèé êîììèò, áåç èñòîðèè (git clone --depth 1)
+clone_folder: c:\projects\my-prj # выбираем локальную директорию для клонирования
+shallow_clone: true              # копируем только последний коммит, без истории (git clone --depth 1)
 
 matrix:
-    fast_finish: false           # íå îñòàíàâëèâàåìñÿ ïîñëå âîçíèêíîâåíèÿ îøèáêè â êàêîì-òî èç çàäàíèé
+    fast_finish: false           # не останавливаемся после возникновения ошибки в каком-то из заданий
 
 platform:
-    # áóäåì ãîíÿòü CI íà amd64 è x86...
+    # будем гонять CI на amd64 и x86...
 #    - x64
     - x86
 
 # configuration:
-#    # ... è â äåáàæíîé, è â ðåëèçíîé êîíôèãóðàöèÿõ ...
+#    # ... и в дебажной, и в релизной конфигурациях ...
 #    - Debug
 #    - Release
 
 #environment:
 #    matrix:
-#        # ... íà òð¸õ ñòóäèÿõ (2010, 2012, 2015)
+#        # ... на трёх студиях (2010, 2012, 2015)
 #        - TOOLCHAIN: msvc10
 #        - TOOLCHAIN: msvc12
 #        - TOOLCHAIN: msvc14
 
 install:
-    # ñêðèïò íàñòðîéêè ñðåäû è óñòàíîâêè çàâèñèìîñòåé:
+    # скрипт настройки среды и установки зависимостей:
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
 
 build_script:
-    # ñêðèïò ñáîðêè ïðîåêòà:
+    # скрипт сборки проекта:
     - cl /c /nologo /O2 /Wall /TC *.c
     - link testLab0.obj testDriver.obj /out:testLab0.exe
     - link testLab10.obj testDriver.obj /out:testLab10.exe
@@ -49,7 +49,7 @@ build_script:
     - link testLab9.obj testDriver.obj /out:testLab9.exe
 
 test_script:
-    # ñêðèïò òåñòèðîâàíèÿ ïðîåêòà:
+    # скрипт тестирования проекта:
     - testLab0.exe lab0.exe
     - testLab10.exe lab10.exe
     - testLab11.exe lab11.exe
@@ -67,7 +67,7 @@ test_script:
 #      name: package_name
 
 #deploy:
-#    # âûêëàäûâàåì tagged-êîììèòû íà GitHub Releases:
+#    # выкладываем tagged-коммиты на GitHub Releases:
 #    description: '$(APPVEYOR_REPO_TAG_NAME)'
 #    provider: GitHub
 #
