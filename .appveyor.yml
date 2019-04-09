@@ -33,34 +33,16 @@ install:
     # скрипт настройки среды и установки зависимостей:
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
 
+before_build:
+    - cmake -H. -Bbuild
+
 build_script:
     # скрипт сборки проекта:
-    - cl /c /nologo /O2 /Wall /TC *.c
-    - link testLab0.obj testDriver.obj /out:testLab0.exe
-    - link testLab10.obj testDriver.obj /out:testLab10.exe
-    - link testLab11.obj testDriver.obj /out:testLab11.exe
-    - link testLab2.obj testDriver.obj /out:testLab2.exe
-    - link testLab30.obj testDriver.obj /out:testLab30.exe
-    - link testLab4.obj testDriver.obj /out:testLab4.exe
-    - link testLab5.obj testDriver.obj /out:testLab5.exe
-    - link testLab6.obj testDriver.obj /out:testLab6.exe
-    - link testLab7.obj testDriver.obj /out:testLab7.exe
-    - link testLab80.obj testDriver.obj /out:testLab80.exe
-    - link testLab9.obj testDriver.obj /out:testLab9.exe
+    - cmake --build build --config Release
 
 test_script:
     # скрипт тестирования проекта:
-    - testLab0.exe lab0.exe
-    - testLab10.exe lab10.exe
-    - testLab11.exe lab11.exe
-    - testLab2.exe lab2.exe
-    - testLab30.exe lab30.exe
-    - testLab4.exe lab4.exe
-    - testLab5.exe lab5.exe
-    - testLab6.exe lab6.exe
-    - testLab7.exe lab7.exe
-    - testLab80.exe lab80.exe
-    - testLab9.exe lab9.exe
+    - cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --config Release --target RUN_TESTS
 
 #artifacts:
 #    - path: <local-package-path>
