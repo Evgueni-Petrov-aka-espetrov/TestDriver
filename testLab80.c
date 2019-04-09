@@ -1,16 +1,17 @@
 #include "testLab.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 
 enum testConst { N_MAX = 5000 };
 static int testN = 0;
-struct edge {int a, b; __int64 abL;};
+struct edge {int a, b; int64_t abL;};
 static const struct {
     int N, M;
     struct edge G[8];
     const char *msg;
-    __int64 L;
+    int64_t L;
 } testInOut[] = {
     {3, 3, {{1, 2, 10}, {2, 3, 5}, {3, 1, 5}}, NULL, 10},
     {3, 1, {{1, 2, 10}}, "no spanning tree"},
@@ -22,16 +23,16 @@ static const struct {
     {2, 1, {{1, 2, -1}}, "bad length"},
 
     {2, 0, {{0}}, "no spanning tree"},
-    {2, 1, {{1, 2, (__int64)4*INT_MAX}}, "bad length"},
+    {2, 1, {{1, 2, (int64_t)4*INT_MAX}}, "bad length"},
     {4, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, "no spanning tree"},
     {2, 1, {{1, 1, INT_MAX}}, "no spanning tree"},
 
     {1, 0, {{0}}, NULL, 0},
     {4, 4, {{1, 2, 1}, {2, 3, 2}, {3, 4, 4}, {4, 1, 8}}, NULL, 7},
-    {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (__int64)2*INT_MAX},
-    {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (__int64)1+INT_MAX},
+    {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (int64_t)2*INT_MAX},
+    {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (int64_t)1+INT_MAX},
 
-    {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (__int64)3*INT_MAX},
+    {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (int64_t)3*INT_MAX},
     {4, 4, {{1, 2, 1}, {2, 3, 1}, {3, 4, 1}, {4, 1, 1}}, NULL, 3},
     {5, 4, {{1, 2, 1}, {2, 3, 1}, {3, 1, 1}, {4, 3, 1}}, "no spanning tree"},
     {4, 6, {{1, 2, 1}, {1, 3, 2}, {1, 4, 4}, {2, 3, 8}, {2, 4, 16}, {3, 4, 32}}, NULL, 7},
@@ -117,7 +118,7 @@ static int checkerN(void)
     } else { // test spanning tree
         int i, N = testInOut[testN].N;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b);
@@ -208,7 +209,7 @@ static int checkerBig(void)
     { // test spanning tree
         int i, N = N_MAX;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b);
@@ -360,7 +361,7 @@ static int checkerBig1(void)
     { // test spanning tree
         int i, N = N_MAX;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b), abL;
@@ -472,7 +473,7 @@ static int checkerBig2(void)
     { // test spanning tree
         int i, N = N_MAX;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b);
