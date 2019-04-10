@@ -51,7 +51,6 @@ int main(int argc, char* argv[])
 }
 
 #if defined _WIN32
-#define _WIN32_WINNT 0x0500
 #include <windows.h>
 int labDo(char *labExe)
 {
@@ -94,10 +93,6 @@ int labDo(char *labExe)
     };
     PROCESS_INFORMATION labInfo = {0};
     int exitCode = 1;
-    UINT sysErrorMode = SetErrorMode(SEM_FAILCRITICALERRORS
-        +SEM_NOALIGNMENTFAULTEXCEPT
-        +SEM_NOGPFAULTERRORBOX
-        +SEM_NOOPENFILEERRORBOX);
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION labJobLimits = {
         { // JOBOBJECT_BASIC_LIMIT_INFORMATION
             0, // ignored -- LARGE_INTEGER PerProcessUserTimeLimit;
@@ -122,14 +117,14 @@ int labDo(char *labExe)
     size_t labMem0 = -1;
 
     if (labJob == 0) {
-        printf("\nSystem error: %d in CreateJobObject\n", GetLastError());
+        printf("\nSystem error: %u in CreateJobObject\n", (unsigned)GetLastError());
         CloseHandle(labIn);
         CloseHandle(labOut);
         return 1;
     }
 
     if (!SetInformationJobObject(labJob, JobObjectExtendedLimitInformation, &labJobLimits, sizeof(labJobLimits))) {
-        printf("\nSystem error: %d in SetInformationJobObject\n", GetLastError());
+        printf("\nSystem error: %u in SetInformationJobObject\n", (unsigned)GetLastError());
         CloseHandle(labJob);
         CloseHandle(labIn);
         CloseHandle(labOut);
@@ -149,7 +144,7 @@ int labDo(char *labExe)
         &labInfo //__out        LPPROCESS_INFORMATION lpProcessInformation
         ))
     {
-        printf("\nSystem error: %d in CreateProcess\n", GetLastError());
+        printf("\nSystem error: %u in CreateProcess\n", (unsigned)GetLastError());
         CloseHandle(labJob);
         CloseHandle(labIn);
         CloseHandle(labOut);
@@ -157,7 +152,7 @@ int labDo(char *labExe)
     }
 
     if (!AssignProcessToJobObject(labJob, labInfo.hProcess)) {
-        printf("\nSystem error: %d in AssignProcessToJobObject\n", GetLastError());
+        printf("\nSystem error: %u in AssignProcessToJobObject\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, -1);
         CloseHandle(labInfo.hThread);
         CloseHandle(labInfo.hProcess);
@@ -170,7 +165,7 @@ int labDo(char *labExe)
     {
         BOOL in;
         if (!IsProcessInJob(labInfo.hProcess, labJob, &in)) {
-            printf("\nSystem error: %d in IsProcessInJob\n", GetLastError());
+            printf("\nSystem error: %u in IsProcessInJob\n", (unsigned)GetLastError());
             TerminateProcess(labInfo.hProcess, -1);
             CloseHandle(labInfo.hThread);
             CloseHandle(labInfo.hProcess);
@@ -195,8 +190,8 @@ int labDo(char *labExe)
     }
 
 
-    if (ResumeThread(labInfo.hThread) == -1) {
-        printf("\nSystem error: %d in ResumeThread\n", GetLastError());
+    if (ResumeThread(labInfo.hThread) == (DWORD)-1) {
+        printf("\nSystem error: %u in ResumeThread\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, -1);
         CloseHandle(labInfo.hThread);
         CloseHandle(labInfo.hProcess);
@@ -211,11 +206,11 @@ int labDo(char *labExe)
         {
             DWORD labExit = -1;
             if (!GetExitCodeProcess(labInfo.hProcess, &labExit)) {
-                printf("\nSystem error: %d in GetExitCodeProcess\n", GetLastError());
+                printf("\nSystem error: %u in GetExitCodeProcess\n", (unsigned)GetLastError());
             } else if (labExit >= 0x8000000) {
-                printf("\nExe \"%s\" terminated with exception 0x%08x\n", labExe, labExit);
+                printf("\nExe \"%s\" terminated with exception 0x%08x\n", labExe, (unsigned)labExit);
             } else if (labExit > 0) {
-                printf("\nExe \"%s\" terminated with exit code 0x%08x != 0\n", labExe, labExit);
+                printf("\nExe \"%s\" terminated with exit code 0x%08x != 0\n", labExe, (unsigned)labExit);
             } else {
                 exitCode = 0; // + check memory footprint after this switch (...) {...}
             }
@@ -226,7 +221,7 @@ int labDo(char *labExe)
         TerminateProcess(labInfo.hProcess, -1);
         break;
     case WAIT_FAILED:
-        printf("\nSystem error: %d in WaitForSingleObject\n", GetLastError());
+        printf("\nSystem error: %u in WaitForSingleObject\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, -1);
         break;
     default:
@@ -244,9 +239,9 @@ int labDo(char *labExe)
         //fprintf(stderr, "PeakJobMemoryUsed %d\n", labJobLimits.PeakJobMemoryUsed);
         labMem0 = labJobLimits.PeakProcessMemoryUsed-labMem0;
     }
-    if (exitCode == 0 && labUserOutOfMemory == -1 && labMem0 > labOutOfMemory) {
+    if (exitCode == 0 && labUserOutOfMemory == -1 && (long long)labMem0 > labOutOfMemory) {
         exitCode = 1, printf("\nExe \"%s\" used %dK > %dK\n", labExe, 1+(labMem0-1)/1024, 1+(labOutOfMemory-1)/1024);
-    } else if (exitCode == 0 && labUserOutOfMemory != -1 && labMem0 > labUserOutOfMemory) {
+    } else if (exitCode == 0 && labUserOutOfMemory != -1 && (long long)labMem0 > labUserOutOfMemory) {
         exitCode = 1, printf("\nExe \"%s\" used %dK > %dK\n", labExe, 1+(labMem0-1)/1024, 1+(labUserOutOfMemory-1)/1024);
     }
 

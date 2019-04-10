@@ -130,7 +130,7 @@ static int feederBig(void)
     fprintf(in, "\n");
     fclose(in);
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout 2*T+3... ", t/1000);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     labTimeout = (int)t*2+3000;
     fflush(stdout);
     labOutOfMemory = 1024*1024+4*2000000;
@@ -216,7 +216,7 @@ static int feederBig2(void)
     fprintf(in, "\n");
     fclose(in);
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout 2*T+3... ", t/1000);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     labTimeout = (int)t*2+3000;
     fflush(stdout);
     labOutOfMemory = 1024*1024+4*2000000;

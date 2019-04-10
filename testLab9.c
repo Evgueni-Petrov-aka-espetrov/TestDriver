@@ -348,7 +348,7 @@ static int feederBig2(void)
     fflush(NULL);
 
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout T+6... ", t/1000);
+    printf("done in T=%u seconds. Starting exe with timeout T+6... ", (unsigned)t/1000);
     labTimeout = (int)t+6000;
     fflush(stdout);
     fclose(in);

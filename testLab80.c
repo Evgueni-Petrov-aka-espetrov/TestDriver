@@ -454,7 +454,7 @@ static int feederBig2(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, N_MAX); // reach N_MAX
     tStart = (tickDifference(tStart, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout T+3... ", tStart/1000);
+    printf("done in T=%u seconds. Starting exe with timeout T+3... ", (unsigned)tStart/1000);
     labTimeout = (int)tStart+3000;
     fflush(stdout);
     fclose(in);
