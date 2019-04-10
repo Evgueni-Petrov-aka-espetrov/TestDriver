@@ -113,7 +113,7 @@ static int checkerN(void)
     fclose(out);
     if (strchr(buf, '\n'))
         *strchr(buf, '\n') = 0;
-    passed = strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0;
+    passed = _strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0;
     if (passed) {
         while (1) {
             char ignored;

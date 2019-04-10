@@ -102,7 +102,7 @@ static int checkerN(void)
         } else {
             if (strchr(bufMsg, '\n'))
                 *strchr(bufMsg, '\n') = 0;
-            if (strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
+            if (_strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
                 printf("wrong output -- ");
                 fact = fail;
             }

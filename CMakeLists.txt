@@ -25,7 +25,6 @@ function(SET_COMPILER_SETTINGS target)
 		$<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>,$<C_COMPILER_ID:GNU>>:
 		-Wall
 		-Wextra
-		-Wno-missing-braces
 		-Wno-missing-field-initializers
 		-pedantic
 		-pedantic-errors
@@ -41,6 +40,9 @@ function(SET_COMPILER_SETTINGS target)
 	target_compile_definitions(${target} PRIVATE
 		$<$<BOOL:${MINGW}>:
 		__USE_MINGW_ANSI_STDIO=1
+		>
+		$<$<C_COMPILER_ID:MSVC>:
+		_CRT_SECURE_NO_WARNINGS=1
 		>)
 
 	if(MATH_LIBRARY)

@@ -1,4 +1,5 @@
 #include "testLab.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -76,27 +77,30 @@ int labDo(char *labExe)
         NULL, // LPTSTR lpReserved; must be NULL, see MSDN
         NULL, // LPTSTR lpDesktop;
         NULL, // LPTSTR lpTitle;
-        -1, // DWORD  dwX; ignored, see dwFlags
-        -1, // DWORD  dwY; ignored, see dwFlags
-        -1, // DWORD  dwXSize; ignored, see dwFlags
-        -1, // DWORD  dwYSize; ignored, see dwFlags
-        -1, // DWORD  dwXCountChars; ignored, see dwFlags
-        -1, // DWORD  dwYCountChars; ignored, see dwFlags
-        -1, // DWORD  dwFillAttribute; ignored, see dwFlags
+        0, // DWORD  dwX; ignored, see dwFlags
+        0, // DWORD  dwY; ignored, see dwFlags
+        0, // DWORD  dwXSize; ignored, see dwFlags
+        0, // DWORD  dwYSize; ignored, see dwFlags
+        0, // DWORD  dwXCountChars; ignored, see dwFlags
+        0, // DWORD  dwYCountChars; ignored, see dwFlags
+        0, // DWORD  dwFillAttribute; ignored, see dwFlags
         STARTF_USESTDHANDLES, // DWORD  dwFlags;
-        -1, // WORD   wShowWindow; ignored, see dwFlags
+        0, // WORD   wShowWindow; ignored, see dwFlags
         0, // WORD   cbReserved2; must be 0, see MSDN
         NULL, // LPBYTE lpReserved2; must be NULL, see MSDN
-        labIn, // lab stdin is in.txt
-        labOut, // lab stdout is out.txt
-        labErr // lab and tester share stderr
+	NULL,
+	NULL,
+	NULL,
     };
+    labStartup.hStdInput = labIn; // lab stdin is in.txt
+    labStartup.hStdOutput = labOut; // lab stdout is out.txt
+    labStartup.hStdError = labErr; // lab and tester share stderr
     PROCESS_INFORMATION labInfo = {0};
     int exitCode = 1;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION labJobLimits = {
         { // JOBOBJECT_BASIC_LIMIT_INFORMATION
-            0, // ignored -- LARGE_INTEGER PerProcessUserTimeLimit;
-                0, // ignored -- LARGE_INTEGER PerJobUserTimeLimit;
+		{.QuadPart = 0}, // ignored -- LARGE_INTEGER PerProcessUserTimeLimit;
+		{.QuadPart = 0}, // ignored -- LARGE_INTEGER PerJobUserTimeLimit;
                 JOB_OBJECT_LIMIT_PROCESS_MEMORY
                 +JOB_OBJECT_LIMIT_JOB_MEMORY
                 +JOB_OBJECT_LIMIT_ACTIVE_PROCESS, // DWORD         LimitFlags;
@@ -107,14 +111,18 @@ int labDo(char *labExe)
                 0, // ignored -- DWORD         PriorityClass;
                 0, // ignored -- DWORD         SchedulingClass;
         }, // JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
-        0, // reserved --- IO_COUNTERS                       IoInfo;
-        labOutOfMemory, // SIZE_T                            ProcessMemoryLimit;
-        labOutOfMemory, // SIZE_T                            JobMemoryLimit;
-        labOutOfMemory, // SIZE_T                            PeakProcessMemoryUsed;
-        labOutOfMemory, // SIZE_T                            PeakJobMemoryUsed;
+	{0}, // reserved --- IO_COUNTERS                       IoInfo;
+        0, // SIZE_T                            ProcessMemoryLimit;
+        0, // SIZE_T                            JobMemoryLimit;
+        0, // SIZE_T                            PeakProcessMemoryUsed;
+        0, // SIZE_T                            PeakJobMemoryUsed;
     };
+    labJobLimits.ProcessMemoryLimit = labOutOfMemory;
+    labJobLimits.JobMemoryLimit = labOutOfMemory;
+    labJobLimits.PeakProcessMemoryUsed = labOutOfMemory;
+    labJobLimits.PeakJobMemoryUsed = labOutOfMemory;
     const HANDLE labJob = CreateJobObject(&labInhertitIO, "labJob");
-    size_t labMem0 = -1;
+    size_t labMem0 = SIZE_MAX;
 
     if (labJob == 0) {
         printf("\nSystem error: %u in CreateJobObject\n", (unsigned)GetLastError());
@@ -153,7 +161,7 @@ int labDo(char *labExe)
 
     if (!AssignProcessToJobObject(labJob, labInfo.hProcess)) {
         printf("\nSystem error: %u in AssignProcessToJobObject\n", (unsigned)GetLastError());
-        TerminateProcess(labInfo.hProcess, -1);
+        TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         CloseHandle(labInfo.hThread);
         CloseHandle(labInfo.hProcess);
         CloseHandle(labJob);
@@ -166,7 +174,7 @@ int labDo(char *labExe)
         BOOL in;
         if (!IsProcessInJob(labInfo.hProcess, labJob, &in)) {
             printf("\nSystem error: %u in IsProcessInJob\n", (unsigned)GetLastError());
-            TerminateProcess(labInfo.hProcess, -1);
+            TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
             CloseHandle(labInfo.hThread);
             CloseHandle(labInfo.hProcess);
             CloseHandle(labJob);
@@ -192,7 +200,7 @@ int labDo(char *labExe)
 
     if (ResumeThread(labInfo.hThread) == (DWORD)-1) {
         printf("\nSystem error: %u in ResumeThread\n", (unsigned)GetLastError());
-        TerminateProcess(labInfo.hProcess, -1);
+        TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         CloseHandle(labInfo.hThread);
         CloseHandle(labInfo.hProcess);
         CloseHandle(labJob);
@@ -204,7 +212,7 @@ int labDo(char *labExe)
     switch (WaitForSingleObject(labInfo.hProcess, labTimeout)) {
     case WAIT_OBJECT_0:
         {
-            DWORD labExit = -1;
+            DWORD labExit = EXIT_FAILURE;
             if (!GetExitCodeProcess(labInfo.hProcess, &labExit)) {
                 printf("\nSystem error: %u in GetExitCodeProcess\n", (unsigned)GetLastError());
             } else if (labExit >= 0x8000000) {
@@ -218,15 +226,15 @@ int labDo(char *labExe)
         }
     case WAIT_TIMEOUT:
         printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(labTimeout-1)/1000);
-        TerminateProcess(labInfo.hProcess, -1);
+        TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     case WAIT_FAILED:
         printf("\nSystem error: %u in WaitForSingleObject\n", (unsigned)GetLastError());
-        TerminateProcess(labInfo.hProcess, -1);
+        TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     default:
         printf("\nInternal error: WaitForSingleObject returned WAIT_ABANDONED\n");
-        TerminateProcess(labInfo.hProcess, -1);
+        TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
     }
     {
         QueryInformationJobObject(

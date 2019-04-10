@@ -12,12 +12,11 @@ extern size_t labOutOfMemory;
 
 #ifdef _WIN32
 // Helpers for Windows
-#define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #else
 // Helpers and compatibility for Linux
 #include <strings.h>
-#define strnicmp(a, b, c) strncasecmp((a), (b), (c))
+#define _strnicmp(a, b, c) strncasecmp((a), (b), (c))
 #include <stdint.h>
 #include <sys/time.h>
 typedef uint32_t DWORD;

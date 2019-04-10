@@ -90,7 +90,7 @@ static int checkerN(void)
     if (strchr(buf1, '\n')) {
         *strchr(buf1, '\n') = 0;
     }
-    if (strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
+    if (_strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
         fact = fail;
     }
     if (fact == pass && testInOut[testN].out2 != NULL) { // check path
@@ -101,12 +101,12 @@ static int checkerN(void)
             *strchr(buf2, '\n') = 0;
         }
         if (testInOut[testN].out20 == NULL) { // unique shortest path
-            if (strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
+            if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
                 fact = fail;
             }
         } else { // two shortest paths
-            if (strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0
-                && strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
+            if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0
+                && _strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
                     fact = fail;
             }
         }
