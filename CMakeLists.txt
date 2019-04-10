@@ -24,7 +24,14 @@ function(SET_COMPILER_SETTINGS target)
 	target_compile_options(${target} PRIVATE
 		$<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>,$<C_COMPILER_ID:GNU>>:
 		-Wall
+		-Wextra
+		-Wno-missing-field-initializers
 		-pedantic
+		-pedantic-errors
+		>
+		$<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:
+		-Weverything
+		-Wno-padded
 		>
 		$<$<C_COMPILER_ID:MSVC>:
 		/W4

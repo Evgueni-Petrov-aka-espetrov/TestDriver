@@ -131,7 +131,7 @@ static int feederBig(void)
     fclose(in);
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
     printf("done in T=%d seconds. Starting exe with timeout 2*T+3... ", t/1000);
-    labTimeout = 2*t+3000;
+    labTimeout = (int)t*2+3000;
     fflush(stdout);
     labOutOfMemory = 1024*1024+4*2000000;
     return 0;
@@ -140,7 +140,7 @@ static int feederBig(void)
 static int checkerBig(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    int i, passed = 1, last;
+    int i, passed = 1, last = 0;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
@@ -217,7 +217,7 @@ static int feederBig2(void)
     fclose(in);
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
     printf("done in T=%d seconds. Starting exe with timeout 2*T+3... ", t/1000);
-    labTimeout = 2*t+3000;
+    labTimeout = (int)t*2+3000;
     fflush(stdout);
     labOutOfMemory = 1024*1024+4*2000000;
     return 0;

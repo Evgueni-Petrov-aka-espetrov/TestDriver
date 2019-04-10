@@ -107,7 +107,7 @@ static int feederBig(void)
     fprintf(in, "0123456789abcdef");
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
     printf("done in T=%d seconds. Starting exe with timeout 2*T... ", t/1000);
-    labTimeout = 2*t;
+    labTimeout = (int)t*2;
     fflush(stdout);
     fclose(in);
     return 0;

@@ -1,6 +1,8 @@
 #include "testLab.h"
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
@@ -59,7 +61,7 @@ static int feederN(void)
     }
     fprintf(in, "%d\n%d\n", testInOut[testN].N, testInOut[testN].M);
     for (i = 0; i < testInOut[testN].M && testInOut[testN].G[i].a != 0; i++) {
-        fprintf(in, "%d %d %" LONG_LONG_MODIFIER "d\n",
+        fprintf(in, "%d %d %" PRIi64 "\n",
             testInOut[testN].G[i].a, testInOut[testN].G[i].b, testInOut[testN].G[i].abL);
     }
     fclose(in);
@@ -453,7 +455,7 @@ static int feederBig2(void)
     fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, N_MAX); // reach N_MAX
     tStart = (tickDifference(tStart, GetTickCount())+999)/1000*1000;
     printf("done in T=%d seconds. Starting exe with timeout T+3... ", tStart/1000);
-    labTimeout = tStart+3000;
+    labTimeout = (int)tStart+3000;
     fflush(stdout);
     fclose(in);
     labOutOfMemory = N_MAX*N_MAX*4+1024*1024;

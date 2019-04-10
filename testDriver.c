@@ -282,25 +282,16 @@ int labDo(char *labExe)
  * Проверяем кол-во использованной памяти.
  * Закрываемся.
  */
-int check_memory(struct rusage rusage, size_t * labMem0) {
-    int res = 0;
-
-    *labMem0 = rusage.ru_isrss + //stack
+static int check_memory(struct rusage rusage, size_t * labMem0) {
+    *labMem0 = (size_t) (
+	       rusage.ru_isrss + //stack
              + rusage.ru_idrss + //data??
-             + rusage.ru_ixrss;  //general??
+             + rusage.ru_ixrss);  //general??
                                  //???
     if (labOutOfMemory < *labMem0) {
         return(1);
-    } else {
-        return(0);
     }
-
-    return(res);
-}
-
-void sigchld_handler(int signo, siginfo_t * si, void * ucontext)
-{
-    printf("Caught signal %d\n", signo);
+    return(0);
 }
 
 int labDo(char *labExe)
@@ -333,18 +324,9 @@ int labDo(char *labExe)
         int status = 0;
         struct rusage rusage;
         struct timespec rem;
-        struct sigaction act;
 
         rem.tv_sec = 1 + (labTimeout - 1) / 1000;
         rem.tv_nsec = 0;
-#if 0
-        act.sa_sigaction = sigchld_handler;
-        act.sa_flags = SA_SIGINFO | SA_RESETHAND;
-        if (sigaction(SIGCHLD, &act, NULL)) {
-            printf("\nSystem error: \"%s\" in sigaction\n", strerror(errno));
-            return exitCode;
-        }
-#endif
         if (nanosleep(&rem, &rem)) {
             while (EINTR != errno && rem.tv_sec > 0 && rem.tv_nsec > 0 && nanosleep(&rem, &rem)) ;
         }

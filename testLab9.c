@@ -265,7 +265,7 @@ static int checkerBig1(void)
     }
     if (message == passed) {
         for (i = 0; i < 2501; i++) {
-            int d, status = fscanf(out, "%d", &p[i]);
+            int status = fscanf(out, "%d", &p[i]);
             if (status < 0) {
                 printf("output too short -- ");
                 message = failed;
@@ -349,7 +349,7 @@ static int feederBig2(void)
 
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
     printf("done in T=%d seconds. Starting exe with timeout T+6... ", t/1000);
-    labTimeout = t+6000;
+    labTimeout = (int)t+6000;
     fflush(stdout);
     fclose(in);
     labOutOfMemory = 5000*5000*4+1024*1024;
