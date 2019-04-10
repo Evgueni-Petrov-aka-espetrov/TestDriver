@@ -106,8 +106,8 @@ static int feederBig(void)
         }
     fprintf(in, "0123456789abcdef");
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout 2*T... ", t/1000);
-    labTimeout = 2*t;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
+    labTimeout = (int)t*2;
     fflush(stdout);
     fclose(in);
     return 0;
@@ -116,7 +116,7 @@ static int feederBig(void)
 static int checkerBig(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    int i, passed = 1;
+    unsigned i, passed = 1;
     const int bigOut[] = {
         11589501, 134217713, 134217714, 134217715, 134217716, 134217717,
         134217718, 134217719, 134217720, 134217721, 134217722, 134217723,

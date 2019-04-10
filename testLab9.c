@@ -90,7 +90,7 @@ static int checkerN(void)
     if (strchr(buf1, '\n')) {
         *strchr(buf1, '\n') = 0;
     }
-    if (strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
+    if (_strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
         fact = fail;
     }
     if (fact == pass && testInOut[testN].out2 != NULL) { // check path
@@ -101,12 +101,12 @@ static int checkerN(void)
             *strchr(buf2, '\n') = 0;
         }
         if (testInOut[testN].out20 == NULL) { // unique shortest path
-            if (strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
+            if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
                 fact = fail;
             }
         } else { // two shortest paths
-            if (strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0
-                && strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
+            if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0
+                && _strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
                     fact = fail;
             }
         }
@@ -265,7 +265,7 @@ static int checkerBig1(void)
     }
     if (message == passed) {
         for (i = 0; i < 2501; i++) {
-            int d, status = fscanf(out, "%d", &p[i]);
+            int status = fscanf(out, "%d", &p[i]);
             if (status < 0) {
                 printf("output too short -- ");
                 message = failed;
@@ -348,8 +348,8 @@ static int feederBig2(void)
     fflush(NULL);
 
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout T+6... ", t/1000);
-    labTimeout = t+6000;
+    printf("done in T=%u seconds. Starting exe with timeout T+6... ", (unsigned)t/1000);
+    labTimeout = (int)t+6000;
     fflush(stdout);
     fclose(in);
     labOutOfMemory = 5000*5000*4+1024*1024;
