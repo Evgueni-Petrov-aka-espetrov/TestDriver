@@ -297,7 +297,55 @@ static int check_memory(struct rusage rusage, size_t * labMem0) {
     return(0);
 }
 
-int labDo(char *labExe)
+static void sigchld_trap(int signo) {
+    // Заглушка, чтобы спровоцировать EINTR при SIGCHLD
+    // По умолчанию SIGCHLD работает как SIG_IGN c SA_RESTART и без SA_NOCLDWAIT
+    // Выставить вручную SIG_IGN нельзя, поскольку будет трактоваться как SA_NOCLDWAIT
+    (void) signo;
+}
+
+static int _labDo(char *labExe);
+
+static int labDo(char *labExe) {
+    struct sigaction new;
+    struct sigaction old;
+
+    memset(&new, 0, sizeof(new));
+    new.sa_handler = sigchld_trap;
+    (void)sigemptyset(&new.sa_mask); // не умеет завершаться неуспешно
+    // Не используем SA_RESETHAND, чтобы не зависеть от использования fork вне labDo
+    new.sa_flags = SA_NOCLDSTOP;
+    if (sigaction(SIGCHLD, &new, &old)) {
+        perror("sigaction set failed");
+        return -1;
+    }
+
+    int ret_code = _labDo(labExe);
+    if (sigaction(SIGCHLD, &old, NULL)) {
+        perror("sigaction restore failed");
+        return -1;
+    }
+
+    return ret_code;
+}
+
+static int timed_wait_pid(pid_t pid, int* status, struct timespec* ts, struct rusage* rusage) {
+    while (ts->tv_sec > 0 || ts->tv_nsec > 0) {
+        pid_t child = wait4(pid, status, WNOHANG, rusage);
+	if (child) {
+            return child;
+	}
+        if (!nanosleep(ts, ts)) {
+            return 0;
+	}
+	if (errno != EINTR) {
+            return -1;
+        }
+    }
+    return 0; // timeout
+}
+
+static int _labDo(char *labExe)
 {
     int exitCode = 1;
     pid_t pid;
@@ -330,10 +378,7 @@ int labDo(char *labExe)
 
         rem.tv_sec = 1 + (labTimeout - 1) / 1000;
         rem.tv_nsec = 0;
-        if (nanosleep(&rem, &rem)) {
-            while (EINTR != errno && rem.tv_sec > 0 && rem.tv_nsec > 0 && nanosleep(&rem, &rem)) ;
-        }
-        status = wait4(pid, &status, WNOHANG, &rusage); //what is WNOHANG???
+        status = timed_wait_pid(pid, &status, &rem, &rusage);
         if (-1 == status) {
             printf("\nSystem error: \"%s\" in wait4\n", strerror(errno));
             return exitCode;

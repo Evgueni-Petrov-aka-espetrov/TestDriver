@@ -32,6 +32,7 @@ function(SET_COMPILER_SETTINGS target)
 		$<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:
 		-Weverything
 		-Wno-padded
+		-Wno-disabled-macro-expansion
 		>
 		$<$<C_COMPILER_ID:MSVC>:
 		/W4
