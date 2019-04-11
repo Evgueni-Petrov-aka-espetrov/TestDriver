@@ -24,7 +24,7 @@ inline DWORD GetTickCount(void)
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return (DWORD)(tv.tv_sec*1000+tv.tv_sec/1000);
+    return (DWORD)(tv.tv_sec*1000+tv.tv_usec/1000);
 }
 #endif /* _WIN32 */
 
