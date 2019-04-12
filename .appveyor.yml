@@ -1,4 +1,7 @@
-image: Visual Studio 2015   # на этом VM-образе установлены все Visual Studio с 2008 по 2015
+image:
+    # на этом VM-образе установлены все Visual Studio с 2008 по 2015
+    - Visual Studio 2015
+    - Ubuntu
 
 init:
     # секция инициализации, исполняется до клонирования проекта
@@ -6,7 +9,7 @@ init:
     # вместе с тем, она присутствует в официальных примерах, так что пусть будет:
     - git config --global core.autocrlf input
 
-clone_folder: c:\projects\my-prj # выбираем локальную директорию для клонирования
+#clone_folder: c:\projects\my-prj # выбираем локальную директорию для клонирования
 shallow_clone: true              # копируем только последний коммит, без истории (git clone --depth 1)
 
 matrix:
@@ -31,18 +34,23 @@ platform:
 
 install:
     # скрипт настройки среды и установки зависимостей:
-    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+    - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+    - sh: sudo apt-get install -y ninja-build
 
 before_build:
-    - cmake -H. -Bbuild
+    - cmd: cmake -H. -Bbuild
+    - sh: cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -G Ninja
+    - sh: chmod +x test/*  # TODO выяснить куда исчезает флаг
 
 build_script:
     # скрипт сборки проекта:
-    - cmake --build build --config Release
+    - cmd: cmake --build build --config Release
+    - sh: cmake --build build
 
 test_script:
     # скрипт тестирования проекта:
-    - cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --config Release --target RUN_TESTS
+    - cmd: cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --config Release --target RUN_TESTS
+    - sh: cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test
 
 #artifacts:
 #    - path: <local-package-path>
