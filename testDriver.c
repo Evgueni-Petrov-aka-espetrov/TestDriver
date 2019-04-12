@@ -286,15 +286,11 @@ int labDo(char *labExe)
  * Закрываемся.
  */
 static int check_memory(struct rusage rusage, size_t * labMem0) {
-    *labMem0 = (size_t) (
-	       rusage.ru_isrss + //stack
-             + rusage.ru_idrss + //data??
-             + rusage.ru_ixrss);  //general??
-                                 //???
+    *labMem0 = (size_t) rusage.ru_maxrss * 1024u;
     if (labOutOfMemory < *labMem0) {
-        return(1);
+        return 1;
     }
-    return(0);
+    return 0;
 }
 
 static void sigchld_trap(int signo) {
