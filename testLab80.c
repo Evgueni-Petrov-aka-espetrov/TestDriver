@@ -194,7 +194,7 @@ static int feederBig(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX, 1, N_MAX);
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -292,7 +292,7 @@ static int feederBig1(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, 2*N_MAX-2); // reach 5000
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -313,7 +313,7 @@ static int feederBig10(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX, N_MAX-1, 2*N_MAX-2); // reach 5000
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -458,7 +458,7 @@ static int feederBig2(void)
     labTimeout = (int)tStart+3000;
     fflush(stdout);
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -589,5 +589,5 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 8-x Kruskal or Prim Shortest Spanning Tree";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
 

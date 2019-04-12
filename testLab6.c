@@ -142,7 +142,7 @@ static int feederBig(void)
     fprintf(in, "\n");
     fclose(in);
     {
-        labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+1024*1024;
+        labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
     }
     return 0;
 }
@@ -209,7 +209,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+1024*1024;
+    labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -308,7 +308,7 @@ static int feederBig2(void)
     genTree(in, 30, 0, 4000000);
     fprintf(in, "\n");
     fclose(in);
-    labOutOfMemory = 1346269*up16(sizeof(int)+sizeof(int)+2*ptr_size())+1024*1024;
+    labOutOfMemory = 1346269*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -407,4 +407,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 6 AVL trees";
 
 int labTimeout = 6000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;

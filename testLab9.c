@@ -144,7 +144,7 @@ static int feederBig(void)
         fprintf(in, "%d %d 1\n", i+1, i+2);
     }
     fclose(in);
-    labOutOfMemory = 5000*5000*4+1024*1024;
+    labOutOfMemory = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -230,7 +230,7 @@ static int feederBig1(void)
     }
     fprintf(in, "5000 1 1\n");
     fclose(in);
-    labOutOfMemory = 5000*5000*4+1024*1024;
+    labOutOfMemory = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -352,7 +352,7 @@ static int feederBig2(void)
     labTimeout = (int)t+6000;
     fflush(stdout);
     fclose(in);
-    labOutOfMemory = 5000*5000*4+1024*1024;
+    labOutOfMemory = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -500,4 +500,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 9 Dijkstra Shortest Path";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;

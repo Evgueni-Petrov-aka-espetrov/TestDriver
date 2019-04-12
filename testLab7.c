@@ -184,7 +184,7 @@ static int feederBig(void)
             fprintf(in, "%d %d\n", i+1, j+1);
     }
     fclose(in);
-    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+1024*1024;
+    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -254,7 +254,7 @@ static int feederBig1(void)
             fprintf(in, "%d %d\n", j+1, i+1);
     }
     fclose(in);
-    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+1024*1024;
+    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -354,4 +354,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 7 Topological Sort";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
