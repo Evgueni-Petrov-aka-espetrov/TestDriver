@@ -9,19 +9,57 @@
 
 static int labDo(char *labExe);
 static int labUserOutOfMemory = -1;
+static int labUserTimeout = -1;
+
+static size_t getLabOutOfMemory(void) {
+	return labUserOutOfMemory < 0 ? labOutOfMemory : (size_t) labUserOutOfMemory;
+}
+
+static int getLabTimeout(void) {
+	return labUserTimeout < 0 ? labTimeout : labUserTimeout;
+}
+
+static const char* getRunnerCommand(const char* runnerExe, const char* labExe) {
+	static char testRunner[4096] = {0};
+	int testRunnerSize = snprintf(
+		testRunner, sizeof(testRunner), "%s -m %zu -t %d -e %s",
+		runnerExe, (getLabOutOfMemory() + 1023) / 1024, getLabTimeout(), labExe);
+	if (testRunnerSize < 0) {
+		fprintf(stderr, "\nInternal error: snprintf returned negative value\n");
+		return NULL;
+	}
+	if (testRunnerSize == sizeof(testRunner) - 1) {
+		fprintf(stderr, "\nInternal error: snprintf stopped at the end of buffer\n");
+		return NULL;
+	}
+	return testRunner;
+}
 
 int main(int argc, char* argv[])
 {
     int i;
-    printf("\nKOI FIT NSU Lab Tester (c) 2009-2014 by Evgueni Petrov\n");
+    const char* runnerExe = argv[0];
 
-    if (argc < 2) {
-        printf("\nUser error: to test mylab.exe do %s mylab.exe\n", argv[0]);
-        return 1;
-    } if (argc == 4 && strcmp(argv[1],"-m") == 0 && atoi(argv[2]) != 0) {
+    if (argc >= 4 && strcmp(argv[1],"-m") == 0 && atoi(argv[2]) != 0) {
         labUserOutOfMemory = atoi(argv[2])*1024;
         argv += 2;
+        argc -= 2;
     }
+	if (argc >= 4 && strcmp(argv[1],"-t") == 0 && atoi(argv[2]) != 0) {
+		labUserTimeout = atoi(argv[2]);
+		argv += 2;
+		argc -= 2;
+	}
+    if (argc >= 3 && strcmp(argv[1], "-e") == 0) {
+        return labDo(argv[2]);
+    }
+
+	printf("\nKOI FIT NSU Lab Tester (c) 2009-2014 by Evgueni Petrov\n");
+
+	if (argc < 2) {
+		printf("\nUser error: to test mylab.exe do %s mylab.exe\n", runnerExe);
+		return 1;
+	}
 
     printf("\nTesting %s...\n", labName);
 
@@ -30,7 +68,11 @@ int main(int argc, char* argv[])
         if (labTests[i].feeder() != 0) {
             break;
         }
-        if (labDo(argv[1]) != 0) {
+        const char* testRunner = getRunnerCommand(runnerExe, argv[1]);
+        if (!testRunner) {
+            break;
+        }
+        if (system(testRunner) != 0) {
             break;
         }
         if (labTests[i].checker() != 0) {
@@ -117,10 +159,10 @@ int labDo(char *labExe)
         0, // SIZE_T                            PeakProcessMemoryUsed;
         0, // SIZE_T                            PeakJobMemoryUsed;
     };
-    labJobLimits.ProcessMemoryLimit = labOutOfMemory;
-    labJobLimits.JobMemoryLimit = labOutOfMemory;
-    labJobLimits.PeakProcessMemoryUsed = labOutOfMemory;
-    labJobLimits.PeakJobMemoryUsed = labOutOfMemory;
+    labJobLimits.ProcessMemoryLimit = getLabOutOfMemory();
+    labJobLimits.JobMemoryLimit = getLabOutOfMemory();
+    labJobLimits.PeakProcessMemoryUsed = getLabOutOfMemory();
+    labJobLimits.PeakJobMemoryUsed = getLabOutOfMemory();
     const HANDLE labJob = CreateJobObject(&labInhertitIO, "labJob");
     size_t labMem0 = SIZE_MAX;
 
@@ -209,7 +251,7 @@ int labDo(char *labExe)
         return 1;
     }
 
-    switch (WaitForSingleObject(labInfo.hProcess, labTimeout)) {
+    switch (WaitForSingleObject(labInfo.hProcess, getLabTimeout())) {
     case WAIT_OBJECT_0:
         {
             DWORD labExit = EXIT_FAILURE;
@@ -225,7 +267,7 @@ int labDo(char *labExe)
             break;
         }
     case WAIT_TIMEOUT:
-        printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(labTimeout-1)/1000);
+        printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(getLabTimeout()-1)/1000);
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     case WAIT_FAILED:
@@ -247,10 +289,8 @@ int labDo(char *labExe)
         //fprintf(stderr, "PeakJobMemoryUsed %d\n", labJobLimits.PeakJobMemoryUsed);
         labMem0 = labJobLimits.PeakProcessMemoryUsed-labMem0;
     }
-    if (exitCode == 0 && labUserOutOfMemory == -1 && (long long)labMem0 > labOutOfMemory) {
-        exitCode = 1, printf("\nExe \"%s\" used %dK > %dK\n", labExe, 1+(labMem0-1)/1024, 1+(labOutOfMemory-1)/1024);
-    } else if (exitCode == 0 && labUserOutOfMemory != -1 && (long long)labMem0 > labUserOutOfMemory) {
-        exitCode = 1, printf("\nExe \"%s\" used %dK > %dK\n", labExe, 1+(labMem0-1)/1024, 1+(labUserOutOfMemory-1)/1024);
+    if (exitCode == 0 && (long long)labMem0 > getLabOutOfMemory()) {
+        exitCode = 1, printf("\nExe \"%s\" used %dK > %dK\n", labExe, 1+(labMem0-1)/1024, 1+(getLabOutOfMemory()-1)/1024);
     }
 
     CloseHandle(labInfo.hThread);
@@ -287,7 +327,7 @@ int labDo(char *labExe)
  */
 static int check_memory(struct rusage rusage, size_t * labMem0) {
     *labMem0 = (size_t) rusage.ru_maxrss * 1024u;
-    if (labOutOfMemory < *labMem0) {
+    if (getLabOutOfMemory() < *labMem0) {
         return 1;
     }
     return 0;
@@ -378,7 +418,7 @@ static int _labDo(char *labExe)
         struct rusage rusage;
         struct timespec rem;
 
-        rem.tv_sec = 1 + (labTimeout - 1) / 1000;
+        rem.tv_sec = 1 + (getLabTimeout() - 1) / 1000;
         rem.tv_nsec = 0;
         status = timed_wait_pid(pid, &status, &rem, &rusage);
         if (-1 == status) {
@@ -389,13 +429,13 @@ static int _labDo(char *labExe)
                 printf("\nSystem error: \"%s\" in kill\n", strerror(errno));
                 return exitCode;
             }
-            printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(labTimeout-1)/1000);
+            printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(getLabTimeout()-1)/1000);
             return exitCode;
         } else {
             size_t labMem0 = 0;
 
             if (check_memory(rusage, &labMem0)) {
-                printf("\nExe \"%s\" used %luK > %luK\n", labExe, 1+(labMem0-1)/1024, 1+(labOutOfMemory-1)/1024); //?!
+                printf("\nExe \"%s\" used %luK > %luK\n", labExe, 1+(labMem0-1)/1024, 1+(getLabOutOfMemory()-1)/1024);
                 return exitCode;
             } else {
                 exitCode = 0;
