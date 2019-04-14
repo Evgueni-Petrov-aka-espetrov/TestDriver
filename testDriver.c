@@ -362,8 +362,14 @@ static int _labDo(char *labExe)
     } else if (!pid) {
         int ret = 0;
 
-        freopen("in.txt", "r", stdin);
-        freopen("out.txt", "w", stdout);
+        if (!freopen("in.txt", "r", stdin)) {
+	    fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
+	    exit(EXIT_FAILURE);
+	}
+        if (!freopen("out.txt", "w", stdout)) {
+	    fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
+	    exit(EXIT_FAILURE);
+	}
         ret = execl(labExe, labExe, NULL);
         if (-1 == ret) {
             fprintf(stderr, "\nSystem error: \"%s\" in execl\n", strerror(errno));
