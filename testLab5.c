@@ -67,7 +67,7 @@ static int checkerN(void)
         return -1;
     }
     if (testN%2 == 0) { // check the compression ratio is matched
-	size_t maxLenZipped = (size_t)(ceil(testIn[testN/2].nIn*testIn[testN/2].nBits/8)+testIn[testN/2].header);
+        size_t maxLenZipped = (size_t)(ceil(testIn[testN/2].nIn*testIn[testN/2].nBits/8)+testIn[testN/2].header);
         lenZipped = fread(zipped, 1, maxLenZipped+1, out);
         if (lenZipped > maxLenZipped) {
             passed = 0;

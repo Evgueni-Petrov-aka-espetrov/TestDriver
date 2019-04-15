@@ -12,27 +12,27 @@ static int labUserOutOfMemory = -1;
 static int labUserTimeout = -1;
 
 static size_t getLabOutOfMemory(void) {
-	return labUserOutOfMemory < 0 ? labOutOfMemory : (size_t) labUserOutOfMemory;
+    return labUserOutOfMemory < 0 ? labOutOfMemory : (size_t) labUserOutOfMemory;
 }
 
 static int getLabTimeout(void) {
-	return labUserTimeout < 0 ? labTimeout : labUserTimeout;
+    return labUserTimeout < 0 ? labTimeout : labUserTimeout;
 }
 
 static const char* getRunnerCommand(const char* runnerExe, const char* labExe) {
-	static char testRunner[4096] = {0};
-	int testRunnerSize = snprintf(
-		testRunner, sizeof(testRunner), "%s -m %zu -t %d -e %s",
-		runnerExe, (getLabOutOfMemory() + 1023) / 1024, getLabTimeout(), labExe);
-	if (testRunnerSize < 0) {
-		fprintf(stderr, "\nInternal error: snprintf returned negative value\n");
-		return NULL;
-	}
-	if (testRunnerSize == sizeof(testRunner) - 1) {
-		fprintf(stderr, "\nInternal error: snprintf stopped at the end of buffer\n");
-		return NULL;
-	}
-	return testRunner;
+    static char testRunner[4096] = {0};
+    int testRunnerSize = snprintf(
+        testRunner, sizeof(testRunner), "%s -m %zu -t %d -e %s",
+        runnerExe, (getLabOutOfMemory() + 1023) / 1024, getLabTimeout(), labExe);
+    if (testRunnerSize < 0) {
+        fprintf(stderr, "\nInternal error: snprintf returned negative value\n");
+        return NULL;
+    }
+    if (testRunnerSize == sizeof(testRunner) - 1) {
+        fprintf(stderr, "\nInternal error: snprintf stopped at the end of buffer\n");
+        return NULL;
+    }
+    return testRunner;
 }
 
 int main(int argc, char* argv[])
@@ -45,21 +45,21 @@ int main(int argc, char* argv[])
         argv += 2;
         argc -= 2;
     }
-	if (argc >= 4 && strcmp(argv[1],"-t") == 0 && atoi(argv[2]) != 0) {
-		labUserTimeout = atoi(argv[2]);
-		argv += 2;
-		argc -= 2;
-	}
+    if (argc >= 4 && strcmp(argv[1],"-t") == 0 && atoi(argv[2]) != 0) {
+        labUserTimeout = atoi(argv[2]);
+        argv += 2;
+        argc -= 2;
+    }
     if (argc >= 3 && strcmp(argv[1], "-e") == 0) {
         return labDo(argv[2]);
     }
 
-	printf("\nKOI FIT NSU Lab Tester (c) 2009-2014 by Evgueni Petrov\n");
+    printf("\nKOI FIT NSU Lab Tester (c) 2009-2014 by Evgueni Petrov\n");
 
-	if (argc < 2) {
-		printf("\nUser error: to test mylab.exe do %s mylab.exe\n", runnerExe);
-		return 1;
-	}
+    if (argc < 2) {
+        printf("\nUser error: to test mylab.exe do %s mylab.exe\n", runnerExe);
+        return 1;
+    }
 
     printf("\nTesting %s...\n", labName);
 
@@ -130,9 +130,9 @@ int labDo(char *labExe)
         0, // WORD   wShowWindow; ignored, see dwFlags
         0, // WORD   cbReserved2; must be 0, see MSDN
         NULL, // LPBYTE lpReserved2; must be NULL, see MSDN
-	NULL,
-	NULL,
-	NULL,
+        NULL,
+        NULL,
+        NULL,
     };
     labStartup.hStdInput = labIn; // lab stdin is in.txt
     labStartup.hStdOutput = labOut; // lab stdout is out.txt
@@ -141,8 +141,8 @@ int labDo(char *labExe)
     int exitCode = 1;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION labJobLimits = {
         { // JOBOBJECT_BASIC_LIMIT_INFORMATION
-		{.QuadPart = 0}, // ignored -- LARGE_INTEGER PerProcessUserTimeLimit;
-		{.QuadPart = 0}, // ignored -- LARGE_INTEGER PerJobUserTimeLimit;
+        {.QuadPart = 0}, // ignored -- LARGE_INTEGER PerProcessUserTimeLimit;
+        {.QuadPart = 0}, // ignored -- LARGE_INTEGER PerJobUserTimeLimit;
                 JOB_OBJECT_LIMIT_PROCESS_MEMORY
                 +JOB_OBJECT_LIMIT_JOB_MEMORY
                 +JOB_OBJECT_LIMIT_ACTIVE_PROCESS, // DWORD         LimitFlags;
@@ -153,7 +153,7 @@ int labDo(char *labExe)
                 0, // ignored -- DWORD         PriorityClass;
                 0, // ignored -- DWORD         SchedulingClass;
         }, // JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
-	{0}, // reserved --- IO_COUNTERS                       IoInfo;
+        {0}, // reserved --- IO_COUNTERS                       IoInfo;
         0, // SIZE_T                            ProcessMemoryLimit;
         0, // SIZE_T                            JobMemoryLimit;
         0, // SIZE_T                            PeakProcessMemoryUsed;
@@ -352,13 +352,13 @@ static int labDo(char *labExe) {
     // Не используем SA_RESETHAND, чтобы не зависеть от использования fork вне labDo
     new.sa_flags = SA_NOCLDSTOP;
     if (sigaction(SIGCHLD, &new, &old)) {
-        perror("sigaction set failed");
+        fprintf(stderr, "\nSystem error: \"%s\" in sigaction set\n", strerror(errno));
         return -1;
     }
 
     int ret_code = _labDo(labExe);
     if (sigaction(SIGCHLD, &old, NULL)) {
-        perror("sigaction restore failed");
+        fprintf(stderr, "\nSystem error: \"%s\" in sigaction restore\n", strerror(errno));
         return -1;
     }
 
@@ -368,13 +368,13 @@ static int labDo(char *labExe) {
 static int timed_wait_pid(pid_t pid, int* status, struct timespec* ts, struct rusage* rusage) {
     while (ts->tv_sec > 0 || ts->tv_nsec > 0) {
         pid_t child = wait4(pid, status, WNOHANG, rusage);
-	if (child) {
+        if (child) {
             return child;
-	}
+        }
         if (!nanosleep(ts, ts)) {
             return 0;
-	}
-	if (errno != EINTR) {
+        }
+        if (errno != EINTR) {
             return -1;
         }
     }
@@ -399,13 +399,13 @@ static int _labDo(char *labExe)
         int ret = 0;
 
         if (!freopen("in.txt", "r", stdin)) {
-	    fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
-	    exit(EXIT_FAILURE);
-	}
+            fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
         if (!freopen("out.txt", "w", stdout)) {
-	    fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
-	    exit(EXIT_FAILURE);
-	}
+            fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
         ret = execl(labExe, labExe, NULL);
         if (-1 == ret) {
             fprintf(stderr, "\nSystem error: \"%s\" in execl\n", strerror(errno));
