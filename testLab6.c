@@ -1,8 +1,9 @@
 #include "testLab.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-static int ptr_size(void )
+static size_t ptr_size(void )
 {
     static int x64 = -1;
     if (x64 == -1)
@@ -10,10 +11,10 @@ static int ptr_size(void )
         char *cpu = getenv("PROCESSOR_IDENTIFIER");
         x64 = cpu ? strstr(cpu, "x86") == NULL : 1;
     }
-    return sizeof(int)*(x64+1);
+    return sizeof(int)*(size_t)(x64+1);
 }
 
-static int up16(int n)
+static size_t up16(size_t n)
 {
     return (1+(n-1)/16)*16;
 }
@@ -141,7 +142,7 @@ static int feederBig(void)
     fprintf(in, "\n");
     fclose(in);
     {
-        labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+1024*1024;
+        labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
     }
     return 0;
 }
@@ -193,7 +194,7 @@ static int checkerBig(void)
 static int feederBig1(void)
 {
     FILE *const in = fopen("in.txt", "w+");
-    int i;
+    unsigned i;
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
@@ -208,7 +209,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+1024*1024;
+    labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -307,7 +308,7 @@ static int feederBig2(void)
     genTree(in, 30, 0, 4000000);
     fprintf(in, "\n");
     fclose(in);
-    labOutOfMemory = 1346269*up16(sizeof(int)+sizeof(int)+2*ptr_size())+1024*1024;
+    labOutOfMemory = 1346269*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -406,4 +407,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 6 AVL trees";
 
 int labTimeout = 6000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;

@@ -1,16 +1,19 @@
 #include "testLab.h"
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
 enum testConst { N_MAX = 5000 };
 static int testN = 0;
-struct edge {int a, b; __int64 abL;};
+struct edge {int a, b; int64_t abL;};
 static const struct {
     int N, M;
     struct edge G[8];
     const char *msg;
-    __int64 L;
+    int64_t L;
 } testInOut[] = {
     {3, 3, {{1, 2, 10}, {2, 3, 5}, {3, 1, 5}}, NULL, 10},
     {3, 1, {{1, 2, 10}}, "no spanning tree"},
@@ -22,16 +25,16 @@ static const struct {
     {2, 1, {{1, 2, -1}}, "bad length"},
 
     {2, 0, {{0}}, "no spanning tree"},
-    {2, 1, {{1, 2, (__int64)4*INT_MAX}}, "bad length"},
+    {2, 1, {{1, 2, (int64_t)4*INT_MAX}}, "bad length"},
     {4, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, "no spanning tree"},
     {2, 1, {{1, 1, INT_MAX}}, "no spanning tree"},
 
     {1, 0, {{0}}, NULL, 0},
     {4, 4, {{1, 2, 1}, {2, 3, 2}, {3, 4, 4}, {4, 1, 8}}, NULL, 7},
-    {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (__int64)2*INT_MAX},
-    {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (__int64)1+INT_MAX},
+    {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (int64_t)2*INT_MAX},
+    {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (int64_t)1+INT_MAX},
 
-    {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (__int64)3*INT_MAX},
+    {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (int64_t)3*INT_MAX},
     {4, 4, {{1, 2, 1}, {2, 3, 1}, {3, 4, 1}, {4, 1, 1}}, NULL, 3},
     {5, 4, {{1, 2, 1}, {2, 3, 1}, {3, 1, 1}, {4, 3, 1}}, "no spanning tree"},
     {4, 6, {{1, 2, 1}, {1, 3, 2}, {1, 4, 4}, {2, 3, 8}, {2, 4, 16}, {3, 4, 32}}, NULL, 7},
@@ -58,7 +61,7 @@ static int feederN(void)
     }
     fprintf(in, "%d\n%d\n", testInOut[testN].N, testInOut[testN].M);
     for (i = 0; i < testInOut[testN].M && testInOut[testN].G[i].a != 0; i++) {
-        fprintf(in, "%d %d %" LONG_LONG_MODIFIER "d\n",
+        fprintf(in, "%d %d %" PRIi64 "\n",
             testInOut[testN].G[i].a, testInOut[testN].G[i].b, testInOut[testN].G[i].abL);
     }
     fclose(in);
@@ -109,7 +112,7 @@ static int checkerN(void)
         } else {
             if (strchr(bufMsg, '\n'))
                 *strchr(bufMsg, '\n') = 0;
-            if (strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
+            if (_strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
                 printf("wrong output -- ");
                 fact = fail;
             }
@@ -117,7 +120,7 @@ static int checkerN(void)
     } else { // test spanning tree
         int i, N = testInOut[testN].N;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b);
@@ -191,7 +194,7 @@ static int feederBig(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX, 1, N_MAX);
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -208,7 +211,7 @@ static int checkerBig(void)
     { // test spanning tree
         int i, N = N_MAX;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b);
@@ -289,7 +292,7 @@ static int feederBig1(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, 2*N_MAX-2); // reach 5000
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -310,7 +313,7 @@ static int feederBig10(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX, N_MAX-1, 2*N_MAX-2); // reach 5000
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -360,7 +363,7 @@ static int checkerBig1(void)
     { // test spanning tree
         int i, N = N_MAX;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b), abL;
@@ -451,11 +454,11 @@ static int feederBig2(void)
     }
     fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, N_MAX); // reach N_MAX
     tStart = (tickDifference(tStart, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout T+3... ", tStart/1000);
-    labTimeout = tStart+3000;
+    printf("done in T=%u seconds. Starting exe with timeout T+3... ", (unsigned)tStart/1000);
+    labTimeout = (int)tStart+3000;
     fflush(stdout);
     fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+1024*1024;
+    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -472,7 +475,7 @@ static int checkerBig2(void)
     { // test spanning tree
         int i, N = N_MAX;
         int parent[N_MAX];
-        __int64 L = 0;
+        int64_t L = 0;
         for (i = 0; i < N; i++) parent[i] = i;
         for (i = 0; i < N-1; i++) {
             int a, b, status = fscanf(out, "%d%d", &a, &b);
@@ -586,5 +589,5 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 8-x Kruskal or Prim Shortest Spanning Tree";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
 

@@ -68,7 +68,7 @@ static int checkerN(void)
     if (strchr(buf, '.'))
         strncpy(buf+strlen(buf), "0000""0000""0000""0000""0000""0000""0000""0000", sizeof(buf)-strlen(buf)-1);
     //printf("%s %s\n", testInOut[testN].out, buf);
-    if (strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0) {
+    if (_strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0) {
         printf("PASSED\n");
         testN++;
         return 0;
@@ -119,4 +119,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 0 Number Systems";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;

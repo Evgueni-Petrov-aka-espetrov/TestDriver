@@ -1,7 +1,8 @@
 #include "testLab.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-static int ptr_size(void)
+static size_t ptr_size(void)
 {
     static int x64 = -1;
     if (x64 == -1)
@@ -9,10 +10,10 @@ static int ptr_size(void)
         char *cpu = getenv("PROCESSOR_IDENTIFIER");
         x64 = cpu ? strstr(cpu, "x86") == NULL : 1;
     }
-    return sizeof(int)*(x64+1);
+    return sizeof(int)*(size_t)(x64+1);
 }
 
-static int up16(int n)
+static size_t up16(size_t n)
 {
     return (1+(n-1)/16)*16;
 }
@@ -26,24 +27,24 @@ static const struct {
 } testInOut[] = {
     {3, 2, {{1, 2}, {1, 3}}, NULL},
     {3, 3, {{1, 2}, {2, 3}, {3, 1}}, "impossible to sort"}, // 123
-    {4, -1, {0}, "bad number of lines"},
+    {4, -1, {{0}}, "bad number of lines"},
     {3, 3, {{1, 2}, {1, 3}, {2, 3}}, NULL}, // 123
     {3, 3, {{1, 3}, {1, 2}, {3, 2}}, NULL}, // 132
     {3, 3, {{2, 1}, {2, 3}, {1, 3}}, NULL}, // 213
     {3, 3, {{2, 3}, {2, 1}, {3, 1}}, NULL}, // 231
     {3, 3, {{3, 1}, {3, 2}, {1, 2}}, NULL}, // 312
     {3, 3, {{3, 2}, {3, 1}, {2, 1}}, NULL}, // 321
-    {-1, -1, {0}, "bad number of lines"},
+    {-1, -1, {{0}}, "bad number of lines"},
     {3, 3, {{1, 3}, {3, 2}, {2, 1}}, "impossible to sort"}, // 132
     {3, 3, {{2, 1}, {1, 3}, {3, 2}}, "impossible to sort"}, // 213
     {3, 3, {{2, 3}, {3, 1}, {1, 2}}, "impossible to sort"}, // 231
     {3, 3, {{3, 1}, {1, 2}, {2, 3}}, "impossible to sort"}, // 312
     {3, 3, {{3, 2}, {2, 1}, {1, 3}}, "impossible to sort"}, // 321
-    {2, 1, {0}, "bad number of lines"},
+    {2, 1, {{0}}, "bad number of lines"},
     {N_MAX, 1, {{N_MAX-1, N_MAX}}, NULL},
-    {N_MAX, 0, {0}, NULL},
+    {N_MAX, 0, {{0}}, NULL},
     {N_MAX+1, 1, {{1, 1}}, "bad number of vertices"},
-    {0, 1, {0}, "bad number of edges"},
+    {0, 1, {{0}}, "bad number of edges"},
     {4, 6, {{1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4}}, NULL},
     {4, 4, {{1, 2}, {2, 3}, {1, 3}, {4, 3}}, NULL},
     {2, 4, {{1, 1}, {1, 2}, {2, 1}, {2, 2}}, "bad number of edges"},
@@ -101,7 +102,7 @@ static int checkerN(void)
         } else {
             if (strchr(bufMsg, '\n'))
                 *strchr(bufMsg, '\n') = 0;
-            if (strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
+            if (_strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
                 printf("wrong output -- ");
                 fact = fail;
             }
@@ -128,7 +129,7 @@ static int checkerN(void)
             sorted[i].jobN = i;
         }
         if (fact == pass) {
-            qsort(sorted, N, sizeof(struct {int job, jobN;}), job_compare); 
+            qsort(sorted, (size_t)N, sizeof(struct {int job, jobN;}), job_compare); 
             for (i = 0; i < N; i++) {
                 if (sorted[i].job != i) {
                     printf("wrong output -- ");
@@ -183,7 +184,7 @@ static int feederBig(void)
             fprintf(in, "%d %d\n", i+1, j+1);
     }
     fclose(in);
-    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+1024*1024;
+    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -253,7 +254,7 @@ static int feederBig1(void)
             fprintf(in, "%d %d\n", j+1, i+1);
     }
     fclose(in);
-    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+1024*1024;
+    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -353,4 +354,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 7 Topological Sort";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;

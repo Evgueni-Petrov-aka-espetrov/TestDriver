@@ -1,5 +1,6 @@
 #include "testLab.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -22,8 +23,8 @@ static const struct {const char *const in; size_t nIn; double nBits; int header;
     {"z", 1, 1, 4+2+100}, // 5 6
     {"zz", 2, 1, 4+2+100}, // 7 8
     {"zzzz", 4, 1, 4+2+100}, // 9 10
-    {"ÿÿÿÿ", 4, 1, 4+2+100}, // 11 12
-    {"zzzzÿÿÿÿ", 8, 1, 4+3+100}, // 13 14
+    {"\xFF\xFF\xFF\xFF", 4, 1, 4+2+100}, // 11 12
+    {"zzzz\xFF\xFF\xFF\xFF", 8, 1, 4+3+100}, // 13 14
     {"\n\r\n\r", 4, 1, 4+3+100}, // 15 16
     {"\r\n\r\n", 4, 1, 4+3+100}, // 17 18
     {"\n\n\n\n", 4, 1, 4+3+100}, // 19 20
@@ -66,8 +67,9 @@ static int checkerN(void)
         return -1;
     }
     if (testN%2 == 0) { // check the compression ratio is matched
-        lenZipped = fread(zipped, 1, ceil(testIn[testN/2].nIn*testIn[testN/2].nBits/8)+testIn[testN/2].header+1, out);
-        if (lenZipped > ceil(testIn[testN/2].nIn*testIn[testN/2].nBits/8)+testIn[testN/2].header) {
+        size_t maxLenZipped = (size_t)(ceil(testIn[testN/2].nIn*testIn[testN/2].nBits/8)+testIn[testN/2].header);
+        lenZipped = fread(zipped, 1, maxLenZipped+1, out);
+        if (lenZipped > maxLenZipped) {
             passed = 0;
             printf("output is too long -- ");
         }
@@ -96,10 +98,10 @@ static int checkerN(void)
     }
 }
 
-static int big1N = 16;
-static int fib(int n)
+static unsigned big1N = 16;
+static unsigned fib(unsigned n)
 {
-    static int f[128] = {1, 1};
+    static unsigned f[128] = {1, 1};
     if (n >= sizeof(f)/sizeof(f[0])) {
         printf("Tester error: out of range in fib\n");
         exit(1);
@@ -116,7 +118,7 @@ static int feederBig1(void)
     if (!in) {
         error = 1;
     } else if (testN%2 == 0) { // ask to compress data
-        char c;
+        unsigned char c;
         error = EOF == fprintf(in, "c\r\n");
         for (c = 0; !error && c < big1N; c++) {
             memset(zipped, c, fib(c));
@@ -144,8 +146,8 @@ static int checkerBig1(void)
         return -1;
     }
     if (testN%2 == 0) { // check the compression ratio is matched
-        char c;
-        int bits = fib(0)*(big1N-1);
+        unsigned char c;
+        unsigned bits = fib(0)*(big1N-1);
         for (c = 1; c < big1N; c++)
             bits += fib(c)*(big1N-c);
         lenZipped = fread(zipped, 1, (bits+7)/8+4+(10*big1N+7)/8+1+100, out);
@@ -155,7 +157,7 @@ static int checkerBig1(void)
             printf("output is too long -- ");
         }
     } else { // check that compress+decompress doesn't corrupt the data
-        const int nIn = fib(big1N+1)-1;
+        const unsigned nIn = fib(big1N+1)-1;
         const size_t nOut = fread(zipped, 1, nIn+1, out);
         if (nOut < nIn) {
             passed = 0;
@@ -165,9 +167,9 @@ static int checkerBig1(void)
             printf("output is too long -- ");
         } else {
             int z = 0;
-            char c;
+            unsigned char c;
             for (c = 0; passed && c < big1N; c++) {
-                int i;
+                unsigned int i;
                 for (i = 0; passed && i < fib(c); i++)
                     passed = zipped[z++] == c;
             }
@@ -203,7 +205,7 @@ static int feederBig2(void)
         int i;
         error = EOF == fprintf(in, "c\r\n");
         for (i = 0; !error && i < 256*256; i++) {
-            const char c = i & 0xff;
+            const unsigned char c = i & 0xff;
             error |= fwrite(&c, 1, 1, in) < 1;
         }
     } else { // ask to decompress compressed data
@@ -377,4 +379,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 5 Huffman";
 
 int labTimeout = 6000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;

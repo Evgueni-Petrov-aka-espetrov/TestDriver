@@ -113,7 +113,7 @@ static int checkerN(void)
     fclose(out);
     if (strchr(buf, '\n'))
         *strchr(buf, '\n') = 0;
-    passed = strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0;
+    passed = _strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0;
     if (passed) {
         while (1) {
             char ignored;
@@ -179,4 +179,4 @@ const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 const char labName[] = "Lab 4 Calc";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024*2;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES*2;
