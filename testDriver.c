@@ -325,8 +325,16 @@ int labDo(char *labExe)
  * Проверяем кол-во использованной памяти.
  * Закрываемся.
  */
+
+#ifdef __APPLE__
+// https://unix.stackexchange.com/questions/30940/getrusage-system-call-what-is-maximum-resident-set-size#comment552809_30940
+#define RU_MAXRSS_UNITS 1u
+#else
+#define RU_MAXRSS_UNITS 1024u
+#endif
+
 static int check_memory(struct rusage rusage, size_t * labMem0) {
-    *labMem0 = (size_t) rusage.ru_maxrss * 1024u;
+    *labMem0 = (size_t) rusage.ru_maxrss * RU_MAXRSS_UNITS;
     if (getLabOutOfMemory() < *labMem0) {
         return 1;
     }
