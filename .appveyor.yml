@@ -55,9 +55,9 @@ test_script:
     - sh: cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test
 
 artifacts:
-    - path:testlab_win.zip
+    - path: testlab_win.zip
       name: TestLabForWindows
-    - path:testlab_lnx.zip
+    - path: testlab_lnx.zip
       name: TestLabForLinux
 
 #deploy:
