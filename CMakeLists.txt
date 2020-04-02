@@ -74,7 +74,7 @@ foreach(source ${TEST_LAB_SOURCES})
 	set_compiler_settings(${target} EXTENSIONS NO)
 	target_link_libraries(${target} PRIVATE testDriver)
 
-	string(REPLACE "testLab" "lab" test ${target})
+	string(REPLACE "testlab" "lab" test ${target})
 	add_test(NAME ${test}
 		COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${target}"
 		        "${CMAKE_CURRENT_SOURCE_DIR}/test/${test}$<$<BOOL:${WIN32}>:.exe>")
