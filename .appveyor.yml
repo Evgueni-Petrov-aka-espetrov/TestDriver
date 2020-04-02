@@ -47,7 +47,7 @@ build_script:
     - cmd: cmake --build build --config Release
     - cmd: 7z a testlab_win.zip %APPVEYOR_BUILD_FOLDER%\build\Release\*.exe
     - sh: cmake --build build
-    - sh: 7z a testlab_win.zip ${APPVEYOR_BUILD_FOLDER}/build/Release/*
+    - sh: 7z a testlab_lnx.zip ${APPVEYOR_BUILD_FOLDER}/build/*
 
 test_script:
     # скрипт тестирования проекта:
