@@ -45,16 +45,18 @@ before_build:
 build_script:
     # скрипт сборки проекта:
     - cmd: cmake --build build --config Release
+    - cmd: 7z a testlab_win.zip %APPVEYOR_BUILD_FOLDER%\build\Release\*.exe
     - sh: cmake --build build
+    - sh: 7z a testlab_win.zip ${APPVEYOR_BUILD_FOLDER}/build/Release/*
 
 test_script:
     # скрипт тестирования проекта:
     - cmd: cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --config Release --target RUN_TESTS
     - sh: cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test
 
-#artifacts:
-#    - path: <local-package-path>
-#      name: package_name
+artifacts:
+    - testlab_win.zip
+    - testlab_lnx.zip
 
 #deploy:
 #    # выкладываем tagged-коммиты на GitHub Releases:
