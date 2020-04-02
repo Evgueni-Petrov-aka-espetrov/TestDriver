@@ -4,24 +4,24 @@
 
 static int testN = 0;
 static const struct {const char *const in; int n, out[32];} testInOut[] = {
-    {"example\nthis is simple example", 8, {1577, 16, 17, 18, 19, 20, 21, 22}},
-    {"x\n", 1, {0}},
-    {"0123456789abcdef\n0123456789abcdef", 17, {11589501, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}},
-    {"0123\n01230123", 9, {21, 1, 2, 3, 4, 5, 6, 7, 8}},
-    {"0123\n0123x0123", 9, {21, 1, 2, 3, 4, 6, 7, 8, 9}},
-    {"0123\n012300123", 9, {21, 1, 2, 3, 4, 6, 7, 8, 9}},
-    {"0123\n012310123", 9, {21, 1, 2, 3, 4, 6, 7, 8, 9}},
-    {"0123\n012320123", 9, {21, 1, 2, 3, 4, 6, 7, 8, 9}},
-    {"0123\n012330123", 9, {21, 1, 2, 3, 4, 6, 7, 8, 9}},
-    {"0123\n01220123", 5, {21, 5, 6, 7, 8}},
-    {"0123\n01210123", 5, {21, 5, 6, 7, 8}},
-    {"0123\n01200123", 9, {21, 1, 2, 3, 4, 5, 6, 7, 8}},
-    {"àáâã\nàáâãàáâã", 9, {65, 1, 2, 3, 4, 5, 6, 7, 8}},
-    {"àá âã\nàá âãàáâã", 6, {209, 1, 2, 3, 4, 5}},
-    {"àá âã\nàáâã\nàá âã", 6, {209, 6, 7, 8, 9, 10}},
-    {"0123\n31230123", 6, {21, 1, 5, 6, 7, 8}},
-    {"0123\n21230123", 5, {21, 5, 6, 7, 8}},
-    {"0123\n11230123", 5, {21, 5, 6, 7, 8}}
+    {"example\nthis is simple example", 14, {7, 14, 13, 12, 11, 10, 20, 22, 21, 20, 19, 18, 17, 16}},
+    {"x\n", 0, {0}},
+    {"0123456789abcdef\n0123456789abcdef", 16, {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}},
+    {"0123\n01230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
+    {"0123\n0123x0123", 9, {4, 3, 2, 1, 8, 9, 8, 7, 6}},
+    {"0123\n012300123", 9, {4, 3, 2, 1, 8, 9, 8, 7, 6}},
+    {"0123\n012310123", 9, {4, 3, 2, 1, 8, 9, 8, 7, 6}},
+    {"0123\n012320123", 9, {4, 3, 2, 1, 8, 9, 8, 7, 6}},
+    {"0123\n012330123", 9, {4, 3, 2, 1, 8, 9, 8, 7, 6}},
+    {"0123\n01220123", 6, {4, 5, 8, 7, 6, 5}},
+    {"0123\n01210123", 6, {4, 6, 8, 7, 6, 5}},
+    {"0123\n01200123", 6, {4, 7, 8, 7, 6, 5}},
+    {"\xE0\xE1\xE2\xE3\n\xE0\xE1\xE2\xE3\xE0\xE1\xE2\xE3", 8, {4, 3, 2, 1, 8, 7, 6, 5}}, // Ð°Ð±Ð²Ð³\nÐ°Ð±Ð²Ð³Ð°Ð±Ð²Ð³
+    {"\xE0\xE1 \xE2\xE3\n\xE0\xE1 \xE2\xE3\xE0\xE1\xE2\xE3", 5, {5, 4, 3, 2, 1}}, // Ð°Ð± Ð²Ð³\nÐ°Ð± Ð²Ð³Ð°Ð±Ð²Ð³
+    {"\xE0\xE1 \xE2\xE3\n\xE0\xE1\xE2\xE3\n\xE0\xE1 \xE2\xE3", 6, {5, 10, 9, 8, 7, 6}}, // Ð°Ð± Ð²Ð³\nÐ°Ð±Ð²Ð³\nÐ°Ð± Ð²Ð³
+    {"0123\n31230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
+    {"0123\n21230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
+    {"0123\n11230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}}
 };
 
 static int feederN(void)
@@ -61,7 +61,7 @@ static int checkerN(void)
             break;
         }
     }
-    if (i >= testInOut[testN].n) {
+    if (passed) {
         while (1) {
             char ignored;
             if (fscanf(out, "%c", &ignored) == EOF)
@@ -106,8 +106,8 @@ static int feederBig(void)
         }
     fprintf(in, "0123456789abcdef");
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout 2*T... ", t/1000);
-    labTimeout = 2*t;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
+    labTimeout = (int)t*2;
     fflush(stdout);
     fclose(in);
     return 0;
@@ -117,17 +117,12 @@ static int checkerBig(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i, passed = 1;
-    const int bigOut[] = {
-        11589501, 134217713, 134217714, 134217715, 134217716, 134217717,
-        134217718, 134217719, 134217720, 134217721, 134217722, 134217723,
-        134217724, 134217725, 134217726, 134217727, 134217728
-    };
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
-    for (i = 0; i < sizeof(bigOut)/sizeof(bigOut[0]); i++) {
+    for (i = 16; i < 1024*1024*8*16; i += 16) {
         int n, nStatus = fscanf(out, "%d", &n);
         if (EOF == nStatus) {
             passed = 0;
@@ -137,10 +132,28 @@ static int checkerBig(void)
             passed = 0;
             printf("bad format -- ");
             break;
-        } else if (bigOut[i] != n) {
+        } else if (i != n) {
             passed = 0;
             printf("wrong output -- ");
             break;
+        }
+    }
+    if (passed) {
+        for (; i > 1024*1024*8*16-16; i--) {
+            int n, nStatus = fscanf(out, "%d", &n);
+            if (EOF == nStatus) {
+                passed = 0;
+                printf("output too short -- ");
+                break;
+            } else if (1 != nStatus) {
+                passed = 0;
+                printf("bad format -- ");
+                break;
+            } else if (i != n) {
+                passed = 0;
+                printf("wrong output -- ");
+                break;
+            }
         }
     }
     if (passed) {
@@ -191,8 +204,8 @@ const struct labFeedAndCheck labTests[] = {
 
 const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
 
-const char labName[] = "Lab 1-1 Rabin-Karp";
+const char labName[] = "Lab 1-0 Boyer-Moore";
 
 int labTimeout = 3000;
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
 

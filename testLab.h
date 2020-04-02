@@ -10,27 +10,40 @@ extern const char labName[];
 extern int labTimeout;
 extern size_t labOutOfMemory;
 
+// MIN_PROCESS_RSS_BYTES IS CHANGED
+// Before: (1024*1024*sizeof(void*)/4)
+// Doubling MIN_PROCESS_RSS_BYTES is humane solution
+// that helps people with VS Debug builds, self-written libraries, very old (or very new) compilers.
+// Also there is no way to abuse it (no proofs for this statement yet)
+#define MIN_PROCESS_RSS_BYTES (1024*1024*sizeof(void*)/2)
+
+
 #ifdef _WIN32
 // Helpers for Windows
-#define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
-#define LONG_LONG_MODIFIER "I64"
-#else
-// Helpers and compatibility for Linux
-#define LONG_LONG_MODIFIER "ll"
-#define strnicmp(a, b, c) strncasecmp((a), (b), (c))
-#include <sys/time.h>
-typedef unsigned int DWORD;
-static DWORD GetTickCount(void)
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return(tv.tv_sec*1000+tv.tv_sec/1000);
-}
-#endif /* _WIN32 */
 
-static unsigned int tickDifference(unsigned int start, unsigned int finish)
+inline unsigned int tickDifference(unsigned int start, unsigned int finish)
 {
     return finish-start;
 }
+
+#else
+// Helpers and compatibility for Linux
+#include <strings.h>
+#define _strnicmp(a, b, c) strncasecmp((a), (b), (c))
+#include <stdint.h>
+#include <sys/time.h>
+typedef uint32_t DWORD;
+static inline DWORD GetTickCount(void)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (DWORD)(tv.tv_sec*1000+tv.tv_usec/1000);
+}
+
+static inline unsigned int tickDifference(unsigned int start, unsigned int finish)
+{
+    return finish-start;
+}
+#endif
 #endif /* labreporter */

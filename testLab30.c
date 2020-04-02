@@ -130,17 +130,17 @@ static int feederBig(void)
     fprintf(in, "\n");
     fclose(in);
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout 2*T+3... ", t/1000);
-    labTimeout = 2*t+3000;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
+    labTimeout = (int)t*2+3000;
     fflush(stdout);
-    labOutOfMemory = 1024*1024+4*2000000;
+    labOutOfMemory = MIN_PROCESS_RSS_BYTES+4*2000000;
     return 0;
 }
 
 static int checkerBig(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    int i, passed = 1, last;
+    int i, passed = 1, last = 0;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
@@ -216,10 +216,10 @@ static int feederBig2(void)
     fprintf(in, "\n");
     fclose(in);
     t = (tickDifference(t, GetTickCount())+999)/1000*1000;
-    printf("done in T=%d seconds. Starting exe with timeout 2*T+3... ", t/1000);
-    labTimeout = 2*t+3000;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
+    labTimeout = (int)t*2+3000;
     fflush(stdout);
-    labOutOfMemory = 1024*1024+4*2000000;
+    labOutOfMemory = MIN_PROCESS_RSS_BYTES+4*2000000;
     return 0;
 }
 
@@ -323,4 +323,4 @@ const char labName[] = "Lab 3-x Quick Sort or Heap Sort";
 
 int labTimeout = 3000;
 
-size_t labOutOfMemory = 1024*1024;
+size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
