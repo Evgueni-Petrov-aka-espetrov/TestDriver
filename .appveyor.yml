@@ -45,9 +45,9 @@ before_build:
 build_script:
     # скрипт сборки проекта:
     - cmd: cmake --build build --config Release
-    - cmd: 7z a testlab_win.zip %APPVEYOR_BUILD_FOLDER%\build\Release\*.exe
+    - cmd: 7z a testlab_win.zip %APPVEYOR_BUILD_FOLDER%\build\Release\testlab*.exe
     - sh: cmake --build build
-    - sh: 7z a testlab_lnx.zip ${APPVEYOR_BUILD_FOLDER}/build/*
+    - sh: 7z a testlab_lnx.zip ${APPVEYOR_BUILD_FOLDER}/build/testlab*
 
 test_script:
     # скрипт тестирования проекта:

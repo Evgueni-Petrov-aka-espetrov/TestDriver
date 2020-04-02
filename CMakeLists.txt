@@ -56,17 +56,17 @@ add_library(testDriver testDriver.c)
 set_compiler_settings(testDriver EXTENSIONS YES)
 
 set(TEST_LAB_SOURCES
-	testLab0.c
-	testLab10.c
-	testLab11.c
-	testLab2.c
-	testLab30.c
-	testLab4.c
-	testLab5.c
-	testLab6.c
-	testLab7.c
-	testLab80.c
-	testLab9.c
+	testlab0.c
+	testlab1-0.c
+	testlab1-1.c
+	testlab2.c
+	testlab3-0.c
+	testlab4.c
+	testlab5.c
+	testlab6.c
+	testlab7.c
+	testlab8-0.c
+	testlab9.c
 )
 foreach(source ${TEST_LAB_SOURCES})
 	get_filename_component(target ${source} NAME_WE)
