@@ -150,10 +150,10 @@ static int checkerBig1(void)
         unsigned bits = fib(0)*(big1N-1);
         for (c = 1; c < big1N; c++)
             bits += fib(c)*(big1N-c);
-        lenZipped = fread(zipped, 1, (bits+7)/8+4+(10*big1N+7)/8+1+100, out);
-        printf("want <= %d got >= %zu\n",(bits+7)/8+4+(10*big1N+7)/8, lenZipped);
-        if (lenZipped > (bits+7)/8+4+(10*big1N+7)/8) {
-            passed = 1;
+        const size_t expectedSize = 4+(10*big1N+bits+7)/8;
+        lenZipped = fread(zipped, 1, expectedSize+1, out);
+        if (lenZipped > expectedSize) {
+            passed = 0;
             printf("output is too long -- ");
         }
     } else { // check that compress+decompress doesn't corrupt the data
@@ -230,8 +230,9 @@ static int checkerBig2(void)
         return -1;
     }
     if (testN%2 == 0) { // check the compression ratio is matched
-        lenZipped = fread(zipped, 1, 256*256+4+256*10/8+1+100, out);
-        if (lenZipped > 256*256+4+256*10/8) {
+        const size_t expectedSize = 4+(10*256+256*256*8+7)/8;
+        lenZipped = fread(zipped, 1, expectedSize+1, out);
+        if (lenZipped > expectedSize) {
             passed = 0;
             printf("output is too long -- ");
         }
@@ -300,8 +301,9 @@ static int checkerBig3(void)
         return -1;
     }
     if (testN%2 == 0) { // check the compression ratio is matched
-        lenZipped = fread(zipped, 1, 256*256*256+4+1*(10+7)/8+1+100, out);
-        if (lenZipped > 256*256*256+4+1*(10+7)/8) {
+        const size_t expectedSize = 4+(10*1+256*256*256+7)/8;
+        lenZipped = fread(zipped, 1, expectedSize+1, out);
+        if (lenZipped > expectedSize) {
             passed = 0;
             printf("output is too long -- ");
         }
