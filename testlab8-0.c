@@ -259,7 +259,7 @@ static int Feed(void) {
         if (edge.Begin == IGNORED_VERTEX_IDX) {
             break;
         }
-        if (fprintf(in, "%u %u %" PRIu64 "\n", edge.Begin, edge.End, edge.Length) < 3) {
+        if (fprintf(in, "%u %u %llu\n", edge.Begin, edge.End, edge.Length) < 3) {
             printf("can't create in.txt. No space on disk?\n");
             fclose(in);
             return -1;
