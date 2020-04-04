@@ -24,7 +24,7 @@ static const struct {const char *const in; int n, out[32];} testInOut[] = {
     {"0123\n11230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}}
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
@@ -36,7 +36,7 @@ static int feederN(void)
     return 0;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i, passed = 1;
@@ -62,16 +62,7 @@ static int checkerN(void)
         }
     }
     if (passed) {
-        while (1) {
-            char ignored;
-            if (fscanf(out, "%c", &ignored) == EOF)
-                break;
-            if (strchr("\n\t ", ignored))
-                continue;
-            passed = 0;
-            printf("output is too long -- ");
-            break;
-        }
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -84,6 +75,8 @@ static int checkerN(void)
         return 1;
     }
 }
+
+static int LabTimeout;
 
 static int feederBig(void)
 {
@@ -105,9 +98,9 @@ static int feederBig(void)
             return -1;
         }
     fprintf(in, "0123456789abcdef");
-    t = (tickDifference(t, GetTickCount())+999)/1000*1000;
+    t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
-    labTimeout = (int)t*2;
+    LabTimeout = (int)t*2;
     fflush(stdout);
     fclose(in);
     return 0;
@@ -123,15 +116,9 @@ static int checkerBig(void)
         return -1;
     }
     for (i = 16; i < 1024*1024*8*16; i += 16) {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-            break;
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
-            break;
         } else if (i != n) {
             passed = 0;
             printf("wrong output -- ");
@@ -140,15 +127,9 @@ static int checkerBig(void)
     }
     if (passed) {
         for (; i > 1024*1024*8*16-16; i--) {
-            int n, nStatus = fscanf(out, "%d", &n);
-            if (EOF == nStatus) {
+            int n;
+            if (ScanInt(out, &n) != Pass) {
                 passed = 0;
-                printf("output too short -- ");
-                break;
-            } else if (1 != nStatus) {
-                passed = 0;
-                printf("bad format -- ");
-                break;
             } else if (i != n) {
                 passed = 0;
                 printf("wrong output -- ");
@@ -157,16 +138,7 @@ static int checkerBig(void)
         }
     }
     if (passed) {
-        while (1) {
-            char ignored;
-            if (fscanf(out, "%c", &ignored) == EOF)
-                break;
-            if (strchr("\n\t ", ignored))
-                continue;
-            passed = 0;
-            printf("output is too long -- ");
-            break;
-        }
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -180,32 +152,45 @@ static int checkerBig(void)
     }
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
     {feederBig, checkerBig}
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 1-0 Boyer-Moore";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 3000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+const char* GetTesterName(void) {
+    return "Lab 1-0 Boyer-Moore";
+}
 
+static int LabTimeout = 3000;
+int GetTestTimeout() {
+    return LabTimeout;
+}
+
+size_t GetTestMemoryLimit() {
+    return MIN_PROCESS_RSS_BYTES;
+}

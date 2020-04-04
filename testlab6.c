@@ -3,22 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static size_t ptr_size(void )
-{
-    static int x64 = -1;
-    if (x64 == -1)
-    {
-        char *cpu = getenv("PROCESSOR_IDENTIFIER");
-        x64 = cpu ? strstr(cpu, "x86") == NULL : 1;
-    }
-    return sizeof(int)*(size_t)(x64+1);
-}
-
-static size_t up16(size_t n)
-{
-    return (1+(n-1)/16)*16;
-}
-
 static int testN = 0;
 static const struct {const char *const in; int n;} testInOut[] = {
     {"0\n\n", 0},
@@ -63,7 +47,7 @@ static const struct {const char *const in; int n;} testInOut[] = {
     {"4\n4 3 2 1\n", 3},
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
@@ -79,7 +63,7 @@ static int feederN(void)
     return 0;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int passed = 1;
@@ -89,27 +73,16 @@ static int checkerN(void)
         return -1;
     }
     {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
         } else if (testInOut[testN].n != n) {
             passed = 0;
             printf("wrong output -- ");
         }
     }
-    while (1) {
-        char ignored;
-        if (fscanf(out, "%c", &ignored) == EOF)
-            break;
-        if (strchr("\n\t ", ignored))
-            continue;
-        passed = 0;
-        printf("output is too long -- ");
-        break;
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -122,6 +95,8 @@ static int checkerN(void)
         return 1;
     }
 }
+
+static size_t LabMemoryLimit;
 
 static int feederBig(void)
 {
@@ -141,9 +116,7 @@ static int feederBig(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    {
-        labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
-    }
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -157,27 +130,16 @@ static int checkerBig(void)
         return -1;
     }
     {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
         } else if (21 != n) {
             passed = 0;
             printf("wrong output -- ");
         }
     }
-    while (1) {
-        char ignored;
-        if (fscanf(out, "%c", &ignored) == EOF)
-            break;
-        if (strchr("\n\t ", ignored))
-            continue;
-        passed = 0;
-        printf("output is too long -- ");
-        break;
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -209,7 +171,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    labOutOfMemory = 2000000*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -223,27 +185,16 @@ static int checkerBig1(void)
         return -1;
     }
     {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
         } else if (23 != n) {
             passed = 0;
             printf("wrong output -- ");
         }
     }
-    while (1) {
-        char ignored;
-        if (fscanf(out, "%c", &ignored) == EOF)
-            break;
-        if (strchr("\n\t ", ignored))
-            continue;
-        passed = 0;
-        printf("output is too long -- ");
-        break;
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -308,7 +259,7 @@ static int feederBig2(void)
     genTree(in, 30, 0, 4000000);
     fprintf(in, "\n");
     fclose(in);
-    labOutOfMemory = 1346269*up16(sizeof(int)+sizeof(int)+2*ptr_size())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 1346269*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -322,27 +273,16 @@ static int checkerBig2(void)
         return -1;
     }
     {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
         } else if (29 != n) {
             passed = 0;
             printf("wrong output -- ");
         }
     }
-    while (1) {
-        char ignored;
-        if (fscanf(out, "%c", &ignored) == EOF)
-            break;
-        if (strchr("\n\t ", ignored))
-            continue;
-        passed = 0;
-        printf("output is too long -- ");
-        break;
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -356,55 +296,69 @@ static int checkerBig2(void)
     }
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
     {feederBig, checkerBig},
     {feederBig1, checkerBig1},
     {feederBig2, checkerBig2},
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 6 AVL trees";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 6000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+const char* GetTesterName(void) {
+    return "Lab 6 AVL trees";
+}
+
+int GetTestTimeout() {
+    return 6000;
+}
+
+static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+size_t GetTestMemoryLimit() {
+    return LabMemoryLimit;
+}

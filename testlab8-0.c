@@ -5,589 +5,370 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <assert.h>
+#include <math.h>
 
-enum testConst { N_MAX = 5000 };
-static int testN = 0;
-struct edge {int a, b; int64_t abL;};
-static const struct {
-    int N, M;
-    struct edge G[8];
-    const char *msg;
-    int64_t L;
-} testInOut[] = {
-    {3, 3, {{1, 2, 10}, {2, 3, 5}, {3, 1, 5}}, NULL, 10},
-    {3, 1, {{1, 2, 10}}, "no spanning tree"},
-    {2, 1, {{0}}, "bad number of lines"},
+enum { MAX_VERTEX_COUNT = 5000 };
 
-    {0, 0, {{0}}, "no spanning tree"},
-    {N_MAX+1, 1, {{1, 1, 1}}, "bad number of vertices"},
-    {2, 4, {{1, 1, 1}, {1, 2, 1}, {2, 1, 1}, {2, 2, 1}}, "bad number of edges"},
-    {2, 1, {{1, 2, -1}}, "bad length"},
+static unsigned TestcaseIdx = 0;
 
-    {2, 0, {{0}}, "no spanning tree"},
-    {2, 1, {{1, 2, (int64_t)4*INT_MAX}}, "bad length"},
-    {4, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, "no spanning tree"},
-    {2, 1, {{1, 1, INT_MAX}}, "no spanning tree"},
+static int Feed(void);
+static int Check(void);
 
-    {1, 0, {{0}}, NULL, 0},
-    {4, 4, {{1, 2, 1}, {2, 3, 2}, {3, 4, 4}, {4, 1, 8}}, NULL, 7},
-    {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (int64_t)2*INT_MAX},
-    {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (int64_t)1+INT_MAX},
+TLabTest GetLabTest(int testIdx) {
+    TLabTest labTest = {Feed, Check};
+    return labTest;
+}
 
-    {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (int64_t)3*INT_MAX},
-    {4, 4, {{1, 2, 1}, {2, 3, 1}, {3, 4, 1}, {4, 1, 1}}, NULL, 3},
-    {5, 4, {{1, 2, 1}, {2, 3, 1}, {3, 1, 1}, {4, 3, 1}}, "no spanning tree"},
-    {4, 6, {{1, 2, 1}, {1, 3, 2}, {1, 4, 4}, {2, 3, 8}, {2, 4, 16}, {3, 4, 32}}, NULL, 7},
-    
-    {3, 2, {{1, 2, 1}, {2, 4, 1}}, "bad vertex"},
-    {3, 2, {{1, 2, 1}, {4, 2, 1}}, "bad vertex"},
-    {3, 2, {{1, 2, 1}, {-1, 2, 1}}, "bad vertex"},
-    {3, 2, {{1, 2, 1}, {2, -1, 1}}, "bad vertex"},
+static const unsigned TestcaseCount = 31;
+int GetTestCount(void) {
+    return TestcaseCount;
+}
 
-    {4, 4, {{1, 2, 1}, {2, 3, 2}, {1, 3, 3}, {4, 3, 4}}, NULL, 7},
-    {4, 3, {{1, 2, 1}, {3, 4, 2}, {2, 4, 3}}, NULL, 6},
-    {6, 6, {{1, 2, 1}, {2, 3, 2}, {4, 5, 3}, {5, 6, 4}, {3, 4, 5}, {1, 6, 6}}, NULL, 15},
+const char* GetTesterName(void) {
+    return "Lab 8-x Kruskal or Prim Shortest Spanning Tree";
+}
 
-    {6, 6, {{1, 2, 1}, {3, 4, 2}, {5, 6, 3}, {2, 3, 4}, {4, 5, 5}, {1, 6, 6}}, NULL, 15},
+static int LabTimeout = 3000;
+int GetTestTimeout() {
+    return LabTimeout;
+}
+
+static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+size_t GetTestMemoryLimit() {
+    return LabMemoryLimit;
+}
+
+struct TEdge {
+    unsigned Begin;
+    unsigned End;
+    unsigned Length;
 };
 
-static int feederN(void)
-{
-    FILE *const in = fopen("in.txt", "w+");
-    int i;
-    if (!in) {
+typedef union {
+    struct TEdge Edge;
+    unsigned Integer;
+    const char* String;
+} TTestcaseData;
+
+static TTestcaseData MakeInteger(unsigned integer) {
+    TTestcaseData testcaseData;
+    testcaseData.Integer = integer;
+    return testcaseData;
+}
+
+static TTestcaseData MakeString(const char* string) {
+    TTestcaseData testcaseData;
+    testcaseData.String = string;
+    return testcaseData;
+}
+
+static TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned length) {
+    TTestcaseData testcaseData;
+    testcaseData.Edge.Begin = begin;
+    testcaseData.Edge.End = end;
+    testcaseData.Edge.Length = length;
+    return testcaseData;
+}
+
+static unsigned SumRange(unsigned begin, unsigned end) {
+    return (begin + end) * (end - begin + 1) / 2;
+}
+
+static void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx) {
+    *rowIdx = sqrt(8 * linearIdx + 1) / 2 - 0.5;
+    *columnIdx = linearIdx - SumRange(0, *rowIdx);
+}
+
+enum { IGNORED_EDGE_IDX = -1, IGNORED_VERTEX_IDX = 0 };
+
+enum ETestcaseDataId {
+    VERTEX_COUNT,
+    EDGE_COUNT,
+    EDGE,
+    ERROR_MESSAGE,
+    MST_LENGTH
+};
+
+static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId dataId, unsigned edgeIdx) {
+    if (testcaseIdx < 27u) {
+        typedef struct TSmallTest {
+            unsigned VertexCount;
+            unsigned EdgeCount;
+            struct TEdge Edges[8];
+            const char* Message;
+            unsigned MstLength;
+        } TSmallTest;
+
+        static const TSmallTest smallTests[] = {
+            {3, 3, {{1, 2, 10}, {2, 3, 5}, {3, 1, 5}}, NULL, 10},
+            {3, 1, {{1, 2, 10}}, "no spanning tree"},
+            {2, 1, {{IGNORED_VERTEX_IDX}}, "bad number of lines"},
+
+            {0, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
+            {MAX_VERTEX_COUNT+1, 1, {{1, 1, 1}}, "bad number of vertices"},
+            {2, 4, {{1, 1, 1}, {1, 2, 1}, {2, 1, 1}, {2, 2, 1}}, "bad number of edges"},
+            {2, 1, {{1, 2, -1}}, "bad length"},
+
+            {2, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
+            {2, 1, {{1, 2, (int64_t)4*INT_MAX}}, "bad length"},
+            {4, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, "no spanning tree"},
+            {2, 1, {{1, 1, INT_MAX}}, "no spanning tree"},
+
+            {1, 0, {{IGNORED_VERTEX_IDX}}, NULL, 0},
+            {4, 4, {{1, 2, 1}, {2, 3, 2}, {3, 4, 4}, {4, 1, 8}}, NULL, 7},
+            {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (int64_t)2*INT_MAX},
+            {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (int64_t)1+INT_MAX},
+
+            {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (int64_t)3*INT_MAX},
+            {4, 4, {{1, 2, 1}, {2, 3, 1}, {3, 4, 1}, {4, 1, 1}}, NULL, 3},
+            {5, 4, {{1, 2, 1}, {2, 3, 1}, {3, 1, 1}, {4, 3, 1}}, "no spanning tree"},
+            {4, 6, {{1, 2, 1}, {1, 3, 2}, {1, 4, 4}, {2, 3, 8}, {2, 4, 16}, {3, 4, 32}}, NULL, 7},
+
+            {3, 2, {{1, 2, 1}, {2, 4, 1}}, "bad vertex"},
+            {3, 2, {{1, 2, 1}, {4, 2, 1}}, "bad vertex"},
+            {3, 2, {{1, 2, 1}, {-1, 2, 1}}, "bad vertex"},
+            {3, 2, {{1, 2, 1}, {2, -1, 1}}, "bad vertex"},
+
+            {4, 4, {{1, 2, 1}, {2, 3, 2}, {1, 3, 3}, {4, 3, 4}}, NULL, 7},
+            {4, 3, {{1, 2, 1}, {3, 4, 2}, {2, 4, 3}}, NULL, 6},
+            {6, 6, {{1, 2, 1}, {2, 3, 2}, {4, 5, 3}, {5, 6, 4}, {3, 4, 5}, {1, 6, 6}}, NULL, 15},
+
+            {6, 6, {{1, 2, 1}, {3, 4, 2}, {5, 6, 3}, {2, 3, 4}, {4, 5, 5}, {1, 6, 6}}, NULL, 15},
+        };
+        assert(testcaseIdx < sizeof(smallTests) / sizeof(smallTests[0]));
+        const TSmallTest* test = &smallTests[testcaseIdx];
+        switch (dataId) {
+            case VERTEX_COUNT:
+                return MakeInteger(test->VertexCount);
+            case EDGE_COUNT:
+                return MakeInteger(test->EdgeCount);
+            case EDGE:
+                assert(edgeIdx < test->EdgeCount);
+                return MakeEdge(test->Edges[edgeIdx].Begin, test->Edges[edgeIdx].End, test->Edges[edgeIdx].Length);
+            case ERROR_MESSAGE:
+                return MakeString(test->Message);
+            case MST_LENGTH:
+                return MakeInteger(test->MstLength);
+            default:
+                abort();
+        }
+        assert(0);
+    } else if (testcaseIdx == 27) {
+        switch (dataId) {
+            case VERTEX_COUNT:
+            case EDGE_COUNT:
+                return MakeInteger(MAX_VERTEX_COUNT);
+            case EDGE:
+                assert(edgeIdx < MAX_VERTEX_COUNT);
+                return MakeEdge(edgeIdx + 1, (edgeIdx + 1) % MAX_VERTEX_COUNT + 1, edgeIdx + 1);
+            case ERROR_MESSAGE:
+                return MakeString(NULL);
+            case MST_LENGTH:
+                return MakeInteger(SumRange(1, MAX_VERTEX_COUNT - 1));
+            default:
+                abort();
+        }
+    } else if (testcaseIdx == 28 || testcaseIdx == 29) {
+        const unsigned partOneEdgeCount = MAX_VERTEX_COUNT - 2;
+        const unsigned partTwoEdgeCount = MAX_VERTEX_COUNT - 3;
+        const int slope = testcaseIdx == 28 ? 1 : -1;
+        const int bias = testcaseIdx == 28 ? 0 : MAX_VERTEX_COUNT + 1;
+        switch (dataId) {
+            case VERTEX_COUNT:
+                return MakeInteger(MAX_VERTEX_COUNT);
+            case EDGE_COUNT:
+                return MakeInteger(partOneEdgeCount + partTwoEdgeCount + 1);
+            case EDGE:
+                assert(edgeIdx < partOneEdgeCount + partTwoEdgeCount + 1);
+                if (edgeIdx < partOneEdgeCount) {
+                    return MakeEdge((edgeIdx + 1) * slope + bias, (edgeIdx + 2) * slope + bias, edgeIdx + 1);
+                } else if (edgeIdx < partOneEdgeCount + partTwoEdgeCount) {
+                    return MakeEdge(1 * slope + bias, (edgeIdx - partOneEdgeCount + 3) * slope + bias, edgeIdx + 3);
+                } else {
+                    return MakeEdge((MAX_VERTEX_COUNT - 1) * slope + bias, MAX_VERTEX_COUNT * slope + bias, 2 * MAX_VERTEX_COUNT - 2);
+                }
+            case ERROR_MESSAGE:
+                return MakeString(NULL);
+            case MST_LENGTH:
+                return MakeInteger(SumRange(1, MAX_VERTEX_COUNT - 2) + 2 * MAX_VERTEX_COUNT - 2);
+            default:
+                abort();
+        }
+    } else if (testcaseIdx == 30) {
+        const unsigned partOneEdgeCount = MAX_VERTEX_COUNT - 2;
+        const unsigned partTwoEdgeCount = SumRange(MAX_VERTEX_COUNT * 4 / 5, MAX_VERTEX_COUNT - 3);
+        switch (dataId) {
+            case VERTEX_COUNT:
+                return MakeInteger(MAX_VERTEX_COUNT);
+            case EDGE_COUNT:
+                return MakeInteger(partOneEdgeCount + partTwoEdgeCount + 1);
+            case EDGE:
+                assert(edgeIdx < partOneEdgeCount + partTwoEdgeCount + 1);
+                if (edgeIdx < partOneEdgeCount) {
+                    return MakeEdge(edgeIdx + 1, edgeIdx + 2, edgeIdx + 1);
+                } else if (edgeIdx < partOneEdgeCount + partTwoEdgeCount) {
+                    unsigned row, column;
+                    CalcRowColumn(edgeIdx - partOneEdgeCount + SumRange(0, MAX_VERTEX_COUNT * 4 / 5 - 1), &row, &column); // row = N * 4 / 5 ... N - 3, column = 0 ... row
+                    row = MAX_VERTEX_COUNT - row;
+                    return MakeEdge(row - 3, column + row, MAX_VERTEX_COUNT - 1);
+                } else {
+                    return MakeEdge(MAX_VERTEX_COUNT - 1, MAX_VERTEX_COUNT, MAX_VERTEX_COUNT);
+                }
+            case ERROR_MESSAGE:
+                return MakeString(NULL);
+            case MST_LENGTH:
+                return MakeInteger((MAX_VERTEX_COUNT - 1) * (MAX_VERTEX_COUNT - 2) / 2 + MAX_VERTEX_COUNT);
+            default:
+                abort();
+        }
+    } else {
+        abort();
+    }
+}
+
+static int Feed(void) {
+    FILE* const in = fopen("in.txt", "w+");
+    if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(in, "%d\n%d\n", testInOut[testN].N, testInOut[testN].M);
-    for (i = 0; i < testInOut[testN].M && testInOut[testN].G[i].a != 0; i++) {
-        fprintf(in, "%d %d %" PRIi64 "\n",
-            testInOut[testN].G[i].a, testInOut[testN].G[i].b, testInOut[testN].G[i].abL);
+
+    const unsigned vertexCount = GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
+    const unsigned edgeCount = GetFromTestcase(TestcaseIdx, EDGE_COUNT, IGNORED_EDGE_IDX).Integer;
+    fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
+
+    const int isVerbose = edgeCount > 1000 * 1000;
+    if (isVerbose) {
+        printf("Creating large text... ");
+        fflush(stdout);
+    }
+
+    unsigned start = GetTickCount();
+    for (int idx = 0; idx < edgeCount; ++idx) {
+        const struct TEdge edge = GetFromTestcase(TestcaseIdx, EDGE, idx).Edge;
+        if (edge.Begin == IGNORED_VERTEX_IDX) {
+            break;
+        }
+        if (fprintf(in, "%u %u %u\n", edge.Begin, edge.End, edge.Length) < 3) {
+            printf("can't create in.txt. No space on disk?\n");
+            fclose(in);
+            return -1;
+        }
     }
     fclose(in);
+    start = RoundUptoThousand(GetTickCount() - start);
+
+    if (isVerbose) {
+        printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", start / 1000);
+        fflush(stdout);
+    }
+
+    LabTimeout = (int)start + 3000;
+    LabMemoryLimit = vertexCount * vertexCount * 4 + MIN_PROCESS_RSS_BYTES;
+
     return 0;
 }
 
-
-static int find(int a, int b, int M, const struct edge G[])
-{
-    int i;
-    for (i = 0; i < M; i++) {
-        if (G[i].a == a && G[i].b == b) {
-            return i;
-        }
-        if (G[i].a == b && G[i].b == a) {
-            return i;
+static unsigned FindEdge(unsigned a, unsigned b) {
+    const unsigned vertexCount = GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
+    if (a < 1 || a > vertexCount || b < 1 || b > vertexCount) {
+        return IGNORED_EDGE_IDX;
+    }
+    const unsigned edgeCount = GetFromTestcase(TestcaseIdx, EDGE_COUNT, IGNORED_EDGE_IDX).Integer;
+    for (unsigned idx = 0; idx < edgeCount; ++idx) {
+        const struct TEdge edge = GetFromTestcase(TestcaseIdx, EDGE, idx).Edge;
+        if (edge.Begin == a && edge.End == b || edge.Begin == b && edge.End == a) {
+            return idx;
         }
     }
-    return -1;
+    return IGNORED_EDGE_IDX;
 }
 
-static int root(int v, const int parent[N_MAX])
-{
+static int FindRoot(int vertex, const int parent[]) {
     while (1) {
-        const int xv = v;
-        v = parent[v];
-        if (v == xv) {
-            return v;
+        if (vertex == parent[vertex]) {
+            return vertex;
         }
+        vertex = parent[vertex];
     }
 }
 
-static int checkerN(void)
-{
-    FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
-    if (!out) {
+static int CountRoots(int vertexCount, const int parent[]) {
+    int rootCount = 0;
+    int i;
+    for (i = 0; i < vertexCount; ++i) {
+        if (parent[i] == i) {
+            ++rootCount;
+        }
+    }
+    return rootCount;
+}
+
+static void InitParent(int vertexCount, int parent[]) {
+    int i;
+    for (i = 0; i < vertexCount; ++i) {
+        parent[i] = i;
+    }
+}
+
+static int Check(void) {
+    FILE* const out = fopen("out.txt", "r");
+    if (out == NULL) {
         printf("can't open out.txt\n");
-        testN++;
+        ++TestcaseIdx;
         return -1;
     }
-    if (testInOut[testN].msg != NULL) { // test error message
+    const char* status = Pass;
+    const char* message = GetFromTestcase(TestcaseIdx, ERROR_MESSAGE, IGNORED_EDGE_IDX).String;
+    if (message != NULL) { // test error message
         char bufMsg[128] = {0};
         if (fgets(bufMsg, sizeof(bufMsg), out) == NULL) {
             printf("output too short -- ");
-            fact = fail;
+            status = Fail;
         } else {
-            if (strchr(bufMsg, '\n'))
+            if (strchr(bufMsg, '\n') != NULL) {
                 *strchr(bufMsg, '\n') = 0;
-            if (_strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
+            }
+            if (_strnicmp(message, bufMsg, strlen(message)) != 0) {
                 printf("wrong output -- ");
-                fact = fail;
+                status = Fail;
             }
         }
     } else { // test spanning tree
-        int i, N = testInOut[testN].N;
-        int parent[N_MAX];
-        int64_t L = 0;
-        for (i = 0; i < N; i++) parent[i] = i;
-        for (i = 0; i < N-1; i++) {
-            int a, b, status = fscanf(out, "%d%d", &a, &b);
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
+        const unsigned vertexCount = GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
+        unsigned vertexParent[MAX_VERTEX_COUNT];
+        unsigned length = 0;
+        InitParent(vertexCount, vertexParent);
+        for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
+            unsigned a, b;
+            if (ScanIntInt(out, &a, &b) != Pass) {
+                status = Fail;
                 break;
-            } else if (status < 2) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else {
-                const int indexAB = find(a, b, testInOut[testN].M, testInOut[testN].G);
-                const int rootA = root(a-1, parent), rootB = root(b-1, parent);
-                if (indexAB < 0 || rootA == rootB) {
-                    printf("wrong output -- ");
-                    fact = fail;
-                    break;
-                }
-                parent[rootA] = rootB;
-                L += testInOut[testN].G[indexAB].abL;
             }
-        }
-        if (fact == pass) {
-            int nRoot = 0; 
-            for (i = 0; i < N; i++) {
-                if (parent[i] == i) {
-                    nRoot++;
-                }
-            }
-            if (nRoot != 1 || L > testInOut[testN].L) {
+            const unsigned edgeIdx = FindEdge(a, b);
+            const unsigned rootA = FindRoot(a - 1, vertexParent);
+            const unsigned rootB = FindRoot(b - 1, vertexParent);
+            if (edgeIdx == IGNORED_EDGE_IDX || rootA == rootB) {
                 printf("wrong output -- ");
-                fact = fail;
+                status = Fail;
+                break;
+            }
+            vertexParent[rootA] = rootB;
+            length += GetFromTestcase(TestcaseIdx, EDGE, edgeIdx).Edge.Length;
+        }
+        if (status == Pass) {
+            if (CountRoots(vertexCount, vertexParent) != 1 || length > GetFromTestcase(TestcaseIdx, MST_LENGTH, IGNORED_EDGE_IDX).Integer) {
+                printf("wrong output -- ");
+                status = Fail;
             }
         }
     }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
-        }
+    if (status == Pass && HaveGarbageAtTheEnd(out)) {
+        status = Fail;
     }
     fclose(out);
-    printf("%s\n", fact);
-    testN++;
-    return fact == fail;
+    printf("%s\n", status);
+    ++TestcaseIdx;
+    return status == Fail;
 }
-
-static int feederBig(void)
-{
-    FILE *const in = fopen("in.txt", "w+");
-    int i;
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n");
-        return -1;
-    }
-    fprintf(in, "%d\n%d\n", N_MAX, N_MAX);
-    for (i = 1; i <= N_MAX/2; i++) {
-        fprintf(in, "%d %d %d\n", 2*i-1, 2*i, i);
-    }
-    for (i = 1; i+1 <= N_MAX/2; i++) {
-        fprintf(in, "%d %d %d\n", 2*i, 2*i+1, N_MAX/2+i);
-    }
-    fprintf(in, "%d %d %d\n", N_MAX, 1, N_MAX);
-    fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
-    return 0;
-}
-
-static int checkerBig(void)
-{
-    FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
-    if (!out) {
-        printf("can't open out.txt\n");
-        testN++;
-        return -1;
-    }
-    { // test spanning tree
-        int i, N = N_MAX;
-        int parent[N_MAX];
-        int64_t L = 0;
-        for (i = 0; i < N; i++) parent[i] = i;
-        for (i = 0; i < N-1; i++) {
-            int a, b, status = fscanf(out, "%d%d", &a, &b);
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
-                break;
-            } else if (status < 2) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else if (a < 1 || N_MAX < a || b < 1 || N_MAX < b) {
-                printf("wrong output -- ");
-                fact = fail;
-                break;
-            } else if (abs(a-b) != 1 && !(a == 1 && b == N_MAX) && !(b == 1 && a == N_MAX)) {
-                printf("wrong output -- ");
-                fact = fail;
-                break;
-            } else {
-                const int rootA = root(a-1, parent), rootB = root(b-1, parent);
-                L += a%2 == 1 ? b/2 : a < N_MAX ? b : N_MAX;
-                if (rootA == rootB) {
-                    printf("wrong output -- ");
-                    fact = fail;
-                    break;
-                }
-                parent[rootA] = rootB;
-            }
-        }
-        if (fact == pass) {
-            int nRoot = 0; 
-            for (i = 0; i < N; i++) {
-                if (parent[i] == i) {
-                    nRoot++;
-                }
-            }
-            if (nRoot != 1 || L > N_MAX*(N_MAX-1)/2) {
-                printf("wrong output -- ");
-                fact = fail;
-            }
-        }
-    }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
-        }
-    }
-    fclose(out);
-    printf("%s\n", fact);
-    testN++;
-    return fact == fail;
-}
-
-static int feederBig1(void)
-{
-    FILE *const in = fopen("in.txt", "w+");
-    int i;
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n");
-        return -1;
-    }
-    fprintf(in, "%d\n%d\n", N_MAX, N_MAX-2+N_MAX-3+1);
-    for (i = 1; i <= N_MAX-2; i++) { // N_MAX not reached
-        fprintf(in, "%d %d %d\n", i, i+1, i);
-    }
-    for (i = 3; i <= N_MAX-1; i++) { // many edges for kruskal to delete, N_MAX not reached
-        fprintf(in, "%d %d %d\n", 1, i, N_MAX-2+i);
-    }
-    fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, 2*N_MAX-2); // reach 5000
-    fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
-    return 0;
-}
-
-static int feederBig10(void)
-{
-    FILE *const in = fopen("in.txt", "w+");
-    int i;
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n");
-        return -1;
-    }
-    fprintf(in, "%d\n%d\n", N_MAX, N_MAX-2+N_MAX-3+1);
-    for (i = 1; i <= N_MAX-2; i++) { // N_MAX not reached
-        fprintf(in, "%d %d %d\n", i+1, i, i);
-    }
-    for (i = 3; i <= N_MAX-1; i++) { // many edges for kruskal to delete, N_MAX not reached
-        fprintf(in, "%d %d %d\n", i, 1, N_MAX-2+i);
-    }
-    fprintf(in, "%d %d %d\n", N_MAX, N_MAX-1, 2*N_MAX-2); // reach 5000
-    fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
-    return 0;
-}
-
-static int subG1(int a, int b, int * abL)
-{
-    const int minAB = a < b ? a : b, maxAB = b+a-minAB;
-    if (1 <= minAB && minAB <= N_MAX-2 && maxAB == minAB+1) {
-        *abL = minAB;
-    } else {
-        *abL = -1;
-    }
-    return *abL >= 0;
-}
-
-static int subG2(int a, int b, int * abL)
-{
-    const int minAB = a < b ? a : b, maxAB = b+a-minAB;
-    if (minAB == 1 && 3 <= maxAB && maxAB <= N_MAX-1) {
-        *abL = N_MAX-2+maxAB;
-    } else {
-        *abL = -1;
-    }
-    return *abL >= 0;
-}
-
-static int subG3(int a, int b, int * abL)
-{
-    const int minAB = a < b ? a : b, maxAB = b+a-minAB;
-    if (minAB == N_MAX-1 && maxAB == N_MAX) {
-        *abL = 2*N_MAX-2;
-    } else {
-        *abL = -1;
-    }
-    return *abL >= 0;
-}
-
-static int checkerBig1(void)
-{
-    FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
-    if (!out) {
-        printf("can't open out.txt\n");
-        testN++;
-        return -1;
-    }
-    { // test spanning tree
-        int i, N = N_MAX;
-        int parent[N_MAX];
-        int64_t L = 0;
-        for (i = 0; i < N; i++) parent[i] = i;
-        for (i = 0; i < N-1; i++) {
-            int a, b, status = fscanf(out, "%d%d", &a, &b), abL;
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
-                break;
-            } else if (status < 2) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else if (a < 1 || N_MAX < a || b < 1 || N_MAX < b) {
-                printf("wrong output -- ");
-                fact = fail;
-                break;
-            } else if (!subG1(a, b, &abL) && !subG2(a, b, &abL) && !subG3(a, b, &abL)) {
-                printf("wrong output -- ");
-                fact = fail;
-                break;
-            } else {
-                const int rootA = root(a-1, parent), rootB = root(b-1, parent);
-                if (rootA == rootB) {
-                    printf("wrong output -- ");
-                    fact = fail;
-                    break;
-                }
-                L += abL;
-                parent[rootA] = rootB;
-            }
-        }
-        if (fact == pass) {
-            int nRoot = 0; 
-            for (i = 0; i < N; i++) {
-                if (parent[i] == i) {
-                    nRoot++;
-                }
-            }
-            if (nRoot != 1 || L > (N_MAX-1)*(N_MAX-2)/2+2*N_MAX-2) {
-                printf("wrong output -- ");
-                fact = fail;
-            }
-        }
-    }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
-        }
-    }
-    fclose(out);
-    printf("%s\n", fact);
-    testN++;
-    return fact == fail;
-}
-
-static int feederBig2(void)
-{
-    FILE *const in = fopen("in.txt", "w+");
-    int i, j;
-    DWORD tStart;
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n");
-        return -1;
-    }
-    printf("Creating large text... ");
-    fflush(stdout);
-    tStart = GetTickCount();
-    fprintf(in, "%d\n%d\n", N_MAX, N_MAX-2+((N_MAX-1)/5-2)*((N_MAX-1-3+1)+(N_MAX-1-(N_MAX-1)/5+1))/2+1);
-    for (i = 1; i <= N_MAX-2; i++) { // N_MAX not reached
-        fprintf(in, "%d %d %d\n", i, i+1, i);
-    }
-    for (j = 1; j+2 <= (N_MAX-1)/5; j++) { // many edges for kruskal to delete, N_MAX not reached
-        for (i = j+2; i <= N_MAX-1; i++) {
-            if (fprintf(in, "%d %d %d\n", j, i, N_MAX-2+1) < 3) {
-                printf("can't create in.txt. No space on disk?\n");
-                fclose(in);
-                return -1;
-            }
-        }
-    }
-    fprintf(in, "%d %d %d\n", N_MAX-1, N_MAX, N_MAX); // reach N_MAX
-    tStart = (tickDifference(tStart, GetTickCount())+999)/1000*1000;
-    printf("done in T=%u seconds. Starting exe with timeout T+3... ", (unsigned)tStart/1000);
-    labTimeout = (int)tStart+3000;
-    fflush(stdout);
-    fclose(in);
-    labOutOfMemory = N_MAX*N_MAX*4+MIN_PROCESS_RSS_BYTES;
-    return 0;
-}
-
-static int checkerBig2(void)
-{
-    FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
-    if (!out) {
-        printf("can't open out.txt\n");
-        testN++;
-        return -1;
-    }
-    { // test spanning tree
-        int i, N = N_MAX;
-        int parent[N_MAX];
-        int64_t L = 0;
-        for (i = 0; i < N; i++) parent[i] = i;
-        for (i = 0; i < N-1; i++) {
-            int a, b, status = fscanf(out, "%d%d", &a, &b);
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
-                break;
-            } else if (status < 2) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else if (a < 1 || N_MAX < a || b < 1 || N_MAX < b) {
-                printf("wrong output -- ");
-                fact = fail;
-                break;
-            } else if ((a == N_MAX && b != N_MAX-1) || (b == N_MAX && a != N_MAX-1)) {
-                printf("wrong output -- ");
-                fact = fail;
-                break;
-            } else {
-                const int rootA = root(a-1, parent), rootB = root(b-1, parent);
-                int abL = a+1 == b ? a
-                    : b+1 == a ? b
-                    : a == N_MAX || b == N_MAX ? N_MAX
-                    : N_MAX-2+1;
-                if (rootA == rootB) {
-                    printf("wrong output -- ");
-                    fact = fail;
-                    break;
-                }
-                L += abL;
-                parent[rootA] = rootB;
-            }
-        }
-        if (fact == pass) {
-            int nRoot = 0; 
-            for (i = 0; i < N; i++) {
-                if (parent[i] == i) {
-                    nRoot++;
-                }
-            }
-            if (nRoot != 1 || L > (N_MAX-1)*(N_MAX-2)/2+N_MAX) {
-                printf("wrong output -- ");
-                fact = fail;
-            }
-        }
-    }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
-        }
-    }
-    fclose(out);
-    printf("%s\n", fact);
-    testN++;
-    return fact == fail;
-}
-
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-
-    {feederBig, checkerBig},
-    {feederBig1, checkerBig1},
-    {feederBig10, checkerBig1},
-    {feederBig2, checkerBig2},
-};
-
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
-
-const char labName[] = "Lab 8-x Kruskal or Prim Shortest Spanning Tree";
-
-int labTimeout = 3000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
-

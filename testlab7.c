@@ -13,11 +13,6 @@ static size_t ptr_size(void)
     return sizeof(int)*(size_t)(x64+1);
 }
 
-static size_t up16(size_t n)
-{
-    return (1+(n-1)/16)*16;
-}
-
 enum testConst { N_MAX = 1000 };
 static int testN = 0;
 static const struct {
@@ -58,7 +53,7 @@ static const struct {
 
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     int i;
@@ -84,11 +79,10 @@ static int job_compare(const void *x, const void *y)
     return jobA->job < jobB->job ? -1 : jobA->job == jobB->job ? 0 : 1;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
+    const char *fact = Pass;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
@@ -98,75 +92,63 @@ static int checkerN(void)
         char bufMsg[128] = {0};
         if (fgets(bufMsg, sizeof(bufMsg), out) == NULL) {
             printf("output too short -- ");
-            fact = fail;
+            fact = Fail;
         } else {
             if (strchr(bufMsg, '\n'))
                 *strchr(bufMsg, '\n') = 0;
             if (_strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
                 printf("wrong output -- ");
-                fact = fail;
+                fact = Fail;
             }
         }
     } else { // test order
         int i, N = testInOut[testN].N;
         struct {int job, jobN;} sorted[N_MAX];
         for (i = 0; i < N; i++) {
-            const int status = fscanf(out, "%d", &sorted[i].job);
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
+            fact = ScanInt(out, &sorted[i].job);
+            if (fact == Fail) {
                 break;
-            } else if (status < 1) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else if (sorted[i].job < 1 || sorted[i].job > N) {
+            }
+            if (sorted[i].job < 1 || sorted[i].job > N) {
                 printf("wrong output -- ");
-                fact = fail;
+                fact = Fail;
                 break;
             }
             sorted[i].job--;
             sorted[i].jobN = i;
         }
-        if (fact == pass) {
-            qsort(sorted, (size_t)N, sizeof(struct {int job, jobN;}), job_compare); 
+        if (fact == Pass) {
+            qsort(sorted, (size_t)N, sizeof(struct {int job, jobN;}), job_compare);
             for (i = 0; i < N; i++) {
                 if (sorted[i].job != i) {
                     printf("wrong output -- ");
-                    fact = fail;
+                    fact = Fail;
                     break;
                 }
             }
         }
-        if (fact == pass) {
+        if (fact == Pass) {
             for (i = 0; i < testInOut[testN].M; i++) {
                 if (sorted[testInOut[testN].G[i].a-1].jobN >= sorted[testInOut[testN].G[i].b-1].jobN) {
                     printf("wrong output -- ");
-                    fact = fail;
+                    fact = Fail;
                     break;
                 }
             }
         }
     }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
+    if (fact == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            fact = Fail;
         }
     }
     fclose(out);
     printf("%s\n", fact);
     testN++;
-    return fact == fail;
+    return fact == Fail;
 }
+
+static size_t LabMemoryLimit;
 
 static int feederBig(void)
 {
@@ -184,7 +166,7 @@ static int feederBig(void)
             fprintf(in, "%d %d\n", i+1, j+1);
     }
     fclose(in);
-    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = N_MAX*(N_MAX-1)/2*2*GetLabPointerSize()+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -192,8 +174,7 @@ static int feederBig(void)
 static int checkerBig(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
+    const char *fact = Pass;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
@@ -202,40 +183,27 @@ static int checkerBig(void)
     { // test order
         int i, N = N_MAX;
         for (i = 0; i < N; i++) {
-            int job, status = fscanf(out, "%d", &job);
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
+            int job;
+            fact = ScanInt(out, &job);
+            if (fact == Fail) {
                 break;
-            } else if (status < 1) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else if (job != i+1) {
+            }
+            if (job != i+1) {
                 printf("wrong output -- ");
-                fact = fail;
+                fact = Fail;
                 break;
             }
         }
     }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
+    if (fact == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            fact = Fail;
         }
     }
     fclose(out);
     printf("%s\n", fact);
     testN++;
-    return fact == fail;
+    return fact == Fail;
 }
 
 static int feederBig1(void)
@@ -254,7 +222,7 @@ static int feederBig1(void)
             fprintf(in, "%d %d\n", j+1, i+1);
     }
     fclose(in);
-    labOutOfMemory = N_MAX*(N_MAX-1)/2*up16(ptr_size()*2)+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = N_MAX*(N_MAX-1)/2*2*GetLabPointerSize()+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -262,8 +230,7 @@ static int feederBig1(void)
 static int checkerBig1(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    static const char pass[] = "PASSED", fail[] = "FAILED";
-    const char *fact = pass;
+    const char *fact = Pass;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
@@ -272,86 +239,87 @@ static int checkerBig1(void)
     { // test order
         int i, N = N_MAX;
         for (i = 0; i < N; i++) {
-            int job, status = fscanf(out, "%d", &job);
-            if (status < 0) {
-                printf("output too short -- ");
-                fact = fail;
+            int job;
+            fact = ScanInt(out, &job);
+            if (fact == Fail) {
                 break;
-            } else if (status < 1) {
-                printf("bad output format -- ");
-                fact = fail;
-                break;
-            } else if (job != N_MAX-i) {
+            }
+            if (job != N_MAX-i) {
                 printf("wrong output -- ");
-                fact = fail;
+                fact = Fail;
                 break;
             }
         }
     }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
+    if (fact == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            fact = Fail;
         }
     }
     fclose(out);
     printf("%s\n", fact);
     testN++;
-    return fact == fail;
+    return fact == Fail;
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
     {feederBig, checkerBig},
     {feederBig1, checkerBig1},
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 7 Topological Sort";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 3000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+const char* GetTesterName(void) {
+    return "Lab 7 Topological Sort";
+}
+
+int GetTestTimeout() {
+    return 3000;
+}
+
+static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+size_t GetTestMemoryLimit() {
+    return LabMemoryLimit;
+}

@@ -33,7 +33,7 @@ static const struct {const char *const in; size_t nIn; double nBits; int header;
     {"\0\1\0\1", 4, 1, 4+3+100}
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "wb");
     int error = 0;
@@ -48,7 +48,7 @@ static int feederN(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++) 
+        for (c = zipped; !error && c != lastZipped; c++)
             error |= fwrite(c, 1, 1, in) < 1;
     }
     fclose(in);
@@ -57,7 +57,7 @@ static int feederN(void)
     return error;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "rb");
     int passed = 1;
@@ -127,7 +127,7 @@ static int feederBig1(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++) 
+        for (c = zipped; !error && c != lastZipped; c++)
             error |= fwrite(c, 1, 1, in) < 1;
     }
     fclose(in);
@@ -211,7 +211,7 @@ static int feederBig2(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++) 
+        for (c = zipped; !error && c != lastZipped; c++)
             error |= fwrite(c, 1, 1, in) < 1;
     }
     fclose(in);
@@ -282,7 +282,7 @@ static int feederBig3(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++) 
+        for (c = zipped; !error && c != lastZipped; c++)
             error |= fwrite(c, 1, 1, in) < 1;
     }
     fclose(in);
@@ -337,33 +337,33 @@ static int checkerBig3(void)
     }
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN}, // 1
-    {feederN, checkerN}, // 2
-    {feederN, checkerN}, // 3
-    {feederN, checkerN}, // 4 
-    {feederN, checkerN}, // 5
-    {feederN, checkerN}, // 6
-    {feederN, checkerN}, // 7
-    {feederN, checkerN}, // 8
-    {feederN, checkerN}, // 9
-    {feederN, checkerN}, // 10
-    {feederN, checkerN}, // 11
-    {feederN, checkerN}, // 12
-    {feederN, checkerN}, // 13
-    {feederN, checkerN}, // 14
-    {feederN, checkerN}, // 15
-    {feederN, checkerN}, // 16
-    {feederN, checkerN}, // 17
-    {feederN, checkerN}, // 18
-    {feederN, checkerN}, // 19
-    {feederN, checkerN}, // 20
-    {feederN, checkerN}, // 21
-    {feederN, checkerN}, // 22
-    {feederN, checkerN}, // 23
-    {feederN, checkerN}, // 24
-    {feederN, checkerN}, // 25
-    {feederN, checkerN}, // 26
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray}, // 1
+    {FeedFromArray, CheckFromArray}, // 2
+    {FeedFromArray, CheckFromArray}, // 3
+    {FeedFromArray, CheckFromArray}, // 4
+    {FeedFromArray, CheckFromArray}, // 5
+    {FeedFromArray, CheckFromArray}, // 6
+    {FeedFromArray, CheckFromArray}, // 7
+    {FeedFromArray, CheckFromArray}, // 8
+    {FeedFromArray, CheckFromArray}, // 9
+    {FeedFromArray, CheckFromArray}, // 10
+    {FeedFromArray, CheckFromArray}, // 11
+    {FeedFromArray, CheckFromArray}, // 12
+    {FeedFromArray, CheckFromArray}, // 13
+    {FeedFromArray, CheckFromArray}, // 14
+    {FeedFromArray, CheckFromArray}, // 15
+    {FeedFromArray, CheckFromArray}, // 16
+    {FeedFromArray, CheckFromArray}, // 17
+    {FeedFromArray, CheckFromArray}, // 18
+    {FeedFromArray, CheckFromArray}, // 19
+    {FeedFromArray, CheckFromArray}, // 20
+    {FeedFromArray, CheckFromArray}, // 21
+    {FeedFromArray, CheckFromArray}, // 22
+    {FeedFromArray, CheckFromArray}, // 23
+    {FeedFromArray, CheckFromArray}, // 24
+    {FeedFromArray, CheckFromArray}, // 25
+    {FeedFromArray, CheckFromArray}, // 26
     {feederBig1, checkerBig1}, // 27 n=16
     {feederBig1, checkerBig1}, // 28 n=21
     {feederBig2, checkerBig2}, // 29
@@ -376,9 +376,22 @@ const struct labFeedAndCheck labTests[] = {
     {feederBig1, checkerBig1}, // n=41
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 5 Huffman";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 6000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+const char* GetTesterName(void) {
+    return "Lab 5 Huffman";
+}
+
+int GetTestTimeout() {
+    return 6000;
+}
+
+size_t GetTestMemoryLimit() {
+    return MIN_PROCESS_RSS_BYTES;
+}

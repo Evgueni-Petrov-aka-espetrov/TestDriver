@@ -1,32 +1,35 @@
-#ifndef labreporter
-#define labreporter
+#pragma once
+
 #include <stddef.h>
+#include <stdio.h>
 
-struct labFeedAndCheck {int (*feeder)(void), (*checker)(void);};
+typedef struct {
+    int (*Feeder)(void);
+    int (*Checker)(void);
+} TLabTest;
 
-extern const struct labFeedAndCheck labTests[];
-extern const int labNTests;
-extern const char labName[];
-extern int labTimeout;
-extern size_t labOutOfMemory;
+TLabTest GetLabTest(int testIdx);
+int GetTestCount(void);
+const char* GetTesterName(void);
+int GetTestTimeout(void);
+size_t GetTestMemoryLimit(void);
 
-// MIN_PROCESS_RSS_BYTES IS CHANGED
-// Before: (1024*1024*sizeof(void*)/4)
-// Doubling MIN_PROCESS_RSS_BYTES is humane solution
-// that helps people with VS Debug builds, self-written libraries, very old (or very new) compilers.
-// Also there is no way to abuse it (no proofs for this statement yet)
+int HaveGarbageAtTheEnd(FILE* out);
+
+const char Pass[];
+const char Fail[];
+const char* ScanIntInt(FILE* out, int* a, int* b);
+const char* ScanInt(FILE* out, int* a);
+
+size_t GetLabPointerSize(void);
+
+unsigned RoundUptoThousand(unsigned int n);
+
 #define MIN_PROCESS_RSS_BYTES (1024*1024*sizeof(void*)/2)
-
 
 #ifdef _WIN32
 // Helpers for Windows
 #include <windows.h>
-
-inline unsigned int tickDifference(unsigned int start, unsigned int finish)
-{
-    return finish-start;
-}
-
 #else
 // Helpers and compatibility for Linux
 #include <strings.h>
@@ -40,10 +43,4 @@ static inline DWORD GetTickCount(void)
     gettimeofday(&tv, NULL);
     return (DWORD)(tv.tv_sec*1000+tv.tv_usec/1000);
 }
-
-static inline unsigned int tickDifference(unsigned int start, unsigned int finish)
-{
-    return finish-start;
-}
 #endif
-#endif /* labreporter */

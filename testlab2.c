@@ -19,7 +19,7 @@ static const struct {const char *const in, *const out[16]; int n;} testInOut[] =
     {"024\n5\n", {"042", "204", "240", "402", "420"}, 5}
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
@@ -31,7 +31,7 @@ static int feederN(void)
     return 0;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i, passed = 1;
@@ -42,7 +42,7 @@ static int checkerN(void)
     }
     for (i = 0; i < testInOut[testN].n; i++) {
         char perm[32];
-        const size_t refLen = strlen(testInOut[testN].out[i]); 
+        const size_t refLen = strlen(testInOut[testN].out[i]);
         if (!fgets(perm, sizeof(perm), out)) {
             passed = 0;
             printf("output too short -- ");
@@ -57,17 +57,8 @@ static int checkerN(void)
             break;
         }
     }
-    if (i >= testInOut[testN].n) {
-        while (1) {
-            char ignored;
-            if (fscanf(out, "%c", &ignored) == EOF)
-                break;
-            if (strchr("\n\t ", ignored))
-                continue;
-            passed = 0;
-            printf("output is too long -- ");
-            break;
-        }
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -81,25 +72,38 @@ static int checkerN(void)
     }
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN}
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray}
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 2 Deijkstra permutations";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 3000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+const char* GetTesterName(void) {
+    return "Lab 2 Deijkstra permutations";
+}
+
+int GetTestTimeout() {
+    return 3000;
+}
+
+size_t GetTestMemoryLimit() {
+    return MIN_PROCESS_RSS_BYTES;
+}

@@ -46,7 +46,7 @@ static const struct {const char *const in; int n, out[32];} testInOut[] = {
     {"4\n4 3 2 1\n", 4, {1, 2, 3, 4}},
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
@@ -58,7 +58,7 @@ static int feederN(void)
     return 0;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i, passed = 1;
@@ -68,32 +68,17 @@ static int checkerN(void)
         return -1;
     }
     for (i = 0; i < testInOut[testN].n; i++) {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-            break;
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
-            break;
         } else if (testInOut[testN].out[i] != n) {
             passed = 0;
             printf("wrong output -- ");
             break;
         }
     }
-    if (i >= testInOut[testN].n) {
-        while (1) {
-            char ignored;
-            if (fscanf(out, "%c", &ignored) == EOF)
-                break;
-            if (strchr("\n\t ", ignored))
-                continue;
-            passed = 0;
-            printf("output is too long -- ");
-            break;
-        }
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -106,6 +91,9 @@ static int checkerN(void)
         return 1;
     }
 }
+
+static int LabTimeout;
+static size_t LabMemoryLimit;
 
 static int feederBig(void)
 {
@@ -129,11 +117,11 @@ static int feederBig(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    t = (tickDifference(t, GetTickCount())+999)/1000*1000;
+    t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    labTimeout = (int)t*2+3000;
+    LabTimeout = (int)t*2+3000;
     fflush(stdout);
-    labOutOfMemory = MIN_PROCESS_RSS_BYTES+4*2000000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES+4*2000000;
     return 0;
 }
 
@@ -147,15 +135,9 @@ static int checkerBig(void)
         return -1;
     }
     for (i = 0; i < 2000000; i++) {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-            break;
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
-            break;
         } else if ((n^0x1234567) < 0 || 2000000 <= (n^0x1234567)) {
             passed = 0;
             printf("wrong output -- ");
@@ -170,16 +152,7 @@ static int checkerBig(void)
         }
     }
     if (passed) {
-        while (1) {
-            char ignored;
-            if (fscanf(out, "%c", &ignored) == EOF)
-                break;
-            if (strchr("\n\t ", ignored))
-                continue;
-            passed = 0;
-            printf("output is too long -- ");
-            break;
-        }
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -215,11 +188,11 @@ static int feederBig2(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    t = (tickDifference(t, GetTickCount())+999)/1000*1000;
+    t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    labTimeout = (int)t*2+3000;
+    LabTimeout = (int)t*2+3000;
     fflush(stdout);
-    labOutOfMemory = MIN_PROCESS_RSS_BYTES+4*2000000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES+4*2000000;
     return 0;
 }
 
@@ -233,15 +206,9 @@ static int checkerBig2(void)
         return -1;
     }
     for (i = 0; i < 2000000; i++) {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-            break;
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
-            break;
         } else if (n != 0) {
             passed = 0;
             printf("wrong output -- ");
@@ -249,16 +216,7 @@ static int checkerBig2(void)
         }
     }
     if (passed) {
-        while (1) {
-            char ignored;
-            if (fscanf(out, "%c", &ignored) == EOF)
-                break;
-            if (strchr("\n\t ", ignored))
-                continue;
-            passed = 0;
-            printf("output is too long -- ");
-            break;
-        }
+        passed = !HaveGarbageAtTheEnd(out);
     }
     fclose(out);
     if (passed) {
@@ -272,55 +230,69 @@ static int checkerBig2(void)
     }
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
     {feederBig, checkerBig},
     {feederBig2, checkerBig2}
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 3-x Quick Sort or Heap Sort";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 3000;
+const char* GetTesterName(void) {
+    return "Lab 3-x Quick Sort or Heap Sort";
+}
 
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+static int LabTimeout = 3000;
+int GetTestTimeout() {
+    return LabTimeout;
+}
+
+static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+size_t GetTestMemoryLimit() {
+    return LabMemoryLimit;
+}

@@ -62,7 +62,7 @@ static const struct {const char *const in, *const out1, *const out2, *const out2
 
 };
 
-static int feederN(void)
+static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
@@ -74,10 +74,10 @@ static int feederN(void)
     return 0;
 }
 
-static int checkerN(void)
+static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    char pass[] = "PASSED", fail[] = "FAILED", *fact = pass;
+    const char* fact = Pass;
     char buf1[128] = {0}, buf2[128] = {0};
     if (!out) {
         printf("can't open out.txt\n");
@@ -91,9 +91,9 @@ static int checkerN(void)
         *strchr(buf1, '\n') = 0;
     }
     if (_strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
-        fact = fail;
+        fact = Fail;
     }
-    if (fact == pass && testInOut[testN].out2 != NULL) { // check path
+    if (fact == Pass && testInOut[testN].out2 != NULL) { // check path
         if (fgets(buf2, sizeof(buf2), out) == NULL) {
             printf("output too short -- ");
         }
@@ -102,34 +102,28 @@ static int checkerN(void)
         }
         if (testInOut[testN].out20 == NULL) { // unique shortest path
             if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
-                fact = fail;
+                fact = Fail;
             }
         } else { // two shortest paths
             if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0
                 && _strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
-                    fact = fail;
+                    fact = Fail;
             }
         }
     }
-    if (fact == pass) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                fact = fail;
-                break;
-            }
+    if (fact == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            fact = Fail;
         }
     }
     fclose(out);
     printf("%s\n", fact);
     testN++;
-    return fact == fail;
+    return fact == Fail;
 }
+
+static int LabTimeout;
+static size_t LabMemoryLimit;
 
 static int feederBig(void)
 {
@@ -144,7 +138,7 @@ static int feederBig(void)
         fprintf(in, "%d %d 1\n", i+1, i+2);
     }
     fclose(in);
-    labOutOfMemory = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -152,68 +146,47 @@ static int checkerBig(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i;
-    char passed[] = "PASSED", failed[] = "FAILED", *message = passed;
+    const char* message = Pass;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
     for (i = 0; i < 5000; i++) {
-        int d, status = fscanf(out, "%d", &d);
-        if (status < 0) {
-            printf("output too short -- ");
-            message = failed;
-            break;
-        }
-        if (status == 0) {
-            printf("bad output format -- ");
-            message = failed;
+        int d;
+        message = ScanInt(out, &d);
+        if (message != Pass) {
             break;
         }
         if (d != i) {
             printf("bad output -- ");
-            message = failed;
+            message = Fail;
             break;
         }
     }
-    if (message == passed) {
+    if (message == Pass) {
         for (i = 0; i < 5000; i++) {
-            int d, status = fscanf(out, "%d", &d);
-            if (status < 0) {
-                printf("output too short -- ");
-                message = failed;
-                break;
-            }
-            if (status == 0) {
-                printf("bad output format -- ");
-                message = failed;
+            int d;
+            message = ScanInt(out, &d);
+            if (message != Pass) {
                 break;
             }
             if (d != 5000-i) {
                 printf("bad output -- ");
-                message = failed;
+                message = Fail;
                 break;
             }
         }
     }
-    if (message == passed) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                message = failed;
-                break;
-            }
+    if (message == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            message = Fail;
         }
     }
     fclose(out);
     printf("%s\n", message);
     testN++;
-    return message == failed;
+    return message == Fail;
 }
 
 static int feederBig1(void)
@@ -230,7 +203,7 @@ static int feederBig1(void)
     }
     fprintf(in, "5000 1 1\n");
     fclose(in);
-    labOutOfMemory = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -238,7 +211,7 @@ static int checkerBig1(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i;
-    char passed[] = "PASSED", failed[] = "FAILED", *message = passed;
+    const char* message = Pass;
     int p[2501], v1 = 1, v2 = 1; // two shortest paths exist
     if (!out) {
         printf("can't open out.txt\n");
@@ -246,34 +219,21 @@ static int checkerBig1(void)
         return -1;
     }
     for (i = 0; i < 5000; i++) {
-        int d, status = fscanf(out, "%d", &d);
-        if (status < 0) {
-            printf("output too short -- ");
-            message = failed;
-            break;
-        }
-        if (status == 0) {
-            printf("bad output format -- ");
-            message = failed;
+        int d;
+        message = ScanInt(out, &d);
+        if (message != Pass) {
             break;
         }
         if ((i <= 2500 && d != i) || (i > 2500 && d != 5000-i)) {
             printf("bad output A -- ");
-            message = failed;
+            message = Fail;
             break;
         }
     }
-    if (message == passed) {
+    if (message == Pass) {
         for (i = 0; i < 2501; i++) {
-            int status = fscanf(out, "%d", &p[i]);
-            if (status < 0) {
-                printf("output too short -- ");
-                message = failed;
-                break;
-            }
-            if (status == 0) {
-                printf("bad output format -- ");
-                message = failed;
+            message = ScanInt(out, &p[i]);
+            if (message != Pass) {
                 break;
             }
         }
@@ -285,36 +245,25 @@ static int checkerBig1(void)
         for (i = 0; i < 2500; i++)
             if (p[i] != 2501+i) { // 2501 2502 ... 4999 5000 1
                 v2 = 0;
-printf("want %d get %d\n",2501+i,p[i]);
                 break;
             }
         if (p[2500] != 1) {
-printf("want %d get %d\n",1,p[2500]);
             v2 = 0;
         }
         if (v1 == 0 && v2 == 0) {
             printf("bad output B -- ");
-            message = failed;
+            message = Fail;
         }
     }
-    if (message == passed) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                message = failed;
-                break;
-            }
+    if (message == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            message = Fail;
         }
     }
     fclose(out);
     printf("%s\n", message);
     testN++;
-    return message == failed;
+    return message == Fail;
 }
 
 static int feederBig2(void)
@@ -347,12 +296,12 @@ static int feederBig2(void)
     fprintf(in, "2 1985 1\n");
     fflush(NULL);
 
-    t = (tickDifference(t, GetTickCount())+999)/1000*1000;
+    t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout T+6... ", (unsigned)t/1000);
-    labTimeout = (int)t+6000;
+    LabTimeout = (int)t+6000;
     fflush(stdout);
     fclose(in);
-    labOutOfMemory = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -360,144 +309,140 @@ static int checkerBig2(void)
 {
     FILE *const out = fopen("out.txt", "r");
     int i;
-    char passed[] = "PASSED", failed[] = "FAILED", *message = passed;
+    const char* message = Pass;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
     for (i = 1; i <= 5000; i++) {
-        int d, status = fscanf(out, "%d", &d);
-        if (status < 0) {
-            printf("output too short -- ");
-            message = failed;
-            break;
-        }
-        if (status == 0) {
-            printf("bad output format -- ");
-            message = failed;
+        int d;
+        message = ScanInt(out, &d);
+        if (message != Pass) {
             break;
         }
         if (i != 1 && i != 2 && i != 1985 && d != 2) {
             printf("bad output -- ");
-            message = failed;
+            message = Fail;
             break;
         }
         if (i == 1 && d != 0) {
             printf("bad output -- ");
-            message = failed;
+            message = Fail;
             break;
         }
         if (i == 2 && d != 2) {
             printf("bad output -- ");
-            message = failed;
+            message = Fail;
             break;
         }
         if (i == 1985 && d != 1) {
             printf("bad output -- ");
-            message = failed;
+            message = Fail;
             break;
         }
     }
-    if (message == passed) {
-        int d1, d2, d3, status = fscanf(out, "%d %d %d", &d1, &d2, &d3);
-        if (status < 0) {
-            printf("output too short -- ");
-            message = failed;
-        } else if (status < 3) {
-            printf("bad output format -- ");
-            message = failed;
+    if (message == Pass) {
+        int d1, d2, d3;
+        if (ScanIntInt(out, &d1, &d2) != Pass || ScanInt(out, &d3) != Pass) {
+            message = Fail;
         } else if (d1 != 2 || d2 != 1985 || d3 != 1) {
             printf("bad output -- ");
-            message = failed;
+            message = Fail;
         }
     }
-    if (message == passed) {
-        while (1) {
-            char c;
-            int status = fscanf(out, "%c", &c);
-            if (status < 0) {
-                break;
-            }
-            if (!strchr(" \t\r\n", c)) {
-                printf("garbage at the end -- ");
-                message = failed;
-                break;
-            }
+    if (message == Pass) {
+        if (HaveGarbageAtTheEnd(out)) {
+            message = Fail;
         }
     }
     fclose(out);
     printf("%s\n", message);
     testN++;
-    return message == failed;
+    return message == Fail;
 }
 
-const struct labFeedAndCheck labTests[] = {
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
-    {feederN, checkerN},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
 
     {feederBig, checkerBig},
     {feederBig1, checkerBig1},
     {feederBig2, checkerBig2},
 };
 
-const int labNTests = sizeof(labTests)/sizeof(labTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
+}
 
-const char labName[] = "Lab 9 Dijkstra Shortest Path";
+int GetTestCount(void) {
+    return sizeof(LabTests)/sizeof(LabTests[0]);
+}
 
-int labTimeout = 3000;
-size_t labOutOfMemory = MIN_PROCESS_RSS_BYTES;
+const char* GetTesterName(void) {
+    return "Lab 9 Dijkstra Shortest Path";
+}
+
+static int LabTimeout = 3000;
+int GetTestTimeout() {
+    return LabTimeout;
+}
+
+static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+size_t GetTestMemoryLimit() {
+    return LabMemoryLimit;
+}
