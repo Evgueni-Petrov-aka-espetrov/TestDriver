@@ -2,16 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-static size_t ptr_size(void)
-{
-    static int x64 = -1;
-    if (x64 == -1)
-    {
-        char *cpu = getenv("PROCESSOR_IDENTIFIER");
-        x64 = cpu ? strstr(cpu, "x86") == NULL : 1;
-    }
-    return sizeof(int)*(size_t)(x64+1);
-}
 
 enum testConst { N_MAX = 1000 };
 static int testN = 0;
