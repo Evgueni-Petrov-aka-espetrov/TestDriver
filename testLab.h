@@ -16,8 +16,9 @@ size_t GetTestMemoryLimit(void);
 
 int HaveGarbageAtTheEnd(FILE* out);
 
-const char Pass[];
-const char Fail[];
+extern const char Pass[];
+extern const char Fail[];
+const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b);
 const char* ScanIntInt(FILE* out, int* a, int* b);
 const char* ScanInt(FILE* out, int* a);
 

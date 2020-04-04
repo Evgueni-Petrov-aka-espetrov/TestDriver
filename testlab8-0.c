@@ -16,6 +16,7 @@ static int Feed(void);
 static int Check(void);
 
 TLabTest GetLabTest(int testIdx) {
+    (void)testIdx;
     TLabTest labTest = {Feed, Check};
     return labTest;
 }
@@ -42,16 +43,16 @@ size_t GetTestMemoryLimit() {
 struct TEdge {
     unsigned Begin;
     unsigned End;
-    unsigned Length;
+    unsigned long long Length;
 };
 
 typedef union {
     struct TEdge Edge;
-    unsigned Integer;
+    unsigned long long Integer;
     const char* String;
 } TTestcaseData;
 
-static TTestcaseData MakeInteger(unsigned integer) {
+static TTestcaseData MakeInteger(unsigned long long integer) {
     TTestcaseData testcaseData;
     testcaseData.Integer = integer;
     return testcaseData;
@@ -63,7 +64,7 @@ static TTestcaseData MakeString(const char* string) {
     return testcaseData;
 }
 
-static TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned length) {
+static TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long length) {
     TTestcaseData testcaseData;
     testcaseData.Edge.Begin = begin;
     testcaseData.Edge.End = end;
@@ -76,11 +77,12 @@ static unsigned SumRange(unsigned begin, unsigned end) {
 }
 
 static void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx) {
-    *rowIdx = sqrt(8 * linearIdx + 1) / 2 - 0.5;
+    *rowIdx = (unsigned)(sqrt(8 * linearIdx + 1) / 2 - 0.5);
     *columnIdx = linearIdx - SumRange(0, *rowIdx);
 }
 
-enum { IGNORED_EDGE_IDX = -1, IGNORED_VERTEX_IDX = 0 };
+enum { IGNORED_VERTEX_IDX = 0 };
+static const unsigned IGNORED_EDGE_IDX = (unsigned)-1;
 
 enum ETestcaseDataId {
     VERTEX_COUNT,
@@ -97,7 +99,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             unsigned EdgeCount;
             struct TEdge Edges[8];
             const char* Message;
-            unsigned MstLength;
+            unsigned long long MstLength;
         } TSmallTest;
 
         static const TSmallTest smallTests[] = {
@@ -108,27 +110,27 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             {0, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
             {MAX_VERTEX_COUNT+1, 1, {{1, 1, 1}}, "bad number of vertices"},
             {2, 4, {{1, 1, 1}, {1, 2, 1}, {2, 1, 1}, {2, 2, 1}}, "bad number of edges"},
-            {2, 1, {{1, 2, -1}}, "bad length"},
+            {2, 1, {{1, 2, (unsigned long long)-1}}, "bad length"},
 
             {2, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
-            {2, 1, {{1, 2, (int64_t)4*INT_MAX}}, "bad length"},
+            {2, 1, {{1, 2, (unsigned long long)4*INT_MAX}}, "bad length"},
             {4, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, "no spanning tree"},
             {2, 1, {{1, 1, INT_MAX}}, "no spanning tree"},
 
             {1, 0, {{IGNORED_VERTEX_IDX}}, NULL, 0},
             {4, 4, {{1, 2, 1}, {2, 3, 2}, {3, 4, 4}, {4, 1, 8}}, NULL, 7},
-            {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (int64_t)2*INT_MAX},
-            {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (int64_t)1+INT_MAX},
+            {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (unsigned long long)2*INT_MAX},
+            {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (unsigned long long)1+INT_MAX},
 
-            {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (int64_t)3*INT_MAX},
+            {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (unsigned long long)3*INT_MAX},
             {4, 4, {{1, 2, 1}, {2, 3, 1}, {3, 4, 1}, {4, 1, 1}}, NULL, 3},
             {5, 4, {{1, 2, 1}, {2, 3, 1}, {3, 1, 1}, {4, 3, 1}}, "no spanning tree"},
             {4, 6, {{1, 2, 1}, {1, 3, 2}, {1, 4, 4}, {2, 3, 8}, {2, 4, 16}, {3, 4, 32}}, NULL, 7},
 
             {3, 2, {{1, 2, 1}, {2, 4, 1}}, "bad vertex"},
             {3, 2, {{1, 2, 1}, {4, 2, 1}}, "bad vertex"},
-            {3, 2, {{1, 2, 1}, {-1, 2, 1}}, "bad vertex"},
-            {3, 2, {{1, 2, 1}, {2, -1, 1}}, "bad vertex"},
+            {3, 2, {{1, 2, 1}, {(unsigned)-1, 2, 1}}, "bad vertex"},
+            {3, 2, {{1, 2, 1}, {2, (unsigned)-1, 1}}, "bad vertex"},
 
             {4, 4, {{1, 2, 1}, {2, 3, 2}, {1, 3, 3}, {4, 3, 4}}, NULL, 7},
             {4, 3, {{1, 2, 1}, {3, 4, 2}, {2, 4, 3}}, NULL, 6},
@@ -153,7 +155,6 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             default:
                 abort();
         }
-        assert(0);
     } else if (testcaseIdx == 27) {
         switch (dataId) {
             case VERTEX_COUNT:
@@ -227,6 +228,14 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
     }
 }
 
+static unsigned GetVertexCount() {
+    return (unsigned)GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
+}
+
+static unsigned GetEdgeCount() {
+    return (unsigned)GetFromTestcase(TestcaseIdx, EDGE_COUNT, IGNORED_EDGE_IDX).Integer;
+}
+
 static int Feed(void) {
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
@@ -234,8 +243,8 @@ static int Feed(void) {
         return -1;
     }
 
-    const unsigned vertexCount = GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
-    const unsigned edgeCount = GetFromTestcase(TestcaseIdx, EDGE_COUNT, IGNORED_EDGE_IDX).Integer;
+    const unsigned vertexCount = GetVertexCount();
+    const unsigned edgeCount = GetEdgeCount();
     fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
 
     const int isVerbose = edgeCount > 1000 * 1000;
@@ -245,12 +254,12 @@ static int Feed(void) {
     }
 
     unsigned start = GetTickCount();
-    for (int idx = 0; idx < edgeCount; ++idx) {
+    for (unsigned idx = 0; idx < edgeCount; ++idx) {
         const struct TEdge edge = GetFromTestcase(TestcaseIdx, EDGE, idx).Edge;
         if (edge.Begin == IGNORED_VERTEX_IDX) {
             break;
         }
-        if (fprintf(in, "%u %u %u\n", edge.Begin, edge.End, edge.Length) < 3) {
+        if (fprintf(in, "%u %u %" PRIi64 "\n", edge.Begin, edge.End, edge.Length) < 3) {
             printf("can't create in.txt. No space on disk?\n");
             fclose(in);
             return -1;
@@ -271,21 +280,21 @@ static int Feed(void) {
 }
 
 static unsigned FindEdge(unsigned a, unsigned b) {
-    const unsigned vertexCount = GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
+    const unsigned vertexCount = GetVertexCount();
     if (a < 1 || a > vertexCount || b < 1 || b > vertexCount) {
         return IGNORED_EDGE_IDX;
     }
-    const unsigned edgeCount = GetFromTestcase(TestcaseIdx, EDGE_COUNT, IGNORED_EDGE_IDX).Integer;
+    const unsigned edgeCount = GetEdgeCount();
     for (unsigned idx = 0; idx < edgeCount; ++idx) {
         const struct TEdge edge = GetFromTestcase(TestcaseIdx, EDGE, idx).Edge;
-        if (edge.Begin == a && edge.End == b || edge.Begin == b && edge.End == a) {
+        if ((edge.Begin == a && edge.End == b) || (edge.Begin == b && edge.End == a)) {
             return idx;
         }
     }
     return IGNORED_EDGE_IDX;
 }
 
-static int FindRoot(int vertex, const int parent[]) {
+static int FindRoot(unsigned vertex, const unsigned parent[]) {
     while (1) {
         if (vertex == parent[vertex]) {
             return vertex;
@@ -294,10 +303,9 @@ static int FindRoot(int vertex, const int parent[]) {
     }
 }
 
-static int CountRoots(int vertexCount, const int parent[]) {
+static int CountRoots(unsigned vertexCount, const unsigned parent[]) {
     int rootCount = 0;
-    int i;
-    for (i = 0; i < vertexCount; ++i) {
+    for (unsigned i = 0; i < vertexCount; ++i) {
         if (parent[i] == i) {
             ++rootCount;
         }
@@ -305,9 +313,8 @@ static int CountRoots(int vertexCount, const int parent[]) {
     return rootCount;
 }
 
-static void InitParent(int vertexCount, int parent[]) {
-    int i;
-    for (i = 0; i < vertexCount; ++i) {
+static void InitParent(unsigned vertexCount, unsigned parent[]) {
+    for (unsigned i = 0; i < vertexCount; ++i) {
         parent[i] = i;
     }
 }
@@ -336,13 +343,13 @@ static int Check(void) {
             }
         }
     } else { // test spanning tree
-        const unsigned vertexCount = GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
+        const unsigned vertexCount = GetVertexCount();
         unsigned vertexParent[MAX_VERTEX_COUNT];
-        unsigned length = 0;
+        unsigned long long length = 0;
         InitParent(vertexCount, vertexParent);
         for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
             unsigned a, b;
-            if (ScanIntInt(out, &a, &b) != Pass) {
+            if (ScanUintUint(out, &a, &b) != Pass) {
                 status = Fail;
                 break;
             }

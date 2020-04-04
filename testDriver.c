@@ -110,6 +110,18 @@ int HaveGarbageAtTheEnd(FILE* out) {
 const char Pass[] = "PASSED";
 const char Fail[] = "FAILED";
 
+const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b) {
+    int status = fscanf(out, "%u%u", a, b);
+    if (status < 0) {
+        printf("output too short -- ");
+        return Fail;
+    } else if (status < 2) {
+        printf("bad output format -- ");
+        return Fail;
+    }
+    return Pass;
+}
+
 const char* ScanIntInt(FILE* out, int* a, int* b) {
     if (ScanInt(out, a) == Pass && ScanInt(out, b) == Pass) {
         return Pass;
