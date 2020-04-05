@@ -38,10 +38,9 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"2 15\n1=0\n", "bad input"} // 31
 };
 
-static int FeedFromArray(void)
-{
-    FILE *const in = fopen("in.txt", "w+");
-    if (!in) {
+static int FeedFromArray(void) {
+    FILE* const in = fopen("in.txt", "w+");
+    if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
@@ -50,76 +49,35 @@ static int FeedFromArray(void)
     return 0;
 }
 
-static int CheckFromArray(void)
-{
-    FILE *const out = fopen("out.txt", "r");
-    char buf[128] = {0};
-    if (!out) {
+static int CheckFromArray(void) {
+    FILE* const out = fopen("out.txt", "r");
+    if (out == NULL) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
-    if (fgets(buf, sizeof(buf), out) == NULL) {
-        printf("no output -- ");
-    }
+    char buf[128] = {0};
+    const char* status = ScanChars(out, sizeof(buf), buf);
     fclose(out);
-    if (strchr(buf, '\n'))
-        *strchr(buf, '\n') = 0;
-    if (strchr(buf, '.'))
-        strncpy(buf+strlen(buf), "0000""0000""0000""0000""0000""0000""0000""0000", sizeof(buf)-strlen(buf)-1);
-    //printf("%s %s\n", testInOut[testN].out, buf);
-    if (_strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) == 0) {
-        printf("PASSED\n");
-        testN++;
-        return 0;
-    } else {
-        printf("FAILED\n");
-        testN++;
-        return 1;
+    if (status == Pass && strchr(buf, '.')) {
+        strncpy(buf + strlen(buf), "0000""0000""0000""0000""0000""0000""0000""0000", sizeof(buf) - strlen(buf) - 1);
     }
+    if (status == Pass && _strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) != 0) {
+        status = Fail;
+    }
+    printf("%s\n", status);
+    ++testN;
+    return status == Fail;
 }
 
-const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray}
-};
-
 TLabTest GetLabTest(int testIdx) {
-    return LabTests[testIdx];
+    (void)testIdx;
+    TLabTest labTest = {FeedFromArray, CheckFromArray};
+    return labTest;
 }
 
 int GetTestCount(void) {
-    return sizeof(LabTests)/sizeof(LabTests[0]);
+    return sizeof(testInOut) / sizeof(testInOut[0]);
 }
 
 const char* GetTesterName(void) {

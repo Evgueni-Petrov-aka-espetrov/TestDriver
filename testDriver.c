@@ -141,6 +141,18 @@ const char* ScanInt(FILE* out, int* a) {
     return Pass;
 }
 
+const char* ScanChars(FILE* out, size_t bufferSize, char* buffer) {
+    if (fgets(buffer, bufferSize, out) == NULL) {
+        printf("no output -- ");
+        return Fail;
+    }
+    char* newlinePtr = strchr(buffer, '\n');
+    if (newlinePtr != NULL) {
+        *newlinePtr = '\0';
+    }
+    return Pass;
+}
+
 size_t GetLabPointerSize(void) {
     return 8; // TODO: determine from bitness of the lab executable
 }

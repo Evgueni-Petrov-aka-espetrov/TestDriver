@@ -21,6 +21,7 @@ extern const char Fail[];
 const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b);
 const char* ScanIntInt(FILE* out, int* a, int* b);
 const char* ScanInt(FILE* out, int* a);
+const char* ScanChars(FILE* out, size_t bufferSize, char* buffer);
 
 size_t GetLabPointerSize(void);
 
