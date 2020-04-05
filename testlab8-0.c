@@ -330,17 +330,10 @@ static int Check(void) {
     const char* message = GetFromTestcase(TestcaseIdx, ERROR_MESSAGE, IGNORED_EDGE_IDX).String;
     if (message != NULL) { // test error message
         char bufMsg[128] = {0};
-        if (fgets(bufMsg, sizeof(bufMsg), out) == NULL) {
-            printf("output too short -- ");
+        status = ScanChars(out, sizeof(bufMsg), bufMsg);
+        if (status == Pass && _strnicmp(message, bufMsg, strlen(message)) != 0) {
+            printf("wrong output -- ");
             status = Fail;
-        } else {
-            if (strchr(bufMsg, '\n') != NULL) {
-                *strchr(bufMsg, '\n') = 0;
-            }
-            if (_strnicmp(message, bufMsg, strlen(message)) != 0) {
-                printf("wrong output -- ");
-                status = Fail;
-            }
         }
     } else { // test spanning tree
         const unsigned vertexCount = GetVertexCount();
@@ -354,9 +347,14 @@ static int Check(void) {
                 break;
             }
             const unsigned edgeIdx = FindEdge(a, b);
+            if (edgeIdx == IGNORED_EDGE_IDX) {
+                printf("wrong output -- ");
+                status = Fail;
+                break;
+            }
             const unsigned rootA = FindRoot(a - 1, vertexParent);
             const unsigned rootB = FindRoot(b - 1, vertexParent);
-            if (edgeIdx == IGNORED_EDGE_IDX || rootA == rootB) {
+            if (rootA == rootB) {
                 printf("wrong output -- ");
                 status = Fail;
                 break;
