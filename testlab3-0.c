@@ -138,6 +138,7 @@ static int checkerBig(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
+            break;
         } else if ((n^0x1234567) < 0 || 2000000 <= (n^0x1234567)) {
             passed = 0;
             printf("wrong output -- ");
@@ -209,6 +210,7 @@ static int checkerBig2(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
+            break;
         } else if (n != 0) {
             passed = 0;
             printf("wrong output -- ");

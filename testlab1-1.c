@@ -49,6 +49,7 @@ static int CheckFromArray(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
+            break;
         } else if (testInOut[testN].out[i] != n) {
             passed = 0;
             printf("wrong output -- ");
@@ -118,6 +119,7 @@ static int checkerBig(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
+            break;
         } else if (bigOut[i] != n) {
             passed = 0;
             printf("wrong output -- ");

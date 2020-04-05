@@ -46,14 +46,9 @@ static int CheckFromArray(void)
         return -1;
     }
     for (i = 0; i < testInOut[testN].n; i++) {
-        int n, nStatus = fscanf(out, "%d", &n);
-        if (EOF == nStatus) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
             passed = 0;
-            printf("output too short -- ");
-            break;
-        } else if (1 != nStatus) {
-            passed = 0;
-            printf("bad format -- ");
             break;
         } else if (testInOut[testN].out[i] != n) {
             passed = 0;
@@ -119,6 +114,7 @@ static int checkerBig(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
+            break;
         } else if (i != n) {
             passed = 0;
             printf("wrong output -- ");
