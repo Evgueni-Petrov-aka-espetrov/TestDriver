@@ -80,16 +80,10 @@ static int CheckFromArray(void)
     }
     if (testInOut[testN].msg != NULL) { // test error message
         char bufMsg[128] = {0};
-        if (fgets(bufMsg, sizeof(bufMsg), out) == NULL) {
-            printf("output too short -- ");
+        fact = ScanChars(out, sizeof(bufMsg), bufMsg);
+        if (fact == Pass && _strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
+            printf("wrong output -- ");
             fact = Fail;
-        } else {
-            if (strchr(bufMsg, '\n'))
-                *strchr(bufMsg, '\n') = 0;
-            if (_strnicmp(testInOut[testN].msg, bufMsg, strlen(testInOut[testN].msg)) != 0) {
-                printf("wrong output -- ");
-                fact = Fail;
-            }
         }
     } else { // test order
         int i, N = testInOut[testN].N;
@@ -127,10 +121,8 @@ static int CheckFromArray(void)
             }
         }
     }
-    if (fact == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            fact = Fail;
-        }
+    if (fact == Pass && HaveGarbageAtTheEnd(out)) {
+        fact = Fail;
     }
     fclose(out);
     printf("%s\n", fact);
@@ -185,10 +177,8 @@ static int checkerBig(void)
             }
         }
     }
-    if (fact == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            fact = Fail;
-        }
+    if (fact == Pass && HaveGarbageAtTheEnd(out)) {
+        fact = Fail;
     }
     fclose(out);
     printf("%s\n", fact);
@@ -241,10 +231,8 @@ static int checkerBig1(void)
             }
         }
     }
-    if (fact == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            fact = Fail;
-        }
+    if (fact == Pass && HaveGarbageAtTheEnd(out)) {
+        fact = Fail;
     }
     fclose(out);
     printf("%s\n", fact);
