@@ -77,44 +77,29 @@ static int FeedFromArray(void)
 static int CheckFromArray(void)
 {
     FILE *const out = fopen("out.txt", "r");
-    const char* fact = Pass;
-    char buf1[128] = {0}, buf2[128] = {0};
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
-    if (fgets(buf1, sizeof(buf1), out) == NULL) {
-        printf("no output -- ");
-    }
-    if (strchr(buf1, '\n')) {
-        *strchr(buf1, '\n') = 0;
-    }
-    if (_strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
+    const char* fact = Pass;
+    char buf1[128] = {0};
+    fact = ScanChars(out, sizeof(buf1), buf1);
+    if (fact == Pass && _strnicmp(testInOut[testN].out1, buf1, strlen(testInOut[testN].out1)) != 0) {
         fact = Fail;
     }
     if (fact == Pass && testInOut[testN].out2 != NULL) { // check path
-        if (fgets(buf2, sizeof(buf2), out) == NULL) {
-            printf("output too short -- ");
-        }
-        if (strchr(buf2, '\n')) {
-            *strchr(buf2, '\n') = 0;
-        }
-        if (testInOut[testN].out20 == NULL) { // unique shortest path
-            if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
+        char buf2[128] = {0};
+        fact = ScanChars(out, sizeof(buf2), buf2);
+        if (fact == Pass && _strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0) {
+            if (testInOut[testN].out20 == NULL || _strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
+                printf("wrong output -- ");
                 fact = Fail;
-            }
-        } else { // two shortest paths
-            if (_strnicmp(testInOut[testN].out2, buf2, strlen(testInOut[testN].out2)) != 0
-                && _strnicmp(testInOut[testN].out20, buf2, strlen(testInOut[testN].out20)) != 0) {
-                    fact = Fail;
             }
         }
     }
-    if (fact == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            fact = Fail;
-        }
+    if (fact == Pass && HaveGarbageAtTheEnd(out)) {
+        fact = Fail;
     }
     fclose(out);
     printf("%s\n", fact);
@@ -159,7 +144,7 @@ static int checkerBig(void)
             break;
         }
         if (d != i) {
-            printf("bad output -- ");
+            printf("wrong output -- ");
             message = Fail;
             break;
         }
@@ -172,16 +157,14 @@ static int checkerBig(void)
                 break;
             }
             if (d != 5000-i) {
-                printf("bad output -- ");
+                printf("wrong output -- ");
                 message = Fail;
                 break;
             }
         }
     }
-    if (message == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            message = Fail;
-        }
+    if (message == Pass && HaveGarbageAtTheEnd(out)) {
+        message = Fail;
     }
     fclose(out);
     printf("%s\n", message);
@@ -225,7 +208,7 @@ static int checkerBig1(void)
             break;
         }
         if ((i <= 2500 && d != i) || (i > 2500 && d != 5000-i)) {
-            printf("bad output A -- ");
+            printf("wrong output -- ");
             message = Fail;
             break;
         }
@@ -251,14 +234,12 @@ static int checkerBig1(void)
             v2 = 0;
         }
         if (v1 == 0 && v2 == 0) {
-            printf("bad output B -- ");
+            printf("wrong output -- ");
             message = Fail;
         }
     }
-    if (message == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            message = Fail;
-        }
+    if (message == Pass && HaveGarbageAtTheEnd(out)) {
+        message = Fail;
     }
     fclose(out);
     printf("%s\n", message);
@@ -322,22 +303,22 @@ static int checkerBig2(void)
             break;
         }
         if (i != 1 && i != 2 && i != 1985 && d != 2) {
-            printf("bad output -- ");
+            printf("wrong output -- ");
             message = Fail;
             break;
         }
         if (i == 1 && d != 0) {
-            printf("bad output -- ");
+            printf("wrong output -- ");
             message = Fail;
             break;
         }
         if (i == 2 && d != 2) {
-            printf("bad output -- ");
+            printf("wrong output -- ");
             message = Fail;
             break;
         }
         if (i == 1985 && d != 1) {
-            printf("bad output -- ");
+            printf("wrong output -- ");
             message = Fail;
             break;
         }
@@ -347,14 +328,12 @@ static int checkerBig2(void)
         if (ScanIntInt(out, &d1, &d2) != Pass || ScanInt(out, &d3) != Pass) {
             message = Fail;
         } else if (d1 != 2 || d2 != 1985 || d3 != 1) {
-            printf("bad output -- ");
+            printf("wrong output -- ");
             message = Fail;
         }
     }
-    if (message == Pass) {
-        if (HaveGarbageAtTheEnd(out)) {
-            message = Fail;
-        }
+    if (message == Pass && HaveGarbageAtTheEnd(out)) {
+        message = Fail;
     }
     fclose(out);
     printf("%s\n", message);
