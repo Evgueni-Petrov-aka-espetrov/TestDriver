@@ -21,7 +21,7 @@ TLabTest GetLabTest(int testIdx) {
     return labTest;
 }
 
-static const unsigned TestcaseCount = 31;
+static const unsigned TestcaseCount = 33;
 int GetTestCount(void) {
     return TestcaseCount;
 }
@@ -93,7 +93,8 @@ enum ETestcaseDataId {
 };
 
 static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId dataId, unsigned edgeIdx) {
-    if (testcaseIdx < 27u) {
+    const unsigned smallTestCount = 29;
+    if (testcaseIdx < smallTestCount) {
         typedef struct TSmallTest {
             unsigned VertexCount;
             unsigned EdgeCount;
@@ -119,10 +120,12 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
 
             {1, 0, {{IGNORED_VERTEX_IDX}}, NULL, 0},
             {4, 4, {{1, 2, 1}, {2, 3, 2}, {3, 4, 4}, {4, 1, 8}}, NULL, 7},
-            {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, (unsigned long long)2*INT_MAX},
-            {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, (unsigned long long)1+INT_MAX},
+            {3, 2, {{1, 2, INT_MAX}, {2, 3, INT_MAX}}, NULL, 2ull * INT_MAX},
+            {3, 3, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {1, 3, 1}}, NULL, 1ull + INT_MAX},
 
-            {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, (unsigned long long)3*INT_MAX},
+            {4, 4, {{1, 2, INT_MAX}, {2, 3, INT_MAX}, {3, 4, INT_MAX}, {4, 1, INT_MAX}}, NULL, 3ull * INT_MAX},
+            {4, 4, {{1, 2, 1u << 28}, {2, 3, 2u << 28}, {3, 4, 3u << 28}, {4, 1, 4u << 28}}, NULL, 6ull << 28},
+            {4, 4, {{1, 2, (1u << 28) + 4}, {2, 3, (2u << 28) + 3}, {3, 4, (3u << 28) + 2}, {4, 1, (4u << 28) + 1}}, NULL, (6ull << 28) + 9},
             {4, 4, {{1, 2, 1}, {2, 3, 1}, {3, 4, 1}, {4, 1, 1}}, NULL, 3},
             {5, 4, {{1, 2, 1}, {2, 3, 1}, {3, 1, 1}, {4, 3, 1}}, "no spanning tree"},
             {4, 6, {{1, 2, 1}, {1, 3, 2}, {1, 4, 4}, {2, 3, 8}, {2, 4, 16}, {3, 4, 32}}, NULL, 7},
@@ -138,7 +141,9 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
 
             {6, 6, {{1, 2, 1}, {3, 4, 2}, {5, 6, 3}, {2, 3, 4}, {4, 5, 5}, {1, 6, 6}}, NULL, 15},
         };
-        assert(testcaseIdx < sizeof(smallTests) / sizeof(smallTests[0]));
+        if (smallTestCount != sizeof(smallTests) / sizeof(smallTests[0])) {
+            abort();
+        }
         const TSmallTest* test = &smallTests[testcaseIdx];
         switch (dataId) {
             case VERTEX_COUNT:
@@ -155,7 +160,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             default:
                 abort();
         }
-    } else if (testcaseIdx == 27) {
+    } else if (testcaseIdx == smallTestCount) {
         switch (dataId) {
             case VERTEX_COUNT:
             case EDGE_COUNT:
@@ -170,7 +175,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             default:
                 abort();
         }
-    } else if (testcaseIdx == 28 || testcaseIdx == 29) {
+    } else if (testcaseIdx == smallTestCount + 1 || testcaseIdx == smallTestCount + 2) {
         const unsigned partOneEdgeCount = MAX_VERTEX_COUNT - 2;
         const unsigned partTwoEdgeCount = MAX_VERTEX_COUNT - 3;
         const int slope = testcaseIdx == 28 ? 1 : -1;
@@ -196,7 +201,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             default:
                 abort();
         }
-    } else if (testcaseIdx == 30) {
+    } else if (testcaseIdx == smallTestCount + 3) {
         const unsigned partOneEdgeCount = MAX_VERTEX_COUNT - 2;
         const unsigned partTwoEdgeCount = SumRange(MAX_VERTEX_COUNT * 4 / 5, MAX_VERTEX_COUNT - 3);
         switch (dataId) {
