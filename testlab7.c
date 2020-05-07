@@ -295,7 +295,7 @@ const char* GetTesterName(void) {
 }
 
 int GetTestTimeout() {
-    return 3000;
+    return 6000;
 }
 
 static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
