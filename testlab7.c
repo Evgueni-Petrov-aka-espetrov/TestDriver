@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum testConst { N_MAX = 1000 };
+enum testConst { N_MAX = 2000 };
 static int testN = 0;
 static const struct {
     int N, M;
@@ -43,6 +43,8 @@ static const struct {
 
 };
 
+static size_t LabMemoryLimit;
+
 static int FeedFromArray(void)
 {
     FILE *const in = fopen("in.txt", "w+");
@@ -59,6 +61,7 @@ static int FeedFromArray(void)
         fprintf(in, "%d %d\n", testInOut[testN].G[i].a, testInOut[testN].G[i].b);
     }
     fclose(in);
+    LabMemoryLimit = testInOut[testN].N * 10 + testInOut[testN].M * 2 + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -130,8 +133,6 @@ static int CheckFromArray(void)
     return fact == Fail;
 }
 
-static size_t LabMemoryLimit;
-
 static int feederBig(void)
 {
     FILE *const in = fopen("in.txt", "w+");
@@ -148,7 +149,7 @@ static int feederBig(void)
             fprintf(in, "%d %d\n", i+1, j+1);
     }
     fclose(in);
-    LabMemoryLimit = N_MAX*(N_MAX-1)/2*2*GetLabPointerSize()+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = N_MAX * 10 + N_MAX * (N_MAX-1) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -202,7 +203,7 @@ static int feederBig1(void)
             fprintf(in, "%d %d\n", j+1, i+1);
     }
     fclose(in);
-    LabMemoryLimit = N_MAX*(N_MAX-1)/2*2*GetLabPointerSize()+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = N_MAX * 10 + N_MAX * (N_MAX-1) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 

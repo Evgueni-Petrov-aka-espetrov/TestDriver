@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     printf("\nKOI FIT NSU Lab Tester (c) 2009-2020 by Evgueni Petrov\n");
 
     if (argc < 2) {
-        printf("\nUser error: to test mylab.exe do %s mylab.exe\n", runnerExe);
+        printf("\nTo test mylab.exe, do %s mylab.exe\n", runnerExe);
         return 1;
     }
 
@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
 
     if (i < GetTestCount()) {
         printf("\n:-(\n\n"
-        "Exe %s failed for input file in.txt in the current directory.\n"
+        "Executable file %s failed for input file in.txt in the current directory.\n"
         "Please fix and try again.\n", argv[1]);
         return 1;
     } else {
         printf("\n:-)\n\n"
-        "Exe %s passed all tests.\n"
+        "Executable file %s passed all tests.\n"
         "Please review the source code with your teaching assistant.\n", argv[1]);
         return 0;
     }
@@ -161,6 +161,13 @@ unsigned RoundUptoThousand(unsigned int n) {
     return (n + 999) / 1000 * 1000;
 }
 
+static void ReportTimeout(const char labExe[]) {
+    printf("\nExecutable file \"%s\" didn't terminate in %d seconds\n", labExe, RoundUptoThousand(GetTimeout()) / 1000);
+}
+
+static void ReportOutOfMemory(const char labExe[], unsigned labMem) {
+    printf("\nExecutable file \"%s\" used %dKi > %dKi\n", labExe, RoundUptoThousand(labMem) / 1000, RoundUptoThousand(GetMemoryLimit()) / 1000);
+}
 
 #if defined _WIN32
 #include <windows.h>
@@ -327,16 +334,16 @@ int LaunchLabExecutable(char* labExe)
             if (!GetExitCodeProcess(labInfo.hProcess, &labExit)) {
                 printf("\nSystem error: %u in GetExitCodeProcess\n", (unsigned)GetLastError());
             } else if (labExit >= 0x8000000) {
-                printf("\nExe \"%s\" terminated with exception 0x%08x\n", labExe, (unsigned)labExit);
+                printf("\nExecutable file \"%s\" terminated with exception 0x%08x\n", labExe, (unsigned)labExit);
             } else if (labExit > 0) {
-                printf("\nExe \"%s\" terminated with exit code 0x%08x != 0\n", labExe, (unsigned)labExit);
+                printf("\nExecutable file \"%s\" terminated with exit code 0x%08x != 0\n", labExe, (unsigned)labExit);
             } else {
                 exitCode = 0; // + check memory footprint after this switch (...) {...}
             }
             break;
         }
     case WAIT_TIMEOUT:
-        printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(GetTimeout()-1)/1000);
+        ReportTimeout(labExe);
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     case WAIT_FAILED:
@@ -358,8 +365,9 @@ int LaunchLabExecutable(char* labExe)
         //fprintf(stderr, "PeakJobMemoryUsed %d\n", labJobLimits.PeakJobMemoryUsed);
         labMem0 = labJobLimits.PeakProcessMemoryUsed-labMem0;
     }
-    if (exitCode == 0 && (long long)labMem0 > GetMemoryLimit()) {
-        exitCode = 1, printf("\nExe \"%s\" used %dK > %dK\n", labExe, 1+(labMem0-1)/1024, 1+(GetMemoryLimit()-1)/1024);
+    if ((long long)labMem0 > GetMemoryLimit()) {
+        exitCode = 1;
+        ReportOutOfMemory(labExe, labMem0);
     }
 
     CloseHandle(labInfo.hThread);
@@ -495,7 +503,7 @@ static int _LaunchLabExecutable(char* labExe)
         struct rusage rusage;
         struct timespec rem;
 
-        rem.tv_sec = 1 + (GetTimeout() - 1) / 1000;
+        rem.tv_sec = GetTimeout();
         rem.tv_nsec = 0;
         status = WaitForProcess(pid, &status, &rem, &rusage);
         if (-1 == status) {
@@ -506,13 +514,13 @@ static int _LaunchLabExecutable(char* labExe)
                 printf("\nSystem error: \"%s\" in kill\n", strerror(errno));
                 return exitCode;
             }
-            printf("\nExe \"%s\" didn't terminate in %d seconds\n", labExe, 1+(GetTimeout()-1)/1000);
+            ReportTimeout(labExe);
             return exitCode;
         } else {
             size_t labMem0 = 0;
 
             if (CheckMemory(rusage, &labMem0)) {
-                printf("\nExe \"%s\" used %luK > %luK\n", labExe, 1+(labMem0-1)/1024, 1+(GetMemoryLimit()-1)/1024);
+                ReportOutOfMemory(labExe, labMem0);
                 return exitCode;
             } else {
                 exitCode = 0;
