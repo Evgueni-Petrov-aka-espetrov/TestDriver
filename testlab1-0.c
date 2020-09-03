@@ -148,6 +148,81 @@ static int checkerBig(void)
     }
 }
 
+static int feederBig1(void)
+{
+    FILE *const in = fopen("in.txt", "w+");
+    int i;
+    DWORD t;
+    if (!in) {
+        printf("can't create in.txt. No space on disk?\n");
+        return -1;
+    }
+    printf("Creating large text... ");
+    fflush(stdout);
+    t = GetTickCount();
+    fprintf(in, "0123456789abcdef\n");
+    for (i = 1; i < 1024*1024*12; i++)
+        if (fprintf(in, "0123456789abcdez") == EOF) {
+            printf("can't create in.txt. No space on disk?\n");
+            fclose(in);
+            return -1;
+        }
+    fprintf(in, "0123456789abcdef");
+    t = RoundUptoThousand(GetTickCount() - t);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2;
+    fflush(stdout);
+    fclose(in);
+    return 0;
+}
+
+static int checkerBig1(void)
+{
+    FILE *const out = fopen("out.txt", "r");
+    long long int i, passed = 1;
+    if (!out) {
+        printf("can't open out.txt\n");
+        testN++;
+        return -1;
+    }
+    for (i = 16; i < 1024ll*1024*12*16; i += 16) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
+            passed = 0;
+            break;
+        } else if (i != n) {
+            passed = 0;
+            printf("wrong output -- ");
+            break;
+        }
+    }
+    if (passed) {
+        for (; i > 1024ll*1024*12*16-16; i--) {
+            int n;
+            if (ScanInt(out, &n) != Pass) {
+                passed = 0;
+            } else if (i != n) {
+                passed = 0;
+                printf("wrong output -- ");
+                break;
+            }
+        }
+    }
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
+    }
+    fclose(out);
+    if (passed) {
+        printf("PASSED\n");
+        testN++;
+        return 0;
+    } else {
+        printf("FAILED\n");
+        testN++;
+        return 1;
+    }
+}
+
 const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
@@ -167,7 +242,8 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
-    {feederBig, checkerBig}
+    {feederBig, checkerBig},
+    {feederBig1, checkerBig1}
 };
 
 TLabTest GetLabTest(int testIdx) {
