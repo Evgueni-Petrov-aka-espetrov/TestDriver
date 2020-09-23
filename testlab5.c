@@ -48,12 +48,14 @@ static int FeedFromArray(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++)
+        for (c = zipped; !error && c != lastZipped; c++) {
             error |= fwrite(c, 1, 1, in) < 1;
+        }
     }
     fclose(in);
-    if (error)
+    if (error) {
         printf("can't create in.txt. No space on disk?\n");
+    }
     return error;
 }
 
@@ -106,8 +108,9 @@ static unsigned fib(unsigned n)
         printf("Tester error: out of range in fib\n");
         exit(1);
     }
-    if (f[n] == 0)
+    if (f[n] == 0) {
         f[n] = fib(n-1)+fib(n-2);
+    }
     return f[n];
 }
 
@@ -127,12 +130,14 @@ static int feederBig1(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++)
+        for (c = zipped; !error && c != lastZipped; c++) {
             error |= fwrite(c, 1, 1, in) < 1;
+        }
     }
     fclose(in);
-    if (error)
+    if (error) {
         printf("can't create in.txt. No space on disk?\n");
+    }
     return error;
 }
 
@@ -148,8 +153,9 @@ static int checkerBig1(void)
     if (testN%2 == 0) { // check the compression ratio is matched
         unsigned char c;
         unsigned bits = fib(0)*(big1N-1);
-        for (c = 1; c < big1N; c++)
+        for (c = 1; c < big1N; c++) {
             bits += fib(c)*(big1N-c);
+        }
         const size_t expectedSize = 4+(10*big1N+bits+7)/8;
         lenZipped = fread(zipped, 1, expectedSize+1, out);
         if (lenZipped > expectedSize) {
@@ -170,11 +176,13 @@ static int checkerBig1(void)
             unsigned char c;
             for (c = 0; passed && c < big1N; c++) {
                 unsigned int i;
-                for (i = 0; passed && i < fib(c); i++)
+                for (i = 0; passed && i < fib(c); i++) {
                     passed = zipped[z++] == c;
+                }
             }
-            if (!passed)
+            if (!passed) {
                 printf("output is wrong, expected 0x%02x, got 0x%02x at %d -- ", zipped[z-1], c, z);
+            }
         }
         big1N = big1N == 16 ? 21
             : big1N == 21 ? 26
@@ -211,12 +219,14 @@ static int feederBig2(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++)
+        for (c = zipped; !error && c != lastZipped; c++) {
             error |= fwrite(c, 1, 1, in) < 1;
+        }
     }
     fclose(in);
-    if (error)
+    if (error) {
         printf("can't create in.txt. No space on disk?\n");
+    }
     return error;
 }
 
@@ -282,12 +292,14 @@ static int feederBig3(void)
     } else { // ask to decompress compressed data
         const unsigned char *c, *const lastZipped = zipped+lenZipped;
         error = EOF == fprintf(in, "d\r\n");
-        for (c = zipped; !error && c != lastZipped; c++)
+        for (c = zipped; !error && c != lastZipped; c++) {
             error |= fwrite(c, 1, 1, in) < 1;
+        }
     }
     fclose(in);
-    if (error)
+    if (error) {
         printf("can't create in.txt. No space on disk?\n");
+    }
     return error;
 }
 
@@ -318,7 +330,7 @@ static int checkerBig3(void)
         } else {
             int i;
             for (i = 0; passed && i < 256*256*256; i++) {
-                    passed = zipped[i] == 'x';
+                passed = zipped[i] == 'x';
             }
             if (!passed) {
                 printf("output is wrong, expect 0x%02x, got 0x%02x at %d -- ", zipped[i], i & 0xff, i);

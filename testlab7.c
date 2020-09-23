@@ -53,10 +53,12 @@ static int FeedFromArray(void)
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    if (testInOut[testN].N >= 0)
+    if (testInOut[testN].N >= 0) {
         fprintf(in, "%d\n", testInOut[testN].N);
-    if (testInOut[testN].M >= 0)
+    }
+    if (testInOut[testN].M >= 0) {
         fprintf(in, "%d\n", testInOut[testN].M);
+    }
     for (i = 0; i < testInOut[testN].M && testInOut[testN].G[i].a != 0; i++) {
         fprintf(in, "%d %d\n", testInOut[testN].G[i].a, testInOut[testN].G[i].b);
     }
@@ -145,8 +147,9 @@ static int feederBig(void)
     fprintf(in, "%d\n", N_MAX*(N_MAX-1)/2);
     for (i = 0; i+1 < N_MAX; i++) {
         int j;
-        for (j = i+1; j < N_MAX; j++)
+        for (j = i+1; j < N_MAX; j++) {
             fprintf(in, "%d %d\n", i+1, j+1);
+        }
     }
     fclose(in);
     LabMemoryLimit = N_MAX * 10 + N_MAX * (N_MAX-1) + MIN_PROCESS_RSS_BYTES;
@@ -199,8 +202,9 @@ static int feederBig1(void)
     fprintf(in, "%d\n", N_MAX*(N_MAX-1)/2);
     for (i = 0; i+1 < N_MAX; i++) {
         int j;
-        for (j = i+1; j < N_MAX; j++)
+        for (j = i+1; j < N_MAX; j++) {
             fprintf(in, "%d %d\n", j+1, i+1);
+        }
     }
     fclose(in);
     LabMemoryLimit = N_MAX * 10 + N_MAX * (N_MAX-1) + MIN_PROCESS_RSS_BYTES;

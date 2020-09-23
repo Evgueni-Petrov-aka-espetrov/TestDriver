@@ -86,12 +86,13 @@ static int feederBig(void)
     fflush(stdout);
     t = GetTickCount();
     fprintf(in, "0123456789abcdef\n");
-    for (i = 1; i < 1024*1024*8; i++)
+    for (i = 1; i < 1024*1024*8; i++) {
         if (fprintf(in, "0123456789abcde\n") == EOF) {
             printf("can't create in.txt. No space on disk?\n");
             fclose(in);
             return -1;
         }
+    }
     fprintf(in, "0123456789abcdef");
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);

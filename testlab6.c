@@ -211,8 +211,9 @@ static int checkerBig1(void)
 static void genTree(FILE *in, int height, int min, int max)
 {
     int mid = (min*21+max*34)/55;
-    if (height == 0)
+    if (height == 0) {
         return;
+    }
     if (height == 1) {
         if (fprintf(in, "%d ", min) < 0) {
             printf("can't create in.txt. No space on disk?\n");

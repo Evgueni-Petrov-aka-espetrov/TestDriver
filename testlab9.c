@@ -264,8 +264,9 @@ static int feederBig2(void)
     for (i = 0; i+1 < 5000; i++) {
         int j;
         for (j = i+1; j < 5000; j++) {
-            if ((i == 0 || i == 1 || i == 1984) && (j == 0 || j == 1 || j == 1984))
+            if ((i == 0 || i == 1 || i == 1984) && (j == 0 || j == 1 || j == 1984)) {
                 continue;
+            }
             if (fprintf(in, "%d %d 2\n", i+1, j+1) < 2) {
                 printf("can't create in.txt. No space on disk?\n");
                 fclose(in);
