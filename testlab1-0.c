@@ -21,7 +21,8 @@ static const struct {const char *const in; int n, out[32];} testInOut[] = {
     {"\xE0\xE1 \xE2\xE3\n\xE0\xE1\xE2\xE3\n\xE0\xE1 \xE2\xE3", 6, {5, 10, 9, 8, 7, 6}}, // аб вг\nабвг\nаб вг
     {"0123\n31230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
     {"0123\n21230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
-    {"0123\n11230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}}
+    {"0123\n11230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
+    {"\xE0\xE1\xE2\xFF\n\xE0\xE1\xE2\xFF\xE0\xE1\xE2\xFF", 8, {4, 3, 2, 1, 8, 7, 6, 5}}, // абвя\nабвяабвя
 };
 
 static int FeedFromArray(void)
