@@ -503,8 +503,8 @@ static int _LaunchLabExecutable(char* labExe)
         struct rusage rusage;
         struct timespec rem;
 
-        rem.tv_sec = GetTimeout();
-        rem.tv_nsec = 0;
+        rem.tv_sec = GetTimeout() / 1000;
+        rem.tv_nsec = (GetTimeout() % 1000) * 1000;
         status = WaitForProcess(pid, &status, &rem, &rusage);
         if (-1 == status) {
             printf("\nSystem error: \"%s\" in wait4\n", strerror(errno));
