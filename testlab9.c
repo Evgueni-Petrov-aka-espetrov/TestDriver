@@ -276,13 +276,11 @@ static int feederBig2(void)
     }
     fprintf(in, "1 1985 1\n");
     fprintf(in, "2 1985 1\n");
-    fflush(NULL);
-
+    fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout T+6... ", (unsigned)t/1000);
     LabTimeout = (int)t+6000;
     fflush(stdout);
-    fclose(in);
     LabMemoryLimit = 5000*5000*4+MIN_PROCESS_RSS_BYTES;
     return 0;
 }

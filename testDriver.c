@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 #if defined __linux__
 #include <sys/resource.h>
 #endif
@@ -387,6 +388,7 @@ int LaunchLabExecutable(char* labExe)
 #include <sys/wait.h>          //for wait4
 #include <time.h>              //for nanosleep
 #include <signal.h>            //for sigaction
+#include <sys/time.h>
 /* Задаём некие параметры безопасности.
  * Перехватываем поток ошибок?
  * Задаём начальные параметры для будущего процесса.
@@ -410,12 +412,23 @@ int LaunchLabExecutable(char* labExe)
 #define RU_MAXRSS_UNITS 1024u
 #endif
 
+DWORD GetTickCount(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (DWORD)(tv.tv_sec*1000+tv.tv_usec/1000);
+}
+
 static int CheckMemory(struct rusage rusage, size_t * labMem0) {
     *labMem0 = (size_t) rusage.ru_maxrss * RU_MAXRSS_UNITS;
     if (GetMemoryLimit() < *labMem0) {
         return 1;
     }
     return 0;
+}
+
+static void ReportSystemError(const char api[]) {
+    fprintf(stderr, "\nSystem error: \"%s\" in %s\n", strerror(errno), api);
+    fflush(stderr);
 }
 
 static void SigchldTrap(int signo) {
@@ -428,100 +441,105 @@ static void SigchldTrap(int signo) {
 static int _LaunchLabExecutable(char* labExe);
 
 static int LaunchLabExecutable(char* labExe) {
-    struct sigaction new;
-    struct sigaction old;
-
-    memset(&new, 0, sizeof(new));
+    struct sigaction new = {0};
     new.sa_handler = SigchldTrap;
     (void)sigemptyset(&new.sa_mask); // не умеет завершаться неуспешно
-    // Не используем SA_RESETHAND, чтобы не зависеть от использования fork вне LaunchLabExecutable
-    new.sa_flags = SA_NOCLDSTOP;
+    new.sa_flags = SA_NOCLDSTOP; // Не используем SA_RESETHAND, чтобы не зависеть от использования fork вне LaunchLabExecutable
+    struct sigaction old;
     if (sigaction(SIGCHLD, &new, &old)) {
-        fprintf(stderr, "\nSystem error: \"%s\" in sigaction set\n", strerror(errno));
+        ReportSystemError("sigaction");
         return -1;
     }
 
     int retCode = _LaunchLabExecutable(labExe);
     if (sigaction(SIGCHLD, &old, NULL)) {
-        fprintf(stderr, "\nSystem error: \"%s\" in sigaction restore\n", strerror(errno));
+        ReportSystemError("sigaction");
         return -1;
     }
 
     return retCode;
 }
 
-static int WaitForProcess(pid_t pid, int* status, struct timespec* ts, struct rusage* rusage) {
+typedef enum {Timeout, Exception, NonZeroStatus, OK, WaitError} EWaitStatus;
+
+static int WaitForProcess(pid_t pid, struct timespec* ts, struct rusage* rusage) {
     while (ts->tv_sec > 0 || ts->tv_nsec > 0) {
-        pid_t child = wait4(pid, status, WNOHANG, rusage);
-        if (child) {
-            return child;
-        }
-        if (!nanosleep(ts, ts)) {
-            return 0;
-        }
-        if (errno != EINTR) {
-            return -1;
+        int status = 0;
+        pid_t child = wait4(pid, &status, WNOHANG, rusage);
+        if (child == 0) {
+            int nanosleepStatus = nanosleep(ts, ts);
+            if (nanosleepStatus == 0) {
+                return Timeout;
+            }
+            assert(errno == EINTR);
+        } if (child == -1) {
+            return WaitError;
+        } else if (WIFEXITED(status)) {
+            if (WEXITSTATUS(status) == 0) {
+                return OK;
+            } else {
+                return NonZeroStatus;
+            }
+        } else if (WIFSIGNALED(status)) {
+            return Exception;
+        } else {
+            return WaitError;
         }
     }
-    return 0; // timeout
+    return Timeout;
 }
 
 static int _LaunchLabExecutable(char* labExe)
 {
     int exitCode = 1;
-    pid_t pid;
 
     fflush(stdout);
     if (-1 == access(".", R_OK | W_OK | X_OK | F_OK)) {
-        printf("\nSystem error: \"%s\" in access\n", strerror(errno));
+        ReportSystemError("access");
         return exitCode;
     }
-    pid = fork();
+    pid_t pid = fork();
     if (-1 == pid) {
-        printf("\nSystem error: \"%s\" in fork\n", strerror(errno));
+        ReportSystemError("fork");
         return exitCode;
-    } else if (!pid) {
-        int ret = 0;
-
+    } else if (0 == pid) {
+        // in forked process
         if (!freopen("in.txt", "r", stdin)) {
-            fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
+            ReportSystemError("freopen");
             exit(EXIT_FAILURE);
         }
         if (!freopen("out.txt", "w", stdout)) {
-            fprintf(stderr, "\nSystem error: \"%s\" in freopen\n", strerror(errno));
+            ReportSystemError("freopen");
             exit(EXIT_FAILURE);
         }
-        ret = execl(labExe, labExe, NULL);
-        if (-1 == ret) {
-            fprintf(stderr, "\nSystem error: \"%s\" in execl\n", strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-        exit(EXIT_SUCCESS);
+        int ret = execl(labExe, labExe, NULL);
+        assert(ret == -1);
+        ReportSystemError("execl");
+        exit(EXIT_FAILURE);
     }
     {
-        int status = 0;
-        struct rusage rusage;
-        struct timespec rem;
-
+        // in main process
+        struct rusage rusage = {0};
+        struct timespec rem = {0};
         rem.tv_sec = GetTimeout() / 1000;
         rem.tv_nsec = (GetTimeout() % 1000) * 1000;
-        status = WaitForProcess(pid, &status, &rem, &rusage);
-        if (-1 == status) {
-            printf("\nSystem error: \"%s\" in wait4\n", strerror(errno));
-            return exitCode;
-        } else if (0 == status) {
-            if (kill(pid, SIGKILL)) {
-                printf("\nSystem error: \"%s\" in kill\n", strerror(errno));
-                return exitCode;
-            }
+        EWaitStatus status = WaitForProcess(pid, &rem, &rusage);
+
+        if (WaitError == status) {
+            ReportSystemError("wait4");
+        } else if (Timeout == status) {
             ReportTimeout(labExe);
-            return exitCode;
+            if (kill(pid, SIGKILL)) {
+                ReportSystemError("kill");
+            }
+        } else if (Exception == status) {
+            printf("\nExecutable file \"%s\" terminated with exception\n", labExe);
+        } else if (NonZeroStatus == status) {
+            printf("\nExecutable file \"%s\" terminated with exit code != 0\n", labExe);
         } else {
             size_t labMem0 = 0;
-
             if (CheckMemory(rusage, &labMem0)) {
                 ReportOutOfMemory(labExe, labMem0);
-                return exitCode;
             } else {
                 exitCode = 0;
             }

@@ -95,11 +95,11 @@ static int feederBig(void)
         }
     }
     fprintf(in, "0123456789abcdef");
+    fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
     LabTimeout = (int)t*2;
     fflush(stdout);
-    fclose(in);
     return 0;
 }
 
@@ -171,11 +171,11 @@ static int feederBig1(void)
         }
     }
     fprintf(in, "0123456789abcdef");
+    fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
     LabTimeout = (int)t*2;
     fflush(stdout);
-    fclose(in);
     return 0;
 }
 
@@ -227,6 +227,7 @@ static int checkerBig1(void)
 }
 
 const TLabTest LabTests[] = {
+    {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},

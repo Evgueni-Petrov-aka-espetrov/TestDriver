@@ -37,12 +37,6 @@ unsigned RoundUptoThousand(unsigned int n);
 #include <strings.h>
 #define _strnicmp(a, b, c) strncasecmp((a), (b), (c))
 #include <stdint.h>
-#include <sys/time.h>
 typedef uint32_t DWORD;
-static inline DWORD GetTickCount(void)
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (DWORD)(tv.tv_sec*1000+tv.tv_usec/1000);
-}
+DWORD GetTickCount(void);
 #endif
