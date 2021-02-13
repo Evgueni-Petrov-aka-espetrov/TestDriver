@@ -472,7 +472,7 @@ static int WaitForProcess(pid_t pid, struct timespec* ts, struct rusage* rusage)
                 return Timeout;
             }
             assert(errno == EINTR);
-        } if (child == -1) {
+        } else if (child == -1) {
             return WaitError;
         } else if (WIFEXITED(status)) {
             if (WEXITSTATUS(status) == 0) {
