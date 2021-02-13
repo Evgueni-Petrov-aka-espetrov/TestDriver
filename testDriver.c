@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 #if defined __linux__
 #include <sys/resource.h>
 #endif
@@ -20,17 +21,25 @@ static int GetTimeout(void) {
     return UserTimeout < 0 ? GetTestTimeout() : UserTimeout;
 }
 
+static void PrintWithoutBuffering(const char format[], ...) {
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    fflush(stdout);
+}
+
 static const char* GetRunnerCommand(const char* runnerExe, char* labExe) {
     static char runnerCommand[4096] = {0};
     int testRunnerSize = snprintf(
         runnerCommand, sizeof(runnerCommand), "%s -m %zu -t %d -e %s",
         runnerExe, (GetMemoryLimit() + 1023) / 1024, GetTimeout(), labExe);
     if (testRunnerSize < 0) {
-        fprintf(stderr, "\nInternal error: snprintf returned negative value\n");
+        PrintWithoutBuffering("\nInternal error: snprintf returned negative value\n");
         return NULL;
     }
     if (testRunnerSize == sizeof(runnerCommand) - 1) {
-        fprintf(stderr, "\nInternal error: snprintf stopped at the end of buffer\n");
+        PrintWithoutBuffering("\nInternal error: snprintf stopped at the end of buffer\n");
         return NULL;
     }
     return runnerCommand;
@@ -55,17 +64,17 @@ int main(int argc, char* argv[])
         return LaunchLabExecutable(argv[2]);
     }
 
-    printf("\nKOI FIT NSU Lab Tester (c) 2009-2020 by Evgueni Petrov\n");
+    PrintWithoutBuffering("\nKOI FIT NSU Lab Tester (c) 2009-2020 by Evgueni Petrov\n");
 
     if (argc < 2) {
-        printf("\nTo test mylab.exe, do %s mylab.exe\n", runnerExe);
+        PrintWithoutBuffering("\nTo test mylab.exe, do %s mylab.exe\n", runnerExe);
         return 1;
     }
 
-    printf("\nTesting %s...\n", GetTesterName());
+    PrintWithoutBuffering("\nTesting %s...\n", GetTesterName());
 
     for (i = 0; i < GetTestCount(); i++) {
-        printf("TEST %d/%d: ", i+1, GetTestCount());
+        PrintWithoutBuffering("TEST %d/%d: ", i+1, GetTestCount());
         if (GetLabTest(i).Feeder() != 0) {
             break;
         }
@@ -82,12 +91,12 @@ int main(int argc, char* argv[])
     }
 
     if (i < GetTestCount()) {
-        printf("\n:-(\n\n"
+        PrintWithoutBuffering("\n:-(\n\n"
         "Executable file %s failed for input file in.txt in the current directory.\n"
         "Please fix and try again.\n", argv[1]);
         return 1;
     } else {
-        printf("\n:-)\n\n"
+        PrintWithoutBuffering("\n:-)\n\n"
         "Executable file %s passed all tests.\n"
         "Please review the source code with your teaching assistant.\n", argv[1]);
         return 0;
@@ -102,7 +111,7 @@ int HaveGarbageAtTheEnd(FILE* out) {
             return 0;
         }
         if (!strchr(" \t\r\n", c)) {
-            printf("garbage at the end -- ");
+            PrintWithoutBuffering("garbage at the end -- ");
             return 1;
         }
     }
@@ -114,10 +123,10 @@ const char Fail[] = "FAILED";
 const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b) {
     int status = fscanf(out, "%u%u", a, b);
     if (status < 0) {
-        printf("output too short -- ");
+        PrintWithoutBuffering("output too short -- ");
         return Fail;
     } else if (status < 2) {
-        printf("bad output format -- ");
+        PrintWithoutBuffering("bad output format -- ");
         return Fail;
     }
     return Pass;
@@ -133,10 +142,10 @@ const char* ScanIntInt(FILE* out, int* a, int* b) {
 const char* ScanInt(FILE* out, int* a) {
     int status = fscanf(out, "%d", a);
     if (status < 0) {
-        printf("output too short -- ");
+        PrintWithoutBuffering("output too short -- ");
         return Fail;
     } else if (status < 1) {
-        printf("bad output format -- ");
+        PrintWithoutBuffering("bad output format -- ");
         return Fail;
     }
     return Pass;
@@ -144,7 +153,7 @@ const char* ScanInt(FILE* out, int* a) {
 
 const char* ScanChars(FILE* out, size_t bufferSize, char* buffer) {
     if (fgets(buffer, bufferSize, out) == NULL) {
-        printf("no output -- ");
+        PrintWithoutBuffering("no output -- ");
         return Fail;
     }
     char* newlinePtr = strchr(buffer, '\n');
@@ -163,11 +172,19 @@ unsigned RoundUptoThousand(unsigned int n) {
 }
 
 static void ReportTimeout(const char labExe[]) {
-    printf("\nExecutable file \"%s\" didn't terminate in %d seconds\n", labExe, RoundUptoThousand(GetTimeout()) / 1000);
+    PrintWithoutBuffering("\nExecutable file \"%s\" didn't terminate in %d seconds\n", labExe, RoundUptoThousand(GetTimeout()) / 1000);
 }
 
 static void ReportOutOfMemory(const char labExe[], unsigned labMem) {
-    printf("\nExecutable file \"%s\" used %dKi > %dKi\n", labExe, RoundUptoThousand(labMem) / 1000, RoundUptoThousand(GetMemoryLimit()) / 1000);
+    PrintWithoutBuffering("\nExecutable file \"%s\" used %dKi > %dKi\n", labExe, RoundUptoThousand(labMem) / 1000, RoundUptoThousand(GetMemoryLimit()) / 1000);
+}
+
+static void ReportException(const char labExe[]) {
+    PrintWithoutBuffering("\nExecutable file \"%s\" terminated with exception\n", labExe);
+}
+
+static void ReportNonZeroExitCode(const char labExe[]) {
+    PrintWithoutBuffering("\nExecutable file \"%s\" terminated with return code != 0\n", labExe);
 }
 
 #if defined _WIN32
@@ -244,14 +261,14 @@ int LaunchLabExecutable(char* labExe)
     size_t labMem0 = SIZE_MAX;
 
     if (labJob == 0) {
-        printf("\nSystem error: %u in CreateJobObject\n", (unsigned)GetLastError());
+        PrintWithoutBuffering("\nSystem error: %u in CreateJobObject\n", (unsigned)GetLastError());
         CloseHandle(labIn);
         CloseHandle(labOut);
         return 1;
     }
 
     if (!SetInformationJobObject(labJob, JobObjectExtendedLimitInformation, &labJobLimits, sizeof(labJobLimits))) {
-        printf("\nSystem error: %u in SetInformationJobObject\n", (unsigned)GetLastError());
+        PrintWithoutBuffering("\nSystem error: %u in SetInformationJobObject\n", (unsigned)GetLastError());
         CloseHandle(labJob);
         CloseHandle(labIn);
         CloseHandle(labOut);
@@ -271,7 +288,7 @@ int LaunchLabExecutable(char* labExe)
         &labInfo //__out        LPPROCESS_INFORMATION lpProcessInformation
         ))
     {
-        printf("\nSystem error: %u in CreateProcess\n", (unsigned)GetLastError());
+        PrintWithoutBuffering("\nSystem error: %u in CreateProcess\n", (unsigned)GetLastError());
         CloseHandle(labJob);
         CloseHandle(labIn);
         CloseHandle(labOut);
@@ -279,7 +296,7 @@ int LaunchLabExecutable(char* labExe)
     }
 
     if (!AssignProcessToJobObject(labJob, labInfo.hProcess)) {
-        printf("\nSystem error: %u in AssignProcessToJobObject\n", (unsigned)GetLastError());
+        PrintWithoutBuffering("\nSystem error: %u in AssignProcessToJobObject\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         CloseHandle(labInfo.hThread);
         CloseHandle(labInfo.hProcess);
@@ -292,7 +309,7 @@ int LaunchLabExecutable(char* labExe)
     {
         BOOL in;
         if (!IsProcessInJob(labInfo.hProcess, labJob, &in)) {
-            printf("\nSystem error: %u in IsProcessInJob\n", (unsigned)GetLastError());
+            PrintWithoutBuffering("\nSystem error: %u in IsProcessInJob\n", (unsigned)GetLastError());
             TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
             CloseHandle(labInfo.hThread);
             CloseHandle(labInfo.hProcess);
@@ -318,7 +335,7 @@ int LaunchLabExecutable(char* labExe)
 
 
     if (ResumeThread(labInfo.hThread) == (DWORD)-1) {
-        printf("\nSystem error: %u in ResumeThread\n", (unsigned)GetLastError());
+        PrintWithoutBuffering("\nSystem error: %u in ResumeThread\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         CloseHandle(labInfo.hThread);
         CloseHandle(labInfo.hProcess);
@@ -333,11 +350,11 @@ int LaunchLabExecutable(char* labExe)
         {
             DWORD labExit = EXIT_FAILURE;
             if (!GetExitCodeProcess(labInfo.hProcess, &labExit)) {
-                printf("\nSystem error: %u in GetExitCodeProcess\n", (unsigned)GetLastError());
+                PrintWithoutBuffering("\nSystem error: %u in GetExitCodeProcess\n", (unsigned)GetLastError());
             } else if (labExit >= 0x8000000) {
-                printf("\nExecutable file \"%s\" terminated with exception 0x%08x\n", labExe, (unsigned)labExit);
+                ReportException(labExe);
             } else if (labExit > 0) {
-                printf("\nExecutable file \"%s\" terminated with exit code 0x%08x != 0\n", labExe, (unsigned)labExit);
+                ReportNonZeroExitCode(labExe);
             } else {
                 exitCode = 0; // + check memory footprint after this switch (...) {...}
             }
@@ -348,11 +365,11 @@ int LaunchLabExecutable(char* labExe)
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     case WAIT_FAILED:
-        printf("\nSystem error: %u in WaitForSingleObject\n", (unsigned)GetLastError());
+        PrintWithoutBuffering("\nSystem error: %u in WaitForSingleObject\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     default:
-        printf("\nInternal error: WaitForSingleObject returned WAIT_ABANDONED\n");
+        PrintWithoutBuffering("\nInternal error: WaitForSingleObject returned WAIT_ABANDONED\n");
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
     }
     {
@@ -389,21 +406,6 @@ int LaunchLabExecutable(char* labExe)
 #include <time.h>              //for nanosleep
 #include <signal.h>            //for sigaction
 #include <sys/time.h>
-/* Задаём некие параметры безопасности.
- * Перехватываем поток ошибок?
- * Задаём начальные параметры для будущего процесса.
- * Что-то с проверкой семафоров на ошибки?
- * Задаём ограничения для будущего процесса.
- * Создаём некий рабочий объект labJob. Если не удалось, то ругаемся.
- * Привязываем к объекту некую информацию. Если не удалось, то ругаемся.
- * Проверяем процесс на какие-то ошибки.
- * Запрашиваем какую-то информацию об объекте.
- * Проверяем поток на какие-то ошибки.
- * Проверяем на завершение и выдаём букет ошибок.
- * Запрашиваем информацию об объекте.
- * Проверяем кол-во использованной памяти.
- * Закрываемся.
- */
 
 #ifdef __APPLE__
 // https://unix.stackexchange.com/questions/30940/getrusage-system-call-what-is-maximum-resident-set-size#comment552809_30940
@@ -427,8 +429,7 @@ static int CheckMemory(struct rusage rusage, size_t * labMem0) {
 }
 
 static void ReportSystemError(const char api[]) {
-    fprintf(stderr, "\nSystem error: \"%s\" in %s\n", strerror(errno), api);
-    fflush(stderr);
+    PrintWithoutBuffering("\nSystem error: \"%s\" in %s\n", strerror(errno), api);
 }
 
 static void SigchldTrap(int signo) {
@@ -533,9 +534,9 @@ static int _LaunchLabExecutable(char* labExe)
                 ReportSystemError("kill");
             }
         } else if (Exception == status) {
-            printf("\nExecutable file \"%s\" terminated with exception\n", labExe);
+            ReportException(labExe);
         } else if (NonZeroStatus == status) {
-            printf("\nExecutable file \"%s\" terminated with exit code != 0\n", labExe);
+            ReportNonZeroExitCode(labExe);
         } else {
             size_t labMem0 = 0;
             if (CheckMemory(rusage, &labMem0)) {
@@ -549,4 +550,3 @@ static int _LaunchLabExecutable(char* labExe)
     return exitCode;
 }
 #endif
-
