@@ -1,6 +1,6 @@
 #include "testLab.h"
 #include <stdio.h>
-#include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int TestN = 0;
@@ -39,7 +39,7 @@ static size_t InputLength = 0;
 static unsigned char LabOutput[sizeof(Input) + 1];
 static size_t LabOutputLength = 0;
 
-static int IsInputTooLarge(int inputLength) {
+static int IsInputTooLarge(size_t inputLength) {
     if (inputLength > sizeof(Input)) {
         printf("Tester error: generated input is too large");
         return 1;
@@ -73,7 +73,7 @@ static int CheckAtMost(int gotBytes, int expectedBytes) {
     return 1;
 }
 
-static int CheckCompress(int expectedLength) {
+static int CheckCompress(size_t expectedLength) {
     FILE *const out = fopen("out.txt", "rb");
     if (!out) {
         printf("can't open out.txt\n");
@@ -193,7 +193,7 @@ static int FeedCompressBig2(void) {
     if (IsInputTooLarge(InputLength)) {
         return -1;
     }
-    for (int i = 0; i < InputLength; ++i) {
+    for (size_t i = 0; i < InputLength; ++i) {
         Input[i] = i & 0xff;
     }
     return FeedCompress();
@@ -208,7 +208,7 @@ static int FeedCompressBig3(void) {
     if (IsInputTooLarge(InputLength)) {
         return -1;
     }
-    for (int i = 0; i < InputLength; ++i) {
+    for (size_t i = 0; i < InputLength; ++i) {
         Input[i] = 'x';
     }
     return FeedCompress();
