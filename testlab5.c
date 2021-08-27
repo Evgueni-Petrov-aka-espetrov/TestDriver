@@ -49,7 +49,7 @@ static int IsInputTooLarge(size_t inputLength) {
 
 static int FeedData(char mode, const unsigned char* data, size_t count) {
     FILE *const input = fopen("in.txt", "wb");
-    int error = input == NULL || fprintf(input, "%c\r\n", mode) != 3 || fwrite(data, 1, count, input) != count;
+    int error = input == NULL || fprintf(input, "%c", mode) != 1 || fwrite(data, 1, count, input) != count;
     fclose(input);
     if (error) {
         printf("can't create in.txt. No space on disk?\n");
