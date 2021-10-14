@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <time.h>
 #if defined __linux__
 #include <sys/resource.h>
 #endif
@@ -82,9 +83,11 @@ int main(int argc, char* argv[])
         if (!runnerCommand) {
             break;
         }
+        clock_t startTime = clock();
         if (system(runnerCommand) != 0) {
             break;
         }
+        PrintWithoutBuffering("%d ms, ", (clock() - startTime) * 1000 / CLOCKS_PER_SEC);
         if (GetLabTest(i).Checker() != 0) {
             break;
         }
