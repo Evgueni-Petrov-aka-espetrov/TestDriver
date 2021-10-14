@@ -83,11 +83,11 @@ int main(int argc, char* argv[])
         if (!runnerCommand) {
             break;
         }
-        unsigned long long int startTime = clock();
+        clock_t startTime = clock();
         if (system(runnerCommand) != 0) {
             break;
         }
-        PrintWithoutBuffering("Completed in %d ms. ", clock() - startTime);
+        PrintWithoutBuffering("%d ms, ", (clock() - startTime) * 1000 / CLOCKS_PER_SEC);
         if (GetLabTest(i).Checker() != 0) {
             break;
         }
