@@ -21,6 +21,7 @@ static const struct {const char *const in, *const out[16]; int n;} testInOut[] =
     {"987654321098765432109876543210\n1\n", {"bad input"}, 1},
     {"012 3\n1\n", {"bad input"}, 1},
     {"89\n2000000000\n", {"98"}, 1},
+    {"625431\n1\n", {"631245"}, 1}
 };
 
 static int FeedFromArray(void) {
