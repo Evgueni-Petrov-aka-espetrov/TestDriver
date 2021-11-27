@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 static int testN = 0;
-static int seed[] = {1234u, 383u};
+static const int seed[] = {1234u, 383u};
 static int LabTimeout;
 
 static const struct {const char *const in; int n; int out[64];} testInOut[] = {
@@ -25,8 +25,7 @@ static const struct {const char *const in; int n; int out[64];} testInOut[] = {
     {"000001\n000000000010", 18,{0, 1, 2, 3, 4, 0, 1, 5, 2, 5, 3, 5, 4, 5, 5, 5, 6, 6}}
 };
 
-static int FeedFromArray(void)
-{
+static int FeedFromArray(void) {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
@@ -37,16 +36,15 @@ static int FeedFromArray(void)
     return 0;
 }
 
-static int CheckFromArray(void)
-{
+static int CheckFromArray(void) {
     FILE *const out = fopen("out.txt", "r");
-    int i, passed = 1;
+    int passed = 1;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
-    for (i = 0; i < testInOut[testN].n; i++) {
+    for (int i = 0; i < testInOut[testN].n; i++) {
         int n;
         if (ScanInt(out, &n) != Pass || testInOut[testN].out[i] != n) {
             passed = 0;
@@ -69,63 +67,69 @@ static int CheckFromArray(void)
     }
 }
 
-static int FeederBigRand1(void)
-{
+static int FeederBigRand1(void) {
     FILE *const in = fopen("in.txt", "w");
-    DWORD t;
     unsigned int bigTestN = testN - sizeof(testInOut) / sizeof(testInOut[0]);
-    char pattern[] = "0123456789abcdef";
+    if (bigTestN >= sizeof(seed) / sizeof(seed[0])) {
+        printf("\nInternal error: incorrect test number\n");
+        testN++;
+        return -1;
+    }
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
     printf("Creating large text with seed %u... ", seed[bigTestN]);
     fflush(stdout);
+    const char pattern[] = "0123456789abcdef";
     srand(seed[bigTestN]);
-    t = GetTickCount();
-    if(fputs("0123456789abcdef\n", in) == EOF) {
+    DWORD t = GetTickCount();
+    if (fputs(pattern, in) == EOF || fputc('\n',in) == EOF) {
         printf("can't write in in.txt. No space on disk?\n");
         return -1;
     }
-    unsigned int r;
-    for(unsigned int i = 1; i < 1024*1024*8; i++) {
-        r = (unsigned int)rand()%17;
-        if(r == 0) {
-            if(putc(' ', in) == EOF) {
+    for (unsigned int i = 1; i < 1024 * 1024 * 8; i++) {
+        unsigned int randomPrefixLength = (unsigned int)rand() % 17;
+        if (randomPrefixLength == 0) {
+            if (putc(' ', in) == EOF) {
                 printf("can't write in in.txt. No space on disk?\n");
                 return -1;
             }
-        }else {
-            if (fwrite(pattern, 1, r, in) != r) {
+        } else {
+            if (fwrite(pattern, 1, randomPrefixLength, in) != randomPrefixLength) {
                 printf("can't write in in.txt. No space on disk?\n");
                 return -1;
             }
         }
 
     }
-    if(fputs("0123456789abcdef", in) == EOF) {
+    if (fputs(pattern, in) == EOF) {
         printf("can't write in in.txt. No space on disk?\n");
         return -1;
     }
     fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 10*T... ", (unsigned)t/1000);
-    LabTimeout = (int)t*10;
+    printf("done in T=%u seconds. Starting exe with timeout 5*T... ", (unsigned)t/1000);
+    LabTimeout = (int)t*5;
     fflush(stdout);
     return 0;
 }
 
-static int CheckerBigRand1(void)
-{
+static int CheckerBigRand1(void) {
     FILE *const out = fopen("out.txt", "r");
-    unsigned int passed = 1;
+    int passed = 1;
     unsigned int bigTestN = testN - sizeof(testInOut) / sizeof(testInOut[0]);
+    if (bigTestN >= sizeof(seed) / sizeof(seed[0])) {
+        printf("\nInternal error: incorrect test number\n");
+        testN++;
+        return -1;
+    }
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
-    for(unsigned int i = 0; i < 16; i++) {
+    for (unsigned int i = 0; i < 16; i++) {
         int n;
         if(ScanInt(out, &n) != Pass || n != 0) {
             passed = 0;
@@ -133,21 +137,21 @@ static int CheckerBigRand1(void)
             break;
         }
     }
-    if(passed) {
+    if (passed) {
         srand(seed[bigTestN]);
         unsigned int number = 1;
         unsigned int a, b;
         for (unsigned int i = 1; i < 1024 * 1024 * 8; i++) {
-            unsigned int r = ((unsigned int) rand()) % 17;
-            if (r == 0) {
+            unsigned int randomPrefixLength = ((unsigned int) rand()) % 17;
+            if (randomPrefixLength == 0) {
                 number++;
             } else {
-                if (ScanUintUint(out, &a, &b) != Pass || a != number || b != r) {
+                if (ScanUintUint(out, &a, &b) != Pass || a != number || b != randomPrefixLength) {
                     passed = 0;
                     printf("wrong output -- ");
                     break;
                 }
-                number += r;
+                number += randomPrefixLength;
             }
         }
         if (ScanUintUint(out, &a, &b) != Pass) {
@@ -172,77 +176,69 @@ static int CheckerBigRand1(void)
     }
 }
 
-static int FeederBig(void)
-{
+static int FeederBig(void) {
     FILE *const in = fopen("in.txt", "w");
-    DWORD t;
-    char str[] = "abcdabcd\n";
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
     printf("Creating large text... ");
     fflush(stdout);
-    t = GetTickCount();
-
-    if(fputs(str, in) == EOF) {
+    const char str[] = "abcdabcd";
+    DWORD t = GetTickCount();
+    if (fputs(str, in) == EOF || fputc('\n', in) == EOF) {
         printf("can't write in in.txt. No space on disk?\n");
         return -1;
     }
-    for(int i = 0; i < 1024*1024*8; i++) {
-        if(fwrite(str, 1, 8, in) != 8) {
+    for (int i = 0; i < 1024 * 1024 * 8; i++) {
+        if (fputs(str, in) == EOF) {
             printf("can't write in in.txt. No space on disk?\n");
             return -1;
         }
     }
     fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 15*T... ", (unsigned)t/1000);
-    LabTimeout = (int)t*15;
+    printf("done in T=%u seconds. Starting exe with timeout 10*T... ", (unsigned)t/1000);
+    LabTimeout = (int)t*10;
     fflush(stdout);
     return 0;
 }
 
 static int CheckBig(void) {
     FILE *const out = fopen("out.txt", "r");
-    unsigned int passed = 1;
+    int passed = 1;
     if (!out) {
         printf("can't open out.txt\n");
         testN++;
         return -1;
     }
 
-    for(unsigned int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; i++) {
         int n;
-        if(ScanInt(out, &n) != Pass) {
-            passed = 0;
-            printf("wrong output -- ");
-            break;
-        }else if(n != 0) {
-            passed = 0;
-            break;
-        }
-    }
-
-    for(unsigned int i = 1; i < 5; i++) {
-        int n;
-        if(ScanInt(out, &n) != Pass || n != i) {
+        if (ScanInt(out, &n) != Pass || n != 0) {
             passed = 0;
             printf("wrong output -- ");
             break;
         }
     }
 
-    if(passed) {
-        unsigned int number = 1;
-        unsigned int a, b;
+    for (unsigned int i = 1; i < 5; i++) {
+        int n;
+        if (ScanInt(out, &n) != Pass || n != i) {
+            passed = 0;
+            printf("wrong output -- ");
+            break;
+        }
+    }
+
+    if (passed) {
         for (unsigned int i = 0; i < 1024 * 1024 * 8 * 2 - 1; i++) {
-            if (ScanUintUint(out, &a, &b) != Pass || a != number || b != 8) {
+            unsigned int a, b;
+            if (ScanUintUint(out, &a, &b) != Pass || a != 1 + i * 4 || b != 8) {
                 passed = 0;
                 printf("wrong output -- ");
                 break;
             }
-            number += 4;
         }
     }
     if (passed) {
