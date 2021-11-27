@@ -1,5 +1,6 @@
 #include "testLab.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 static int testN = 0;
 static int seed[] = {1234u, 383u};
