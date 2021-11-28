@@ -41,10 +41,10 @@ static int CheckFromArray(void) {
     int passed = 1;
     if (!out) {
         printf("can't open out.txt\n");
-        testN++;
+        ++testN;
         return -1;
     }
-    for (int i = 0; i < testInOut[testN].n; i++) {
+    for (int i = 0; i < testInOut[testN].n; ++i) {
         int n;
         if (ScanInt(out, &n) != Pass || testInOut[testN].out[i] != n) {
             passed = 0;
@@ -58,11 +58,11 @@ static int CheckFromArray(void) {
     fclose(out);
     if (passed) {
         printf("PASSED\n");
-        testN++;
+        ++testN;
         return 0;
     } else {
         printf("FAILED\n");
-        testN++;
+        ++testN;
         return 1;
     }
 }
@@ -72,7 +72,7 @@ static int FeederBigRand1(void) {
     unsigned int bigTestN = testN - sizeof(testInOut) / sizeof(testInOut[0]);
     if (bigTestN >= sizeof(seed) / sizeof(seed[0])) {
         printf("\nInternal error: incorrect test number\n");
-        testN++;
+        ++testN;
         return -1;
     }
     if (!in) {
@@ -88,7 +88,7 @@ static int FeederBigRand1(void) {
         printf("can't write in in.txt. No space on disk?\n");
         return -1;
     }
-    for (unsigned int i = 1; i < 1024 * 1024 * 8; i++) {
+    for (unsigned int i = 1; i < 1024 * 1024 * 8; ++i) {
         unsigned int randomPrefixLength = (unsigned int)rand() % 17;
         if (randomPrefixLength == 0) {
             if (putc(' ', in) == EOF) {
@@ -121,15 +121,15 @@ static int CheckerBigRand1(void) {
     unsigned int bigTestN = testN - sizeof(testInOut) / sizeof(testInOut[0]);
     if (bigTestN >= sizeof(seed) / sizeof(seed[0])) {
         printf("\nInternal error: incorrect test number\n");
-        testN++;
+        ++testN;
         return -1;
     }
     if (!out) {
         printf("can't open out.txt\n");
-        testN++;
+        ++testN;
         return -1;
     }
-    for (unsigned int i = 0; i < 16; i++) {
+    for (unsigned int i = 0; i < 16; ++i) {
         int n;
         if(ScanInt(out, &n) != Pass || n != 0) {
             passed = 0;
@@ -141,10 +141,10 @@ static int CheckerBigRand1(void) {
         srand(seed[bigTestN]);
         unsigned int number = 1;
         unsigned int a, b;
-        for (unsigned int i = 1; i < 1024 * 1024 * 8; i++) {
+        for (unsigned int i = 1; i < 1024 * 1024 * 8; ++i) {
             unsigned int randomPrefixLength = ((unsigned int) rand()) % 17;
             if (randomPrefixLength == 0) {
-                number++;
+                ++number;
             } else {
                 if (ScanUintUint(out, &a, &b) != Pass || a != number || b != randomPrefixLength) {
                     passed = 0;
@@ -167,11 +167,11 @@ static int CheckerBigRand1(void) {
     fclose(out);
     if (passed) {
         printf("PASSED\n");
-        testN++;
+        ++testN;
         return 0;
     } else {
         printf("FAILED\n");
-        testN++;
+        ++testN;
         return 1;
     }
 }
@@ -190,7 +190,7 @@ static int FeederBig(void) {
         printf("can't write in in.txt. No space on disk?\n");
         return -1;
     }
-    for (int i = 0; i < 1024 * 1024 * 8; i++) {
+    for (int i = 0; i < 1024 * 1024 * 8; ++i) {
         if (fputs(str, in) == EOF) {
             printf("can't write in in.txt. No space on disk?\n");
             return -1;
@@ -209,11 +209,11 @@ static int CheckBig(void) {
     int passed = 1;
     if (!out) {
         printf("can't open out.txt\n");
-        testN++;
+        ++testN;
         return -1;
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; ++i) {
         int n;
         if (ScanInt(out, &n) != Pass || n != 0) {
             passed = 0;
@@ -222,7 +222,7 @@ static int CheckBig(void) {
         }
     }
 
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; ++i) {
         int n;
         if (ScanInt(out, &n) != Pass || n != i) {
             passed = 0;
@@ -232,7 +232,7 @@ static int CheckBig(void) {
     }
 
     if (passed) {
-        for (unsigned int i = 0; i < 1024 * 1024 * 8 * 2 - 1; i++) {
+        for (unsigned int i = 0; i < 1024 * 1024 * 8 * 2 - 1; ++i) {
             unsigned int a, b;
             if (ScanUintUint(out, &a, &b) != Pass || a != 1 + i * 4 || b != 8) {
                 passed = 0;
@@ -247,11 +247,11 @@ static int CheckBig(void) {
     fclose(out);
     if (passed) {
         printf("PASSED\n");
-        testN++;
+        ++testN;
         return 0;
     } else {
         printf("FAILED\n");
-       testN++;
+       ++testN;
         return 1;
     }
 }
