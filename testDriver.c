@@ -83,11 +83,11 @@ int main(int argc, char* argv[])
         if (!runnerCommand) {
             break;
         }
-        clock_t startTime = clock();
+        DWORD startTime = GetTickCount();
         if (system(runnerCommand) != 0) {
             break;
         }
-        PrintWithoutBuffering("%d ms, ", (clock() - startTime) * 1000 / CLOCKS_PER_SEC);
+        PrintWithoutBuffering("%d ms, ", GetTickCount() - startTime);
         if (GetLabTest(i).Checker() != 0) {
             break;
         }
