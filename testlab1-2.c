@@ -109,8 +109,8 @@ static int FeederBigRand1(void) {
     }
     fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 5*T... ", (unsigned)t/1000);
-    LabTimeout = (int)t*5;
+    printf("done in T=%u seconds. Starting exe with timeout 3*T... ", (unsigned)(t / 1000)  );
+    LabTimeout = (int)t*3;
     fflush(stdout);
     return 0;
 }
@@ -198,8 +198,8 @@ static int FeederBig(void) {
     }
     fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 10*T... ", (unsigned)t/1000);
-    LabTimeout = (int)t*10;
+    printf("done in T=%u seconds. Starting exe with timeout 6*T... ", (unsigned)(t / 1000));
+    LabTimeout = (int)t*6;
     fflush(stdout);
     return 0;
 }
@@ -213,7 +213,7 @@ static int CheckBig(void) {
         return -1;
     }
 
-    for (unsigned int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         int n;
         if (ScanInt(out, &n) != Pass || n != 0) {
             passed = 0;
@@ -222,7 +222,7 @@ static int CheckBig(void) {
         }
     }
 
-    for (unsigned int i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; i++) {
         int n;
         if (ScanInt(out, &n) != Pass || n != i) {
             passed = 0;
@@ -251,7 +251,7 @@ static int CheckBig(void) {
         return 0;
     } else {
         printf("FAILED\n");
-        testN++;
+       testN++;
         return 1;
     }
 }
