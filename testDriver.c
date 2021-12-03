@@ -526,7 +526,7 @@ static int _LaunchLabExecutable(char* labExe)
         struct rusage rusage = {0};
         struct timespec rem = {0};
         rem.tv_sec = GetTimeout() / 1000;
-        rem.tv_nsec = (GetTimeout() % 1000) * 1000;
+        rem.tv_nsec = (GetTimeout() % 1000) * 1000000;
         EWaitStatus status = WaitForProcess(pid, &rem, &rusage);
 
         if (WaitError == status) {
