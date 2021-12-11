@@ -69,14 +69,15 @@ static int CheckFromArray(void) {
 
 static int FeederBigRand1(void) {
     FILE *const in = fopen("in.txt", "w");
+    if (!in) {
+        printf("can't create in.txt. No space on disk?\n");
+        return -1;
+    }
     unsigned int bigTestN = testN - sizeof(testInOut) / sizeof(testInOut[0]);
     if (bigTestN >= sizeof(seed) / sizeof(seed[0])) {
         printf("\nInternal error: incorrect test number\n");
         ++testN;
-        return -1;
-    }
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n");
+        fclose(in);
         return -1;
     }
     printf("Creating large text with seed %u... ", seed[bigTestN]);
@@ -86,6 +87,7 @@ static int FeederBigRand1(void) {
     DWORD t = GetTickCount();
     if (fputs(pattern, in) == EOF || fputc('\n',in) == EOF) {
         printf("can't write in in.txt. No space on disk?\n");
+        fclose(in);
         return -1;
     }
     for (unsigned int i = 1; i < 1024 * 1024 * 8; ++i) {
@@ -93,11 +95,13 @@ static int FeederBigRand1(void) {
         if (randomPrefixLength == 0) {
             if (putc(' ', in) == EOF) {
                 printf("can't write in in.txt. No space on disk?\n");
+                fclose(in);
                 return -1;
             }
         } else {
             if (fwrite(pattern, 1, randomPrefixLength, in) != randomPrefixLength) {
                 printf("can't write in in.txt. No space on disk?\n");
+                fclose(in);
                 return -1;
             }
         }
@@ -105,6 +109,7 @@ static int FeederBigRand1(void) {
     }
     if (fputs(pattern, in) == EOF) {
         printf("can't write in in.txt. No space on disk?\n");
+        fclose(in);
         return -1;
     }
     fclose(in);
