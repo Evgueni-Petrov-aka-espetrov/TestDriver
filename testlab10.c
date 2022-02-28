@@ -106,7 +106,7 @@ static int CheckFromArray(void)
     }   
     else if (testInOut[testN].outError != NULL) {
         char error[128] = {0};
-        const char* status = ScanChars(out, sizeof(testInOut[testN].outError), error);
+        const char* status = ScanChars(out, sizeof(error), error);
         
         if(status == Pass &&  _strnicmp(testInOut[testN].outError, error, strlen(error)) != 0) {
             status = Fail;
