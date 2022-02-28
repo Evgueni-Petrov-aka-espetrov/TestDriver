@@ -126,6 +126,9 @@ static int CheckFromArray(void)
     return !passed;
 }
 
+static int LabTimeout;
+static size_t LabMemoryLimit;
+
 static int bigSegmentsN = 1;
 static int FeederBigSegment(void)
 {
@@ -137,6 +140,7 @@ static int FeederBigSegment(void)
 
     printf("Creating big segment... ");
     fflush(stdout);
+    DWORD t = GetTickCount();
     fprintf(in, "%d\n", MAX_POINT_COUNT);
 
     for (int i = MAX_POINT_COUNT - 1; i >= 0; --i) {
@@ -157,9 +161,13 @@ static int FeederBigSegment(void)
             }
     }
 
-    fclose(in);
-    printf("done. Starting exe... ");
+    t = RoundUptoThousand(GetTickCount() - t);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2+3000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 8*MAX_POINT_COUNT;
     fflush(stdout);
+    fclose(in);
+
     return 0;    
 }
 
@@ -229,6 +237,7 @@ static int FeederBigTriangle(void)
 
     printf("Creating big triangle... ");
     fflush(stdout);
+    DWORD t = GetTickCount();
     fprintf(in, "%d\n", MAX_POINT_COUNT);
     fprintf(in, "%d %d\n", INT_MIN, INT_MIN);
 
@@ -249,9 +258,13 @@ static int FeederBigTriangle(void)
         }
     }
 
-    fclose(in);
-    printf("done. Starting exe... ");
+    t = RoundUptoThousand(GetTickCount() - t);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2+3000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 8*MAX_POINT_COUNT;
     fflush(stdout);
+    fclose(in);
+
     return 0;    
 }
 
@@ -321,18 +334,40 @@ static int FeederBigParabol(void)
 
     printf("Creating big parabol... ");
     fflush(stdout);
+    DWORD t = GetTickCount();
     fprintf(in, "%d\n", MAX_POINT_COUNT);
 
-    for (long long i = 1; i <= MAX_POINT_COUNT / 2; ++i) {
+    for (long long i = 1; i <= MAX_POINT_COUNT / 4; ++i) {
         int printCount = 0;
         if (bigParabolsN == 1) {
-            printCount = fprintf(in, "%lld %lld\n%lld %lld\n", i, i*i + INT_MIN, -i, i*i + INT_MIN);
+            printCount += fprintf(in, "%lld %lld\n", i, i*i + INT_MIN);
+            printCount += fprintf(in, "%lld %lld\n", -i, i*i + INT_MIN);
+            i += MAX_POINT_COUNT / 4;
+            printCount += fprintf(in, "%lld %lld\n", i, i*i + INT_MIN);
+            printCount += fprintf(in, "%lld %lld\n", -i, i*i + INT_MIN);
+            i -= MAX_POINT_COUNT / 4;
         }
         else if (bigParabolsN == 2) {
-            printCount = fprintf(in, "%lld %lld\n%lld %lld\n", i, -i*i + INT_MAX, -i, -i*i + INT_MAX);
+            printCount += fprintf(in, "%lld %lld\n", i, -i*i + INT_MAX);
+            printCount += fprintf(in, "%lld %lld\n", -i, -i*i + INT_MAX);
+            i += MAX_POINT_COUNT / 4;
+            printCount += fprintf(in, "%lld %lld\n", i, -i*i + INT_MAX);
+            printCount += fprintf(in, "%lld %lld\n", -i, -i*i + INT_MAX);
+            i -= MAX_POINT_COUNT / 4;
         }
         else if (bigParabolsN == 3) {
-            printCount = fprintf(in, "%lld %lld\n%lld %lld\n", i*i + INT_MIN, i, i*i + INT_MIN, -i);
+            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, i);
+            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, -i);
+            i += MAX_POINT_COUNT / 4;
+            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, i);
+            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, -i);
+            i -= MAX_POINT_COUNT / 4;
+        }
+        else if (bigParabolsN == 4) {
+            printCount += fprintf(in, "%lld %lld\n", i, i*i);
+            printCount += fprintf(in, "%lld %lld\n", -i, i*i);
+            printCount += fprintf(in, "%lld %lld\n", i, -i*i);
+            printCount += fprintf(in, "%lld %lld\n", -i, -i*i);
         }
 
         if (printCount < 4) {
@@ -342,9 +377,13 @@ static int FeederBigParabol(void)
         }
     }
 
-    fclose(in);
-    printf("done. Starting exe... ");
+    t = RoundUptoThousand(GetTickCount() - t);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2+3000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 8*MAX_POINT_COUNT;
     fflush(stdout);
+    fclose(in);
+
     return 0;    
 }
 
@@ -356,38 +395,71 @@ static int CheckerBigParabol(void)
         return -1;
     }
 
-    int finded[MAX_POINT_COUNT + 1] = { 0 };
-    int findedCount = 0;
-    for (int i = 0; i < MAX_POINT_COUNT; ++i) {
-        TPoint point = { 0, 0 };
-        if (ScanPoint(out, &point) == Fail) {
-            fclose(out);
-            printf("short output -- %s\n", Fail);
-            return 1;
+
+    if(bigParabolsN == 1 || bigParabolsN == 2 || bigParabolsN == 3) {
+        int finded[MAX_POINT_COUNT + 1] = { 0 };
+        int findedCount = 0;
+
+        for (int i = 0; i < MAX_POINT_COUNT; ++i) {
+            TPoint point = { 0, 0 };
+            if (ScanPoint(out, &point) == Fail) {
+                fclose(out);
+                printf("short output -- %s\n", Fail);
+                return 1;
+            }
+
+            int index = MAX_POINT_COUNT / 2;
+            index += (bigParabolsN == 3) ? point.y : point.x;
+            if (finded[index] == 1) {
+                fclose(out);
+                printf("wrong output -- %s\n", Fail);
+                return 1;
+            }
+
+            ++finded[index];
+            ++findedCount;
         }
 
-        int index = 0;
-        if(bigParabolsN == 1 || bigParabolsN == 2) {
-            index = MAX_POINT_COUNT / 2 + point.x;
-        }
-        else if(bigParabolsN == 3) {
-            index = MAX_POINT_COUNT / 2 + point.y;
-        }
-
-        if (finded[index] == 1) {
+        if (findedCount != MAX_POINT_COUNT) {
             fclose(out);
             printf("wrong output -- %s\n", Fail);
             return 1;
         }
-
-        ++finded[index];
-        ++findedCount;
     }
-    
-    if (findedCount != MAX_POINT_COUNT) {
+    else if (bigParabolsN == 4){
+        int x = MAX_POINT_COUNT / 4;
+        TPoint pointOut[4] =  { {x, x*x}, {x, -x*x}, {-x, x*x}, {-x, -x*x} };
+
+        int finded[4] = { 0 };
+        int findedCount = 0;
+        for (int i = 0; i < 4; ++i) {
+            TPoint point = { 0, 0 };
+            if (ScanPoint(out, &point) == Fail) {
+                fclose(out);
+                printf("short output -- %s\n", Fail);
+                return 1;
+            }
+
+            for (int j = 0; j < 4; ++j) {
+                if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
+                    if (finded[j] == 1) {
+                        fclose(out);
+                        printf("wrong output -- %s\n", Fail);
+                        return 1;
+                    }
+                    
+                    ++finded[j];
+                    ++findedCount;
+                    break;
+                }
+            }
+        }
+
+        if (findedCount != 4) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
         return 1;
+        }
     }
 
     int passed = !HaveGarbageAtTheEnd(out);
@@ -437,7 +509,9 @@ const TLabTest LabTests[] = {
     {FeederBigTriangle, CheckerBigTriangle}, // 36
     {FeederBigParabol, CheckerBigParabol}, // 37
     {FeederBigParabol, CheckerBigParabol}, // 38
-    {FeederBigParabol, CheckerBigParabol}  // 39
+    {FeederBigParabol, CheckerBigParabol}, // 37
+    {FeederBigParabol, CheckerBigParabol}, // 39
+    {FeederBigParabol, CheckerBigParabol}  // 40
 };
 
 TLabTest GetLabTest(int testIdx) {
