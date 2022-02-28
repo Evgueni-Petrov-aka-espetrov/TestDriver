@@ -164,7 +164,7 @@ static int FeederBigSegment(void)
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     LabTimeout = (int)t*2+3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 8*MAX_POINT_COUNT;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 16*MAX_POINT_COUNT;
     fflush(stdout);
     fclose(in);
 
@@ -261,7 +261,7 @@ static int FeederBigTriangle(void)
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     LabTimeout = (int)t*2+3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 8*MAX_POINT_COUNT;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 16*MAX_POINT_COUNT;
     fflush(stdout);
     fclose(in);
 
@@ -380,7 +380,7 @@ static int FeederBigParabol(void)
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     LabTimeout = (int)t*2+3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 8*MAX_POINT_COUNT;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 16*MAX_POINT_COUNT;
     fflush(stdout);
     fclose(in);
 
@@ -509,7 +509,6 @@ const TLabTest LabTests[] = {
     {FeederBigTriangle, CheckerBigTriangle}, // 36
     {FeederBigParabol, CheckerBigParabol}, // 37
     {FeederBigParabol, CheckerBigParabol}, // 38
-    {FeederBigParabol, CheckerBigParabol}, // 37
     {FeederBigParabol, CheckerBigParabol}, // 39
     {FeederBigParabol, CheckerBigParabol}  // 40
 };
