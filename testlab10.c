@@ -162,9 +162,9 @@ static int FeederBigSegment(void)
     }
 
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    LabTimeout = (int)t*2+3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 16*MAX_POINT_COUNT;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+2... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2+2000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 3*sizeof(TPoint)*MAX_POINT_COUNT;
     fflush(stdout);
     fclose(in);
 
@@ -259,9 +259,9 @@ static int FeederBigTriangle(void)
     }
 
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    LabTimeout = (int)t*2+3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 16*MAX_POINT_COUNT;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+2... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2+2000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 3*sizeof(TPoint)*MAX_POINT_COUNT;
     fflush(stdout);
     fclose(in);
 
@@ -378,9 +378,9 @@ static int FeederBigParabol(void)
     }
 
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    LabTimeout = (int)t*2+3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 16*MAX_POINT_COUNT;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+2... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2+2000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 3*sizeof(TPoint)*MAX_POINT_COUNT;
     fflush(stdout);
     fclose(in);
 
