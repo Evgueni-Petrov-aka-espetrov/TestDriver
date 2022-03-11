@@ -300,7 +300,7 @@ const TLabTest LabTests[] = {
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},ed
+        {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {feederBig, checkerBig},
         {feederBig1, checkerBig1},
