@@ -3,45 +3,63 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum testConst { N_MAX = 2000 };
+enum testConst {
+    N_MAX = 2000,
+};
+
 static int testN = 0;
+
 static const struct {
     int N, M;
-    struct { int a, b; } G[8];
+    struct { int a, b; } G[28];
     const char *msg;
 } testInOut[] = {
-    {3, 2, {{1, 2}, {1, 3}}, NULL},
-    {3, 3, {{1, 2}, {2, 3}, {3, 1}}, "impossible to sort"}, // 123
-    {4, -1, {{0}}, "bad number of lines"},
-    {3, 3, {{1, 2}, {1, 3}, {2, 3}}, NULL}, // 123
-    {3, 3, {{1, 3}, {1, 2}, {3, 2}}, NULL}, // 132
-    {3, 3, {{2, 1}, {2, 3}, {1, 3}}, NULL}, // 213
-    {3, 3, {{2, 3}, {2, 1}, {3, 1}}, NULL}, // 231
-    {3, 3, {{3, 1}, {3, 2}, {1, 2}}, NULL}, // 312
-    {3, 3, {{3, 2}, {3, 1}, {2, 1}}, NULL}, // 321
-    {-1, -1, {{0}}, "bad number of lines"},
-    {3, 3, {{1, 3}, {3, 2}, {2, 1}}, "impossible to sort"}, // 132
-    {3, 3, {{2, 1}, {1, 3}, {3, 2}}, "impossible to sort"}, // 213
-    {3, 3, {{2, 3}, {3, 1}, {1, 2}}, "impossible to sort"}, // 231
-    {3, 3, {{3, 1}, {1, 2}, {2, 3}}, "impossible to sort"}, // 312
-    {3, 3, {{3, 2}, {2, 1}, {1, 3}}, "impossible to sort"}, // 321
-    {2, 1, {{0}}, "bad number of lines"},
-    {N_MAX, 1, {{N_MAX-1, N_MAX}}, NULL},
-    {N_MAX, 0, {{0}}, NULL},
-    {N_MAX+1, 1, {{1, 1}}, "bad number of vertices"},
-    {0, 1, {{0}}, "bad number of edges"},
-    {4, 6, {{1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4}}, NULL},
-    {4, 4, {{1, 2}, {2, 3}, {1, 3}, {4, 3}}, NULL},
-    {2, 4, {{1, 1}, {1, 2}, {2, 1}, {2, 2}}, "bad number of edges"},
-    {N_MAX, 1, {{N_MAX, N_MAX}}, "impossible to sort"},
-    {4, 4, {{1, 2}, {2, 3}, {3, 4}, {4, 1}}, "impossible to sort"},
-    {5, 4, {{1, 2}, {2, 3}, {3, 1}, {4, 3}}, "impossible to sort"},
-    {3, 2, {{1, 2}, {2, 4}}, "bad vertex"},
-    {3, 2, {{1, 2}, {4, 2}}, "bad vertex"},
-    {3, 2, {{1, 2}, {-1, 2}}, "bad vertex"},
-    {3, 2, {{1, 2}, {2, -1}}, "bad vertex"},
-
+        {3, 2, {{1, 2}, {1, 3}}, NULL},
+        {3, 3, {{1, 2}, {2, 3}, {3, 1}}, "impossible to sort"}, // 123
+        {4, -1, {{0}}, "bad number of lines"},
+        {5, 6, {{2, 1}, {3, 2}, {5, 3}, {4, 5}, {5, 2}, {4, 1}}, NULL},
+        {2, 1, {{2, 1}}, NULL},
+        {9, 23, {{1, 8}, {5, 3}, {2, 4}, {3, 6}, {3, 8}, {7, 5}, {6, 1}, {4, 7}, {1, 2}, {1, 5}, {6, 4}, {5, 8}, {7, 1}, {3, 7}, {3, 2}, {8, 9}, {2, 7}, {8, 7}, {4, 9}, {1, 9}, {4, 8}, {2, 5}, {5, 9}}, "impossible to sort"},
+        {4, 1, {{2, 3}}, NULL},
+        {4, 3, {{3, 4}, {4, 1}, {1, 3}}, "impossible to sort"},
+        {8, 12, {{6, 7}, {2, 7}, {8, 7}, {5, 8}, {2, 6}, {6, 1}, {6, 4}, {1, 4}, {1, 7}, {6, 5}, {8, 2}, {7, 4}}, "impossible to sort"},
+        {8, 13, {{3, 1}, {7, 4}, {8, 6}, {6, 3}, {5, 7}, {3, 7}, {7, 6}, {2, 3}, {8, 3}, {8, 2}, {4, 5}, {5, 2}, {5, 1}}, "impossible to sort"},
+        {6, 10, {{5, 4}, {2, 4}, {6, 1}, {5, 2}, {6, 4}, {2, 1}, {5, 6}, {3, 1}, {6, 2}, {5, 1}}, NULL},
+        {4, 2, {{4, 3}, {1, 4}}, NULL},
+        {4, -1, {{0}}, "bad number of lines"},
+        {9, 26, {{1, 8}, {5, 3}, {2, 4}, {3, 6}, {3, 8}, {7, 5}, {6, 1}, {4, 7}, {1, 2}, {1, 5}, {6, 4}, {5, 8}, {7, 1}, {3, 7}, {3, 2}, {8, 9}, {2, 7}, {8, 7}, {4, 9}, {1, 9}, {4, 8}, {2, 5}, {5, 9}}, "bad number of lines"},
+        {8, 14, {{8, 3}, {8, 5}, {6, 5}, {5, 4}, {4, 1}, {6, 2}, {8, 6}, {7, 2}, {3, 4}, {3, 2}, {1, 5}, {2, 4}, {8, 7}, {2, 5}}, "impossible to sort"},
+        {2, 1, {{1, 2}}, NULL},
+        {5, 1, {{5, 3}}, NULL},
+        {9, 14, {{4, 7}, {9, 6}, {6, 3}, {4, 2}, {1, 8}, {6, 8}, {5, 2}, {1, 6}, {5, 7}, {7, 2}, {2, 1}, {3, 5}, {4, 1}, {9, 8}}, "impossible to sort"},
+        {3, 2, {{1, 3}, {2, 1}}, NULL},
+        {4, 4, {{2, 4}, {1, 3}, {4, 3}, {1, 4}}, NULL},
+        {5, 7, {{4, 2}, {2, 3}, {2, 1}, {4, 5}, {5, 3}, {5, 2}, {4, 1}}, NULL},
+        {2, 4, {{1, 1}, {1, 2}, {2, 1}, {2, 2}}, "bad number of edges"},
+        {N_MAX+1, 1, {{1, 1}}, "bad number of vertices"},
+        {8, 16, {{6, 7}, {6, 4}, {8, 1}, {8, 3}, {2, 7}, {6, 3}, {2, 6}, {1, 7}, {2, 3}, {3, 7}, {4, 3}, {6, 5}, {7, 5}, {3, 1}, {1, 5}, {4, 2}}, "impossible to sort"},
+        {6, 14, {{5, 1}, {5, 2}, {1, 6}, {5, 6}, {2, 6}, {1, 2}, {4, 3}, {6, 4}, {5, 3}, {5, 4}, {4, 1}, {3, 2}, {3, 1}, {6, 3}}, "impossible to sort"},
+        {2, 1, {{1, 2}}, NULL},
+        {4, 5, {{4, 1}, {2, 4}, {3, 1}, {3, 2}, {2, 1}}, NULL},
+        {3, 1, {{1, 2}}, NULL},
+        {3, 2, {{1, 2}, {4, 2}}, "bad vertex"},
+        {5, 9, {{4, 3}, {4, 2}, {2, 1}, {1, 4}, {1, 3}, {2, 5}, {5, 3}, {3, 2}, {1, 5}}, "impossible to sort"},
+        {7, 10, {{6, 1}, {7, 1}, {5, 4}, {7, 6}, {7, 3}, {2, 7}, {7, 4}, {2, 1}, {2, 3}, {1, 4}}, NULL},
+        {2, 1, {{1, 2}}, NULL},
+        {5, 10, {{2, 4}, {1, 4}, {1, 3}, {5, 2}, {5, 4}, {3, 5}, {2, 1}, {1, 5}, {2, 3}, {3, 4}}, "impossible to sort"},
+        {2, 1, {{1, 2}}, NULL},
+        {3, 2, {{1, 2}, {2, 4}}, "bad vertex"},
+        {3, 2, {{1, 2}, {2, -1}}, "bad vertex"},
+        {10, 28, {{3, 7}, {8, 7}, {9, 3}, {1, 4}, {2, 10}, {2, 6}, {10, 4}, {7, 5}, {5, 4}, {2, 9}, {8, 6}, {7, 6}, {1, 9}, {4, 9}, {10, 9}, {2, 3}, {9, 7}, {7, 2}, {2, 5}, {5, 8}, {6, 9}, {5, 3}, {6, 4}, {4, 8}, {2, 1}, {10, 7}, {5, 10}, {6, 10}}, "impossible to sort"},
+        {10, 27, {{3, 10}, {2, 9}, {1, 5}, {7, 8}, {4, 3}, {2, 6}, {6, 3}, {2, 1}, {8, 4}, {5, 7}, {5, 4}, {8, 5}, {2, 10}, {8, 2}, {6, 9}, {3, 1}, {5, 9}, {6, 10}, {5, 3}, {1, 6}, {5, 2}, {9, 4}, {9, 8}, {2, 7}, {2, 3}, {9, 7}, {7, 1}}, "impossible to sort"},
+        {10, 26, {{8, 6}, {4, 2}, {8, 10}, {5, 8}, {6, 3}, {10, 6}, {3, 4}, {9, 3}, {4, 7}, {3, 1}, {9, 8}, {10, 2}, {5, 1}, {6, 5}, {8, 4}, {9, 7}, {10, 3}, {5, 9}, {2, 1}, {9, 2}, {4, 6}, {5, 7}, {7, 3}, {6, 7}, {9, 6}, {10, 9}}, "impossible to sort"},
+        {5, 6, {{4, 3}, {1, 4}, {5, 1}, {3, 5}, {1, 2}, {5, 2}}, "impossible to sort"},
+        {8, 8, {{6, 3}, {4, 2}, {7, 4}, {1, 6}, {4, 1}, {2, 1}, {7, 6}, {7, 3}}, NULL},
+        {3, 2, {{1, 2}, {-1, 2}}, "bad vertex"},
+        {5, 6, {{1, 4}, {4, 5}, {2, 3}, {1, 3}, {5, 3}, {5, 2}}, NULL},
+        {3, 2, {{3, 2}, {1, 3}}, NULL},
 };
+
 
 static size_t LabMemoryLimit;
 
@@ -246,44 +264,52 @@ static int checkerBig1(void)
 }
 
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-
-    {feederBig, checkerBig},
-    {feederBig1, checkerBig1},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {feederBig, checkerBig},
+        {feederBig1, checkerBig1},
 };
 
 TLabTest GetLabTest(int testIdx) {
