@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum testConst { 
+enum testConst {
     N_MAX = 2000,
 };
 
@@ -14,6 +14,9 @@ static const struct {
     struct { int a, b; } G[28];
     const char *msg;
 } testInOut[] = {
+        {3, 2, {{1, 2}, {1, 3}}, NULL},
+        {3, 3, {{1, 2}, {2, 3}, {3, 1}}, "impossible to sort"}, // 123
+        {4, -1, {{0}}, "bad number of lines"},
         {5, 6, {{2, 1}, {3, 2}, {5, 3}, {4, 5}, {5, 2}, {4, 1}}, NULL},
         {2, 1, {{2, 1}}, NULL},
         {9, 23, {{1, 8}, {5, 3}, {2, 4}, {3, 6}, {3, 8}, {7, 5}, {6, 1}, {4, 7}, {1, 2}, {1, 5}, {6, 4}, {5, 8}, {7, 1}, {3, 7}, {3, 2}, {8, 9}, {2, 7}, {8, 7}, {4, 9}, {1, 9}, {4, 8}, {2, 5}, {5, 9}}, "impossible to sort"},
@@ -261,6 +264,9 @@ static int checkerBig1(void)
 }
 
 const TLabTest LabTests[] = {
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
