@@ -72,8 +72,8 @@ static int CheckFromArray(void)
     }
 
     if (testInOut[testN].pointCount != 0) {
-        int finded[8] = {0};
-        int findedCount = 0;
+        int found[8] = {0};
+        int foundCount = 0;
 
         for (int i = 0; i < testInOut[testN].pointCount; ++i) {
             TPoint point = { 0, 0 };
@@ -85,20 +85,20 @@ static int CheckFromArray(void)
             
             for (int j = 0; j < testInOut[testN].pointCount; ++j) {
                 if (point.x == testInOut[testN].outPoints[j].x && point.y == testInOut[testN].outPoints[j].y) {
-                    if (finded[j] == 1) {
+                    if (found[j] == 1) {
                         fclose(out);
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
                     
-                    ++finded[j];
-                    ++findedCount;
+                    ++found[j];
+                    ++foundCount;
                     break;
                 }
             }
         }
         
-        if (findedCount != testInOut[testN].pointCount) {
+        if (foundCount != testInOut[testN].pointCount) {
             fclose(out);
             printf("wrong output -- %s\n", Fail);
             return 1;
@@ -108,7 +108,7 @@ static int CheckFromArray(void)
         char error[128] = {0};
         const char* status = ScanChars(out, sizeof(error), error);
         
-        if(status == Pass &&  _strnicmp(testInOut[testN].outError, error, strlen(error)) != 0) {
+        if (status == Pass &&  _strnicmp(testInOut[testN].outError, error, strlen(error)) != 0) {
             status = Fail;
         }
         
@@ -187,8 +187,8 @@ static int CheckerBigSegment(void)
         pointOut[1].x = 0;
     }
 
-    int finded[2] = { 0 };
-    int findedCount = 0;
+    int found[2] = { 0 };
+    int foundCount = 0;
     for (int i = 0; i < 2; ++i) {
         TPoint point = { 0, 0 };
         if (ScanPoint(out, &point) == Fail) {
@@ -199,20 +199,20 @@ static int CheckerBigSegment(void)
 
         for (int j = 0; j < 2; ++j) {
             if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
-                if (finded[j] == 1) {
+                if (found[j] == 1) {
                     fclose(out);
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
                 
-                ++finded[j];
-                ++findedCount;
+                ++found[j];
+                ++foundCount;
                 break;
             }
         }
     }
     
-    if (findedCount != 2) {
+    if (foundCount != 2) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
         return 1;
@@ -284,8 +284,8 @@ static int CheckerBigTriangle(void)
         pointOut[2].x = INT_MAX - MAX_POINT_COUNT + 2;
     } 
 
-    int finded[3] = { 0 };
-    int findedCount = 0;
+    int found[3] = { 0 };
+    int foundCount = 0;
     for (int i = 0; i < 3; ++i) {
         TPoint point = { 0, 0 };
         if (ScanPoint(out, &point) == Fail) {
@@ -296,20 +296,20 @@ static int CheckerBigTriangle(void)
 
         for (int j = 0; j < 3; ++j) {
             if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
-                if (finded[j] == 1) {
+                if (found[j] == 1) {
                     fclose(out);
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
                 
-                ++finded[j];
-                ++findedCount;
+                ++found[j];
+                ++foundCount;
                 break;
             }
         }
     }
     
-    if (findedCount != 3) {
+    if (foundCount != 3) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
         return 1;
@@ -395,10 +395,9 @@ static int CheckerBigParabol(void)
         return -1;
     }
 
-
     if(bigParabolsN == 1 || bigParabolsN == 2 || bigParabolsN == 3) {
-        int finded[MAX_POINT_COUNT + 1] = { 0 };
-        int findedCount = 0;
+        int found[MAX_POINT_COUNT + 1] = { 0 };
+        int foundCount = 0;
 
         for (int i = 0; i < MAX_POINT_COUNT; ++i) {
             TPoint point = { 0, 0 };
@@ -410,17 +409,17 @@ static int CheckerBigParabol(void)
 
             int index = MAX_POINT_COUNT / 2;
             index += (bigParabolsN == 3) ? point.y : point.x;
-            if (finded[index] == 1) {
+            if (found[index] == 1) {
                 fclose(out);
                 printf("wrong output -- %s\n", Fail);
                 return 1;
             }
 
-            ++finded[index];
-            ++findedCount;
+            ++found[index];
+            ++foundCount;
         }
 
-        if (findedCount != MAX_POINT_COUNT) {
+        if (foundCount != MAX_POINT_COUNT) {
             fclose(out);
             printf("wrong output -- %s\n", Fail);
             return 1;
@@ -430,8 +429,8 @@ static int CheckerBigParabol(void)
         int x = MAX_POINT_COUNT / 4;
         TPoint pointOut[4] =  { {x, x*x}, {x, -x*x}, {-x, x*x}, {-x, -x*x} };
 
-        int finded[4] = { 0 };
-        int findedCount = 0;
+        int found[4] = { 0 };
+        int foundCount = 0;
         for (int i = 0; i < 4; ++i) {
             TPoint point = { 0, 0 };
             if (ScanPoint(out, &point) == Fail) {
@@ -442,20 +441,20 @@ static int CheckerBigParabol(void)
 
             for (int j = 0; j < 4; ++j) {
                 if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
-                    if (finded[j] == 1) {
+                    if (found[j] == 1) {
                         fclose(out);
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
                     
-                    ++finded[j];
-                    ++findedCount;
+                    ++found[j];
+                    ++foundCount;
                     break;
                 }
             }
         }
 
-        if (findedCount != 4) {
+        if (foundCount != 4) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
         return 1;
