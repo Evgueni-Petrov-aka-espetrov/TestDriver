@@ -93,7 +93,7 @@ enum ETestcaseDataId {
 };
 
 static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId dataId, unsigned edgeIdx) {
-    const unsigned smallTestCount = 29;
+    const unsigned smallTestCount = 30;
     if (testcaseIdx < smallTestCount) {
         typedef struct TSmallTest {
             unsigned VertexCount;
@@ -111,6 +111,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             {0, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
             {MAX_VERTEX_COUNT+1, 1, {{1, 1, 1}}, "bad number of vertices"},
             {2, 4, {{1, 1, 1}, {1, 2, 1}, {2, 1, 1}, {2, 2, 1}}, "bad number of edges"},
+            {2, 2, {{1, 2, 2}, {1, 2, 1}}, "bad number of edges"},
             {2, 1, {{1, 2, (unsigned long long)-1}}, "bad length"},
 
             {2, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
