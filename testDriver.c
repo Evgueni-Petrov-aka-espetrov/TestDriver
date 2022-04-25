@@ -83,11 +83,14 @@ int main(int argc, char* argv[])
         if (!runnerCommand) {
             break;
         }
-        DWORD startTime = GetTickCount();
+        double ms0 = GetTickCount();
         if (system(runnerCommand) != 0) {
             break;
         }
-        PrintWithoutBuffering("%d ms, ", GetTickCount() - startTime);
+        double ms1 = GetTickCount();
+        int millisecondsPerDay = 1000 * 60 * 60 * 24;
+        double msElapsed = ((int)(ms1 - ms0) + millisecondsPerDay) % millisecondsPerDay;
+        PrintWithoutBuffering("%.0f ms, ", msElapsed);
         if (GetLabTest(i).Checker() != 0) {
             break;
         }
