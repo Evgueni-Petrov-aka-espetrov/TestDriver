@@ -11,6 +11,8 @@ https://ci.appveyor.com/project/Evgueni-Petrov-aka-espetrov/testdriver
 Для компиляции тестов под убунту можно использовать такой докер файл:
 
 ``
-FROM ubuntu:18.04 as build-env \n
+FROM ubuntu:18.04 as build-env
+``
+``
 RUN apt-get update && apt-get -y install gcc git
 ``
