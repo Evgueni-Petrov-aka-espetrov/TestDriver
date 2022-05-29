@@ -56,6 +56,7 @@ add_library(testDriver testDriver.c)
 set_compiler_settings(testDriver EXTENSIONS YES)
 
 set(TEST_LAB_SOURCES
+	testlab-begin.c
 	testlab0.c
 	testlab1-0.c
 	testlab1-1.c
