@@ -173,7 +173,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
