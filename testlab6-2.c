@@ -117,7 +117,7 @@ static int feederBig(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 20000000*(sizeof(int)+sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 20000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -173,7 +173,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -263,7 +263,7 @@ static int feederBig2(void)
     genTree(in, 30, 0, 4000000);
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 1346269*(sizeof(int)+sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 1346269*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
