@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 static int testN = 0;
 static const struct {const char *const in; int n;} testInOut[] = {
@@ -119,7 +118,7 @@ static int feederBig(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 20000000*(ceil((float)(sizeof(int)/T))+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 20000000*((sizeof(int)+T-2)/(T-1)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -176,7 +175,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 2000000*(ceil((float)(sizeof(int)/T))+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -267,7 +266,7 @@ static int feederBig2(void)
     genTree(in, 30, 0, 4000000);
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 1346269*(ceil((float)(sizeof(int)/T))+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 1346269*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
