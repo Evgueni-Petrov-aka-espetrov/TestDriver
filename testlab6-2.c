@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 static int testN = 0;
 static const struct {const char *const in; int n;} testInOut[] = {
@@ -102,11 +103,12 @@ static int feederBig(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     int i;
+    int T = 2;
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(in, "2\n");
+    fprintf(in, "%d\n", T);
     fprintf(in, "2000000\n");
     for (i = 0; i < 2000000; i++) {
         if (fprintf(in, "%d ", i) < 0) {
@@ -117,7 +119,7 @@ static int feederBig(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 20000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 20000000*(ceil((float)(sizeof(int)/T))+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -158,11 +160,12 @@ static int feederBig1(void)
 {
     FILE *const in = fopen("in.txt", "w+");
     unsigned i;
+    int T = 1000;
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(in, "1000\n");
+    fprintf(in, "%d\n", T);
     fprintf(in, "2000000\n");
     for (i = 0; i < 2000000; i++) {
         if (fprintf(in, "%d ", i^0xcafecafe) < 0) {
@@ -173,7 +176,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(ceil((float)(sizeof(int)/T))+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -254,16 +257,17 @@ static void genTree(FILE *in, int height, int min, int max)
 static int feederBig2(void)
 {
     FILE *const in = fopen("in.txt", "w+");
+    int T = 2000;
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(in, "2000\n");
+    fprintf(in, "%d\n", T);
     fprintf(in, "1346269\n");
     genTree(in, 30, 0, 4000000);
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 1346269*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 1346269*(ceil((float)(sizeof(int)/T))+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
