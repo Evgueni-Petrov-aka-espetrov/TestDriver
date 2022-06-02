@@ -12,8 +12,8 @@ typedef struct TKnapsackItem TKnapsackItem;
 typedef struct IOStream IOStream;
 
 struct TKnapsackItem {
-    unsigned int Weight;
-    unsigned int Cost;
+    int Weight;
+    int Cost;
 };
 
 struct TTestPackage {
@@ -21,8 +21,8 @@ struct TTestPackage {
     TKnapsackItem Result[MAX_ITEMS];
     size_t CountItems;
     size_t CountResultItems;
-    unsigned int MaxKnapsackWeight;
-    unsigned int KnapsackCost;
+    int MaxKnapsackWeight;
+    int KnapsackCost;
 };
 
 struct TTestInOut {
@@ -95,7 +95,7 @@ static int CheckFromArray() {
         printf("Wrong knapsack cost output. Found %d, but excepted %d. -- Failed\n", knapsackCost, TestData.Tests[currentTest].KnapsackCost);
         return 1;
     }
-    unsigned int weight = 0, cost = 0;
+    int weight = 0, cost = 0;
     size_t readItemsCount = 0;
     while(fscanf(stream.out, "%d %d", &weight, &cost) == 2) {
         if (readItemsCount >= TestData.Tests[currentTest].CountResultItems) {
