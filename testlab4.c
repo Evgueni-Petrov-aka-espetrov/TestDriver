@@ -29,6 +29,8 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {")\n", "syntax error"},
     {"1+1)(\n", "syntax error"},
     {"1 1\n", "syntax error"},
+    {"1)+(2\n", "syntax error"},
+    {"(1+2))+(3\n", "syntax error"},
     {"1234567890\n", "1234567890"},
     {"(1234567890)\n", "1234567890"},
     {"((1234567890))\n", "1234567890"},

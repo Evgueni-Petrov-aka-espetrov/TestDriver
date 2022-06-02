@@ -56,6 +56,7 @@ add_library(testDriver testDriver.c)
 set_compiler_settings(testDriver EXTENSIONS YES)
 
 set(TEST_LAB_SOURCES
+	testlab-begin.c
 	testlab0.c
 	testlab1-0.c
 	testlab1-1.c
@@ -68,7 +69,8 @@ set(TEST_LAB_SOURCES
 	testlab7.c
 	testlab8-0.c
 	testlab9.c
-	testlab11.c
+	testlab10.c
+  testlab11.c
 )
 foreach(source ${TEST_LAB_SOURCES})
 	get_filename_component(target ${source} NAME_WE)
