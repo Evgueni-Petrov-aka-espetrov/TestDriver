@@ -65,7 +65,7 @@ static TTestInOut TestData = {{
 static size_t currentTest = 0;
 IOStream stream = { NULL , NULL};
 
-static int FeedFromArray() {
+static int FeedFromArray(void) {
     stream.in = fopen("in.txt", "w+");
     if (!stream.in) {
         printf("can't create in.txt. No space on disk?\n");
@@ -79,7 +79,7 @@ static int FeedFromArray() {
     return 0;
 }
 
-static int CheckFromArray() {
+static int CheckFromArray(void) {
     stream.out = fopen("out.txt", "r");
     if (!stream.out) {
         printf("can't open out.txt\n");
@@ -151,7 +151,7 @@ TLabTest GetLabTest(int testIdx) {
     return labTest;
 }
 
-int GetTestCount() {
+int GetTestCount(void) {
     return TEST_COUNT;
 }
 
@@ -159,10 +159,10 @@ const char* GetTesterName(void) {
     return "Lab 11 Knapsack problem";
 }
 
-int GetTestTimeout() {
+int GetTestTimeout(void) {
     return TIME_LIMIT;
 }
 
-size_t GetTestMemoryLimit() {
+size_t GetTestMemoryLimit(void) {
     return MIN_PROCESS_RSS_BYTES + MEMORY_LIMIT;
 }
