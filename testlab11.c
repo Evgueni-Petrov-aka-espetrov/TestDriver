@@ -30,8 +30,8 @@ struct TTestInOut {
 };
 
 struct IOStream {
-    FILE* in;
-    FILE* out;
+    FILE* In;
+    FILE* Out;
 };
 
 static TTestInOut TestData = {{
@@ -66,28 +66,28 @@ static size_t currentTest = 0;
 IOStream stream = { NULL , NULL};
 
 static int FeedFromArray(void) {
-    stream.in = fopen("in.txt", "w+");
-    if (!stream.in) {
+    stream.In = fopen("in.txt", "w+");
+    if (!stream.In) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(stream.in, "%lu %d\n", TestData.Tests[currentTest].CountItems, TestData.Tests[currentTest].MaxKnapsackWeight);
+    fprintf(stream.In, "%lu %d\n", TestData.Tests[currentTest].CountItems, TestData.Tests[currentTest].MaxKnapsackWeight);
     for (size_t i = 0; i < TestData.Tests[currentTest].CountItems; ++i) {
-        fprintf(stream.in, "%d %d\n", TestData.Tests[currentTest].Items[i].Weight, TestData.Tests[currentTest].Items[i].Cost);
+        fprintf(stream.In, "%d %d\n", TestData.Tests[currentTest].Items[i].Weight, TestData.Tests[currentTest].Items[i].Cost);
     }
-    fclose(stream.in);
+    fclose(stream.In);
     return 0;
 }
 
 static int CheckFromArray(void) {
-    stream.out = fopen("out.txt", "r");
-    if (!stream.out) {
+    stream.Out = fopen("out.txt", "r");
+    if (!stream.Out) {
         printf("can't open out.txt\n");
         currentTest++;
         return -1;
     }
     int knapsackCost = 0;
-    const char* result = ScanInt(stream.out, &knapsackCost);
+    const char* result = ScanInt(stream.Out, &knapsackCost);
     if (result != Pass) {
         return 1;
     }
@@ -98,7 +98,7 @@ static int CheckFromArray(void) {
     
     int weight = 0, cost = 0;
     size_t readItemsCount = 0;
-    while(fscanf(stream.out, "%d %d", &weight, &cost) == 2) {
+    while(fscanf(stream.Out, "%d %d", &weight, &cost) == 2) {
         if (readItemsCount >= TestData.Tests[currentTest].CountResultItems) {
             printf("Output too long -- failed\n");
             return 1;
@@ -115,7 +115,7 @@ static int CheckFromArray(void) {
     }
     printf("PASSED\n");
     ++currentTest;
-    fclose(stream.out);
+    fclose(stream.Out);
     return 0;
 }
 
