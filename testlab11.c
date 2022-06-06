@@ -63,7 +63,7 @@ static TTestInOut TestData = {{
 };
 
 static size_t currentTest = 0;
-IOStream stream = { NULL , NULL};
+IOStream stream = {NULL, NULL};
 
 static int FeedFromArray(void) {
     stream.In = fopen("in.txt", "w+");
