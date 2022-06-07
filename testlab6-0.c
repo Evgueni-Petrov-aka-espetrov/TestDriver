@@ -352,7 +352,7 @@ int GetTestCount(void) {
 }
 
 const char* GetTesterName(void) {
-    return "Lab 6 AVL trees";
+    return "Lab 6-0 AVL trees";
 }
 
 int GetTestTimeout() {
