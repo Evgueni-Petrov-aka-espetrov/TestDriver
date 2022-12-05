@@ -6,7 +6,7 @@
 static int testN = 0;
 static const struct {const char *const in; int n;} testInOut[] = {
     {"0\n\n", 0},
-    {"1\n25\n", 2},
+    {"1\n25\n", 1},
     {"2\n17 25\n", 2},
     {"3\n2 -1 4\n", 2},
     {"3\n2 4 -1\n", 2},
@@ -45,7 +45,13 @@ static const struct {const char *const in; int n;} testInOut[] = {
     {"4\n4 2 3 1\n", 3},
     {"4\n4 3 1 2\n", 3},
     {"4\n4 3 2 1\n", 3},
-    {"12\n10 18 7 15 16 30 20 40 60 2 1 70\n", 4},
+    {"12\n10 18 7 15 16 30 20 40 60 2 1 70\n", 5},
+    {"9\n1 2 3 4 5 6 7 8 9\n", 4},
+    {"10\n1 2 3 4 5 6 7 8 9 10\n", 5},
+    {"13\n1 2 3 4 5 6 7 8 9 10 11 12 13\n", 5},
+    {"14\n1 2 3 4 5 6 7 8 9 10 11 12 13 14\n", 6},
+    {"19\n1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1\n", 5},
+    {"20\n1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0\n", 6},
 };
 
 static int FeedFromArray(void)
@@ -117,7 +123,7 @@ static int feederBig(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+3*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -134,7 +140,7 @@ static int checkerBig(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
-        } else if (21 != n) {
+        } else if (39 != n) {
             passed = 0;
             printf("wrong output -- ");
         }
@@ -172,7 +178,7 @@ static int feederBig1(void)
     }
     fprintf(in, "\n");
     fclose(in);
-    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+2*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = 2000000*(sizeof(int)+sizeof(int)+3*GetLabPointerSize())+MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -189,7 +195,7 @@ static int checkerBig1(void)
         int n;
         if (ScanInt(out, &n) != Pass) {
             passed = 0;
-        } else if (19 != n) {
+        } else if (35 != n) {
             passed = 0;
             printf("wrong output -- ");
         }
