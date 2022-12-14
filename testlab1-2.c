@@ -114,8 +114,8 @@ static int FeederBigRand1(void) {
     }
     fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 3*T... ", (unsigned)(t / 1000)  );
-    LabTimeout = (int)t*3;
+    printf("done in T=%u seconds. Starting exe with timeout 6*T... ", (unsigned)(t / 1000));
+    LabTimeout = (int)t * 6;
     fflush(stdout);
     return 0;
 }
@@ -196,7 +196,7 @@ static int FeederBig(void) {
         return -1;
     }
     for (int i = 0; i < 1024 * 1024 * 8; ++i) {
-        if (fputs(str, in) == EOF) {
+        if (fprintf(in, "%s", str) != strlen(str)) {
             printf("can't write in in.txt. No space on disk?\n");
             return -1;
         }
@@ -204,7 +204,7 @@ static int FeederBig(void) {
     fclose(in);
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 6*T... ", (unsigned)(t / 1000));
-    LabTimeout = (int)t*6;
+    LabTimeout = (int)t * 6;
     fflush(stdout);
     return 0;
 }
