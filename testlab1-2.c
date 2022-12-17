@@ -20,9 +20,9 @@ static const struct {const char *const in; int n; int out[64];} testInOut[] = {
     {"0123456789abcdef\n01234", 16, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
     {"0101230101234\n0101010122301341010101230101234", 27, {0, 0, 1, 2, 0, 0, 1, 2, 3, 4, 5, 6,  0, 1, 4, 3, 4, 5, 5, 7, 2, 12, 2, 17, 4, 19, 13}},
     {"0\nasdbaf", 1, {0}}, // pattern must have at least one char, see todo.txt
-    {"\xE0\xE1\xE2\xE3\n\xE0\xE1\xE2\xE3\xE0\xE1\xE2\xE3",8,{0, 0, 0, 0, 1, 4, 5, 4}}, // ‡·‚„\n‡·‚„‡·‚„
-    {"\xE0\xE1 \xE2\xE3\n\xE0\xE1 \xE2\xE3\xE0\xE1\xE2\xE3", 7, {0, 0, 0, 0, 0, 1, 5}}, // ‡· ‚„\n‡· ‚„‡·‚„
-    {"\xE0\xE1 \xE2\xE3\n\xE0\xE1\xE2\xE3\n\xE0\xE1 \xE2\xE3", 9, {0, 0, 0, 0, 0, 1, 2, 6, 5}}, // ‡· ‚„\n‡·‚„\n‡· ‚„
+    {"\xE0\xE1\xE2\xE3\n\xE0\xE1\xE2\xE3\xE0\xE1\xE2\xE3",8,{0, 0, 0, 0, 1, 4, 5, 4}}, // –∞–±–≤–≥\n–∞–±–≤–≥–∞–±–≤–≥
+    {"\xE0\xE1 \xE2\xE3\n\xE0\xE1 \xE2\xE3\xE0\xE1\xE2\xE3", 7, {0, 0, 0, 0, 0, 1, 5}}, // –∞–± –≤–≥\n–∞–± –≤–≥–∞–±–≤–≥
+    {"\xE0\xE1 \xE2\xE3\n\xE0\xE1\xE2\xE3\n\xE0\xE1 \xE2\xE3", 9, {0, 0, 0, 0, 0, 1, 2, 6, 5}}, // –∞–± –≤–≥\n–∞–±–≤–≥\n–∞–± –≤–≥
     {"000001\n000000000010", 20, {0, 1, 2, 3, 4, 0, 1, 5, 2, 5, 3, 5, 4, 5, 5, 5, 6, 6, 7, 4}}
 };
 
@@ -293,7 +293,7 @@ int GetTestCount(void) {
 }
 
 const char* GetTesterName(void) {
-    return "Lab 1-2 Knuth-Morris-Pratt";
+    return "Lab 1-2 Knuth‚ÄìMorris‚ÄìPratt";
 }
 
 static int LabTimeout = 3000;
