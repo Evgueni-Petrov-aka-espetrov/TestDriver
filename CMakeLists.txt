@@ -68,6 +68,7 @@ set(TEST_LAB_SOURCES
 	testlab6-0.c
 	testlab6-1.c
 	testlab6-2.c
+	testlab6-3.c
 	testlab7.c
 	testlab8-0.c
 	testlab9.c
