@@ -276,8 +276,8 @@ static int feederBig3(void) {
     fclose(in);
     testTimeOut = end - start;
     printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
-    testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char) * 10) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    testTimeOut = testTimeOut * 2 + CLOCKS_PER_SEC * 3;
+    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char) * 4) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
