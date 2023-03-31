@@ -49,8 +49,7 @@ static bool equal(char *const string, char *const pattern) {
         char *begin = pattern;
         char *space_pointer = strchr(begin, ' ');
         while (space_pointer != NULL) {
-            char word[len_pattern + 1];
-            memset(word, '\0', sizeof(char) * (len_pattern + 1));
+            char word[BUFF_SIZE] = "";
             strncpy(word, begin, space_pointer - begin);
             if (strstr(string, word) == NULL) {
                 return false;
@@ -157,8 +156,7 @@ static int feederBig1(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    char output[n + 1];
-    memset(output, '\0', sizeof(char) * (n + 1));
+    char output[MAX_WORD_LENGTH + 1] = "";
     fprintf(in, "%d\n", n);
     for (int i = 0; i < n; i++) {
         output[i] = 'a';
@@ -316,9 +314,8 @@ static int feederBig4(void) {
         return -1;
     }
     fprintf(in, "%d\n", n);
-    char output[n + 1];
+    char output[MAX_WORD_LENGTH + 1] = "";
     memset(output, 'b', sizeof(char) * n);
-    output[n] = '\0';
     fprintf(in, "%s\n", output);
     for (int i = n - 1; i > 0; i--) {
         output[i] = '\0';
