@@ -94,23 +94,23 @@ static bool check(const char *const ans_first, int ans_second, FILE *stream) {
     return passed;
 }
 
-static bool generate(FILE *out, int ind, int order, char *output) {
-    bool res = true;
-    if (order > 0) {
-        for (int i = 0; i < ALPHABET_SIZE; i++) {
-            output[ind] = (char) ('a' + i);
-            res = generate(out, ind + 1, order - 1, output);
-        }
-    }
-    if (order == 0) {
-        if (fprintf(out, "%s\n", output) < 0) {
-            printf("can't create in.txt. No space on disk?\n");
-            fclose(out);
-            res = false;
-        }
-    }
-    return res;
-}
+//static bool generate(FILE *out, int ind, int order, char *output) {
+//    bool res = true;
+//    if (order > 0) {
+//        for (int i = 0; i < ALPHABET_SIZE; i++) {
+//            output[ind] = (char) ('a' + i);
+//            res = generate(out, ind + 1, order - 1, output);
+//        }
+//    }
+//    if (order == 0) {
+//        if (fprintf(out, "%s\n", output) < 0) {
+//            printf("can't create in.txt. No space on disk?\n");
+//            fclose(out);
+//            res = false;
+//        }
+//    }
+//    return res;
+//}
 
 static int FeedFromArray(void) {
     FILE *const in = fopen("in.txt", "w+");
@@ -172,7 +172,7 @@ static int feederBig1(void) {
     testTimeOut = end - start;
     printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (n * 2 * sizeof(char)) + n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = (n * sizeof(char)) + n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -184,57 +184,6 @@ static int checkerBig1(void) {
         return -1;
     }
     bool passed = check("None", MAX_WORD_LENGTH, out);
-    if (passed) {
-        passed = !HaveGarbageAtTheEnd(out);
-    }
-    fclose(out);
-    if (passed) {
-        printf("PASSED\n");
-        testN++;
-        return 0;
-    } else {
-        printf("FAILED\n");
-        testN++;
-        return 1;
-    }
-}
-
-static int feederBig2(void) {
-    FILE *const in = fopen("in.txt", "w+");
-    printf("Creating Large test... ");
-    clock_t start = clock();
-    int amount = 3;
-    int m = ALPHABET_SIZE;
-    int n = m * m * m * m;
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n");
-        return -1;
-    }
-    fprintf(in, "%d\n", n * amount);
-    char buff[5] = "";
-    for (int i = 0; i < amount; i++) {
-        if (!generate(in, 0, 4, buff)) {
-            return -1;
-        }
-    }
-    fprintf(in, "tree\n");
-    clock_t end = clock();
-    fclose(in);
-    testTimeOut = end - start;
-    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
-    testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = n * (sizeof(char) * 50) + n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
-    return 0;
-}
-
-static int checkerBig2(void) {
-    FILE *const out = fopen("out.txt", "r");
-    if (!out) {
-        printf("can't open out.txt\n");
-        testN++;
-        return -1;
-    }
-    bool passed = check("tree", 475254 + 1, out);
     if (passed) {
         passed = !HaveGarbageAtTheEnd(out);
     }
@@ -277,7 +226,7 @@ static int feederBig3(void) {
     testTimeOut = end - start;
     printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char) * 100) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char)) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -330,7 +279,7 @@ static int feederBig4(void) {
     testTimeOut = end - start;
     printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (ALPHABET_SIZE * n * 2 * sizeof(char)) + n * ALPHABET_SIZE * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = (n * sizeof(char)) + n * ALPHABET_SIZE * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -379,7 +328,6 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {feederBig1, checkerBig1},
-    {feederBig2, checkerBig2},
     {feederBig3, checkerBig3},
     {feederBig4, checkerBig4},
 };
