@@ -158,7 +158,7 @@ static int feederBig1(void) {
         return -1;
     }
     fprintf(in, "%d\n", n);
-    char output[500] = "";
+    char output[500 + 1] = "";
     memset(output, 'a', sizeof(char) * 500);
     generate(in, 0, 3, output);
     fprintf(in, "zzzz\n");
