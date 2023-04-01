@@ -74,7 +74,7 @@ set(TEST_LAB_SOURCES
 	testlab9.c
 	testlab10.c
 	testlab11.c
-	)
+)
 foreach(source ${TEST_LAB_SOURCES})
 	get_filename_component(target ${source} NAME_WE)
 	add_executable(${target} ${source})
@@ -84,5 +84,5 @@ foreach(source ${TEST_LAB_SOURCES})
 	string(REPLACE "testlab" "lab" test ${target})
 	add_test(NAME ${test}
 		COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${target}"
-				"${CMAKE_CURRENT_SOURCE_DIR}/test/${test}$<$<BOOL:${WIN32}>:.exe>")
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/${test}$<$<BOOL:${WIN32}>:.exe>")
 endforeach()
