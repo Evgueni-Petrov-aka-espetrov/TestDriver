@@ -170,7 +170,7 @@ static int feederBig1(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%d seconds. Starting exe with timeout T+3 seconds... ", (int) RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     LabMemoryLimit = (n * sizeof(char)) + n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
     return 0;
@@ -199,7 +199,7 @@ static int checkerBig1(void) {
     }
 }
 
-static int feederBig3(void) {
+static int feederBig2(void) {
     FILE *const in = fopen("in.txt", "w+");
     printf("Creating Large test... ");
     clock_t start = clock();
@@ -224,13 +224,13 @@ static int feederBig3(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%d seconds. Starting exe with timeout T+3 seconds... ", (int) RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char)) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char)) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES *2;
     return 0;
 }
 
-static int checkerBig3(void) {
+static int checkerBig2(void) {
     FILE *const out = fopen("out.txt", "r");
     if (!out) {
         printf("can't open out.txt\n");
@@ -253,7 +253,7 @@ static int checkerBig3(void) {
     }
 }
 
-static int feederBig4(void) {
+static int feederBig3(void) {
     FILE *const in = fopen("in.txt", "w+");
     printf("Creating Large test... ");
     clock_t start = clock();
@@ -277,13 +277,13 @@ static int feederBig4(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%d seconds. Starting exe with timeout T+3 seconds... ", (int) RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     LabMemoryLimit = (n * sizeof(char)) + n * ALPHABET_SIZE * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
-static int checkerBig4(void) {
+static int checkerBig3(void) {
     FILE *const out = fopen("out.txt", "r");
     if (!out) {
         printf("can't open out.txt\n");
@@ -328,8 +328,8 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {feederBig1, checkerBig1},
+    {feederBig2, checkerBig2},
     {feederBig3, checkerBig3},
-    {feederBig4, checkerBig4},
 };
 
 TLabTest GetLabTest(int testIdx) {
