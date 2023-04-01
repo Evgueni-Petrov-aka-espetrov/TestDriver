@@ -86,7 +86,7 @@ static bool check(const char *const ans_first, const int ans_second, FILE *strea
             } else {
                 if (ans_second != n) {
                     passed = false;
-                    printf("wrong output 2 -- ");
+                    printf("wrong output 2 got %d, expected %d -- ", n, ans_second);
                 }
             }
         }
