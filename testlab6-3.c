@@ -35,7 +35,7 @@ static const struct {const char *const in; const char *const out1; int out2;} te
     {"4\ndislike\ndisagree\ndisappear\ndisrupt\ndi\n", "dislike disagree disappear disrupt", 6},
 };
 
-static bool equal(char *const string, char *const pattern) {
+static bool equal(char *const string, const char *const pattern) {
     int len_string = (int) strlen(string);
     int len_pattern = (int) strlen(pattern);
     if (string[len_string - 1] == ' ') {
@@ -46,7 +46,7 @@ static bool equal(char *const string, char *const pattern) {
         return false;
     }
     if (strchr(pattern, ' ') != NULL) {
-        char *begin = pattern;
+        char *begin = (char *) pattern;
         char *space_pointer = strchr(begin, ' ');
         while (space_pointer != NULL) {
             char word[BUFF_SIZE] = "";
@@ -70,14 +70,14 @@ static bool equal(char *const string, char *const pattern) {
     return true;
 }
 
-static bool check(const char *const ans_first, int ans_second, FILE *stream) {
+static bool check(const char *const ans_first, const int ans_second, FILE *stream) {
     bool passed = true;
     char buff[BUFF_SIZE] = "";
     int n;
     if (ScanChars(stream, BUFF_SIZE, buff) != Pass) {
         passed = false;
     } else {
-        if (!equal(buff, (char *) ans_first)) {
+        if (!equal(buff, ans_first)) {
             passed = false;
             printf("wrong output 1 -- ");
         } else {
@@ -198,17 +198,16 @@ static int feederBig2(void) {
     FILE *const in = fopen("in.txt", "w+");
     printf("Creating Large test... ");
     clock_t start = clock();
-    int n = 2000;
-    char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+    int n = MAX_WORD_LENGTH / 5 * ALPHABET_SIZE;
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(in, "%d\n", n * ALPHABET_SIZE + 1);
+    fprintf(in, "%d\n", n + 1);
     for (int i = 0; i < ALPHABET_SIZE; i++) {
-        char output[2000] = "";
-        for (int j = 0; j < n; j++) {
-            output[j] = alphabet[i];
+        char output[MAX_WORD_LENGTH / 5 + 1] = "";
+        for (int j = 0; j < MAX_WORD_LENGTH / 5; j++) {
+            output[j] = (char) ('a' + i);
             if (fprintf(in, "%s\n", output) < 0) {
                 printf("can't create in.txt. No space on disk?\n");
                 return -1;
@@ -221,7 +220,7 @@ static int feederBig2(void) {
     testTimeOut = end - start;
     printf("done in T=%d seconds. Starting exe with timeout T+3 seconds... ", (int) (RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC));
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (ALPHABET_SIZE * n * sizeof(char)) + (n * ALPHABET_SIZE + 2) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES *2;
+    LabMemoryLimit = (n * sizeof(char)) + (n + 1) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES * 2;
     return 0;
 }
 
