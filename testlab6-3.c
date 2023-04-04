@@ -223,8 +223,8 @@ static int FeederBig2(void) {
     testTimeOut = end - start;
     printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    size_t memoryForRecursiveCleaning = n;
-    LabMemoryLimit = (n * sizeof(char)) + (n + 1) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES + memoryForRecursiveCleaning;
+    size_t memoryForRecursion = n * (sizeof(void *) + GetLabPointerSize());
+    LabMemoryLimit = (n * sizeof(char)) + (n + 1) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES + memoryForRecursion;
     return 0;
 }
 
