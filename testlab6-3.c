@@ -170,7 +170,9 @@ static int FeederBig1(void) {
     testTimeOut = end - start;
     printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (n * 500 * sizeof(char)) + finalAmountVerts * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    size_t memoryForChars = (n * 500 * sizeof(char));
+    size_t memoryForTreeNodes = finalAmountVerts * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize());
+    LabMemoryLimit = memoryForChars + memoryForTreeNodes + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -224,7 +226,9 @@ static int FeederBig2(void) {
     printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     size_t memoryForRecursion = n * (sizeof(void *) * 3);
-    LabMemoryLimit = (n * sizeof(char)) + (n + 1) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES + memoryForRecursion;
+    size_t memoryForChars = n * sizeof(char);
+    size_t memoryForTreeNodes = (n + 1) * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize());
+    LabMemoryLimit = memoryForChars + memoryForTreeNodes + memoryForRecursion + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -277,7 +281,9 @@ static int FeederBig3(void) {
     testTimeOut = end - start;
     printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (n * sizeof(char)) + n * ALPHABET_SIZE * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    size_t memoryForChars = n * sizeof(char);
+    size_t memoryForTreeNodes =  n * ALPHABET_SIZE * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize());
+    LabMemoryLimit = memoryForChars + memoryForTreeNodes + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
@@ -329,7 +335,9 @@ static int FeederBig4(void) {
     testTimeOut = end - start;
     printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
-    LabMemoryLimit = (n * sizeof(char)) + n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize()) + MIN_PROCESS_RSS_BYTES;
+    size_t memoryForChars = n * sizeof(char);
+    size_t memoryForTreeNodes =  n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize());
+    LabMemoryLimit = memoryForChars + memoryForTreeNodes + MIN_PROCESS_RSS_BYTES;
     return 0;
 }
 
