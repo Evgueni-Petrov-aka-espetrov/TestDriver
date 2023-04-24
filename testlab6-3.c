@@ -17,10 +17,16 @@ static const struct {const char *const in; const char *const out1; int out2;} te
     {"3\napple\nmilk\nbread\nre\n", "None", 4},
     {"8\nappearance\napplicable\nappreciate\napprentice\nappendices\napocalypse\napologetic\napolitical\napp\n", "appearance appendices applicable appreciate apprentice", 14},
     {"0\n", "None", 0},
+    {"2\nlike\ndislike\nd\n", "dislike", 3},
+    {"3\nlike\ndislike\nlikely\nlik\n", "like likely", 4},
+    {"3\nвечер\nвечерело\nвчера\nв\n", "вечер вечерело вчера", 4},
+    {"5\nинтернет\nинтервью\nинтерактивный\nинтроверт\nинтерпретация\nинтер\n", "интернет интервью интерактивный интерпретация", 7},
     {"2\naa\naa\na\n", "aa", 1},
     {"2\naaaaaaa\na\na\n", "a aaaaaaa", 2},
     {"5\nred\nrose\ngreen\nyellow\npink\nr\n", "red rose", 7},
     {"3\naba\nabacaba\nabacabaaba\naba\n", "aba abacaba abacabaaba", 3},
+    {"6\nбег\nбегун\nбеговой\nбегунья\nпробег\nпробежка\nбег\n", "бег бегун бегунья беговой", 8},
+    {"7\nаббревиатура\nабсурд\nлаконичный\nлакомый\nадрес\nпожелание\nпроза\nа\n", "аббревиатура абсурд адрес", 12},
     {"3\naba\nabacaba\nabacabaaba\nabac\n", "abacaba abacabaaba", 3},
     {"3\naba\nabacaba\nabacabaaba\nabacab\n", "abacaba abacabaaba", 3},
     {"8\nappearance\napplicable\nappreciate\napprentice\nappendices\napocalypse\napologetic\napolitical\nappr\n", "appreciate apprentice", 14},
@@ -97,15 +103,15 @@ static bool Check(const char *const ans_first, const int ans_second, FILE *strea
     return passed;
 }
 
-static bool GenerateSequence(FILE *out, int ind, int order, char *output) {
+static bool GenerateSequence(FILE *out, int start_ind, int len, char *output) {
     bool res = true;
-    if (order > 0) {
+    if (len > 0) {
         for (int i = 0; i < ALPHABET_SIZE; i++) {
-            output[ind] = 'a' + i;
-            res = GenerateSequence(out, ind + 1, order - 1, output);
+            output[start_ind] = 'a' + i;
+            res = GenerateSequence(out, start_ind + 1, len - 1, output);
         }
     }
-    if (order == 0) {
+    if (len == 0) {
         if (fprintf(out, "%s\n", output) < 0) {
             printf("can't create in.txt. No space on disk?\n");
             fclose(out);
@@ -203,6 +209,55 @@ static int FeederBig2(void) {
     FILE *const in = fopen("in.txt", "w+");
     printf("Creating Large test... ");
     clock_t start = clock();
+    int n = 17576;
+    int finalAmountVerts = 18279;
+    if (!in) {
+        printf("can't create in.txt. No space on disk?\n");
+        return -1;
+    }
+    fprintf(in, "%d\n", n);
+    char output[500 + 1] = "";
+    memset(output, 'a', sizeof(char) * 500);
+    GenerateSequence(in, 497, 3, output);
+    fprintf(in, "tree\n");
+    clock_t end = clock();
+    fclose(in);
+    testTimeOut = end - start;
+    printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
+    size_t memoryForTreeNodes = finalAmountVerts * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize());
+    size_t memoryForChars = (n * 500 * sizeof(char));
+    LabMemoryLimit = memoryForChars + memoryForTreeNodes + MIN_PROCESS_RSS_BYTES;
+    return 0;
+}
+
+static int CheckerBig2(void) {
+    FILE *const out = fopen("out.txt", "r");
+    if (!out) {
+        printf("can't open out.txt\n");
+        testN++;
+        return -1;
+    }
+    bool passed = Check("None", 18279, out);
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
+    }
+    fclose(out);
+    if (passed) {
+        printf("PASSED\n");
+        testN++;
+        return 0;
+    } else {
+        printf("FAILED\n");
+        testN++;
+        return 1;
+    }
+}
+
+static int FeederBig3(void) {
+    FILE *const in = fopen("in.txt", "w+");
+    printf("Creating Large test... ");
+    clock_t start = clock();
     int n = MAX_WORD_LENGTH / 5 * ALPHABET_SIZE;
     if (!in) {
         printf("can't create in.txt. No space on disk?\n");
@@ -232,7 +287,7 @@ static int FeederBig2(void) {
     return 0;
 }
 
-static int CheckerBig2(void) {
+static int CheckerBig3(void) {
     FILE *const out = fopen("out.txt", "r");
     if (!out) {
         printf("can't open out.txt\n");
@@ -255,7 +310,7 @@ static int CheckerBig2(void) {
     }
 }
 
-static int FeederBig3(void) {
+static int FeederBig4(void) {
     FILE *const in = fopen("in.txt", "w+");
     printf("Creating Large test... ");
     clock_t start = clock();
@@ -287,7 +342,7 @@ static int FeederBig3(void) {
     return 0;
 }
 
-static int CheckerBig3(void) {
+static int CheckerBig4(void) {
     FILE *const out = fopen("out.txt", "r");
     if (!out) {
         printf("can't open out.txt\n");
@@ -310,7 +365,7 @@ static int CheckerBig3(void) {
     }
 }
 
-static int FeederBig4(void) {
+static int FeederBig5(void) {
     FILE *const in = fopen("in.txt", "w+");
     printf("Creating Large test... ");
     clock_t start = clock();
@@ -341,7 +396,7 @@ static int FeederBig4(void) {
     return 0;
 }
 
-static int CheckerBig4(void) {
+static int CheckerBig5(void) {
     FILE *const out = fopen("out.txt", "r");
     if (!out) {
         printf("can't open out.txt\n");
@@ -385,10 +440,17 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
     {FeederBig1, CheckerBig1},
     {FeederBig2, CheckerBig2},
     {FeederBig3, CheckerBig3},
     {FeederBig4, CheckerBig4},
+    {FeederBig5, CheckerBig5},
 };
 
 TLabTest GetLabTest(int testIdx) {
