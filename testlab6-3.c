@@ -79,23 +79,23 @@ static bool Equal(char *const string, const char *const pattern) {
     return true;
 }
 
-static bool Check(const char *const ans_first, const int ans_second, FILE *stream) {
+static bool Check(const char *const firstAns, const int secondAns, FILE *stream) {
     bool passed = true;
     char buff[BUFF_SIZE] = "";
     int n;
     if (ScanChars(stream, BUFF_SIZE, buff) != Pass) {
         passed = false;
     } else {
-        if (!Equal(buff, ans_first)) {
+        if (!Equal(buff, firstAns)) {
             passed = false;
             printf("wrong output 1 -- ");
         } else {
             if (ScanInt(stream, &n) != Pass) {
                 passed = false;
             } else {
-                if (ans_second != n) {
+                if (secondAns != n) {
                     passed = false;
-                    printf("wrong output 2 got %d, expected %d -- ", n, ans_second);
+                    printf("wrong output 2 got %d, expected %d -- ", n, secondAns);
                 }
             }
         }
@@ -103,12 +103,12 @@ static bool Check(const char *const ans_first, const int ans_second, FILE *strea
     return passed;
 }
 
-static bool GenerateSequence(FILE *out, int start_ind, int len, char *output) {
+static bool GenerateSequence(FILE *out, int startInd, int len, char *output) {
     bool res = true;
     if (len > 0) {
         for (int i = 0; i < ALPHABET_SIZE; i++) {
-            output[start_ind] = 'a' + i;
-            res = GenerateSequence(out, start_ind + 1, len - 1, output);
+            output[startInd] = 'a' + i;
+            res = GenerateSequence(out, startInd + 1, len - 1, output);
         }
     }
     if (len == 0) {
