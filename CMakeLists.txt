@@ -68,6 +68,7 @@ set(TEST_LAB_SOURCES
 	testlab6-0.c
 	testlab6-1.c
 	testlab6-2.c
+	testlab6-3.c
 	testlab7.c
 	testlab8-0.c
 	testlab9.c
@@ -83,5 +84,5 @@ foreach(source ${TEST_LAB_SOURCES})
 	string(REPLACE "testlab" "lab" test ${target})
 	add_test(NAME ${test}
 		COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${target}"
-		        "${CMAKE_CURRENT_SOURCE_DIR}/test/${test}$<$<BOOL:${WIN32}>:.exe>")
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/${test}$<$<BOOL:${WIN32}>:.exe>")
 endforeach()
