@@ -62,26 +62,25 @@ static int CheckFromArray(void) {
         } else {
             printf("File read error");
         }
-        currentTest++;
-        return -1;
-    }
-    outLines = (int)strlen(testOutput);
-    if (outLines == testInOut[currentTest].count_symbols) {
-    } else if (outLines > testInOut[currentTest].count_symbols) {
-        printf("Long answer");
-        fclose(fl_Out);
-        currentTest++;
-        return -1;
-    } else {
-        printf("Shot answer");
         fclose(fl_Out);
         currentTest++;
         return -1;
     }
+    const int outSymbols = (int)strlen(testOutput);
+    if (outSymbols != testInOut[currentTest].count_symbols) {
+        if (outSymbols > testInOut[currentTest].count_symbols) {
+            printf("Answer is too long");
+        } else {
+            printf("Answer is too short");
+        }
+        fclose(fl_Out);
+        currentTest++;
+        return -1;
+    }
+
     for (int i = 0; i < outLines; i++) {
         if (testInOut[currentTest].out[i] != testOutput[i]) {
             passed = 0;
-            currentTest++;
             break;
         }
     }
