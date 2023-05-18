@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define TESTS_COUNT 20
+#define TESTS_COUNT 24
 #define TIME_LIMIT 1000
 #define MEMORY_LIMIT (1 << 10)
 
@@ -26,7 +26,11 @@ static const struct {const char *const in; int count_symbols; const char *const 
         {"48.3....7\n..1....7.\n.2.......\n7.5....6.\n...2..8..\n.........\n....76...\n3.....4..\n....5....", 20, "Incorrect input data"}, // повторение числа в квадранте
         {"9....673.\n...94...2\n.24......\n.65....83\n..7.8.5..\n89....41.\n......97.\n7...21...\n.867....5", 89, "958216734\n371945862\n624837159\n465179283\n217483596\n893652417\n542368971\n739521648\n186794325"}, // судоку с 29 заполненными ячейками(тяжёлое)
         {"..2..41..\n9.7..84..\n..1...9.6\n.3..5...9\n.1..6...4\n.9..4.8.7\n..3....2.\n4..7...9.\n5..31....", 89, "852694173\n967138452\n341572986\n734851269\n218967534\n695243817\n173489625\n486725391\n529316748"}, //лёгкое судоку с 28 заполненными клетами
-        {"...5....6\n..948.7..\n..8..2...\n....24..5\n.319.562.\n4..16....\n...6..1..\n..6.472..\n5....1...", 89, "273519486\n159486732\n648732591\n967324815\n831975624\n425168973\n792653148\n316847259\n584291367"} //сложное с 28 заполненными клетами
+        {"...5....6\n..948.7..\n..8..2...\n....24..5\n.319.562.\n4..16....\n...6..1..\n..6.472..\n5....1...", 89, "273519486\n159486732\n648732591\n967324815\n831975624\n425168973\n792653148\n316847259\n584291367"}, //сложное с 28 заполненными клетами
+        {"........2\n.28.9.4..\n41..2.7..\n.45.18...\n1.......8\n...96.14.\n..1.4..25\n..2.8.69.\n3........", 89, "679834512\n528791436\n413526789\n945318267\n136472958\n287965143\n891647325\n752183694\n364259871"},
+        {".........\n.........\n.........\n.........\n.........\n.........\n.........\n.........\n.........", 26, "Sudoku has more 1 solution"},
+        {"1........\n.........\n.........\n.........\n....1....\n.........\n.........\n.........\n........1", 26, "Sudoku has more 1 solution"},
+        {".......8.\n.736.4.2.\n4....2753\n6.27.....\n....46...\n.....96.1\n9312....4\n.5.4.391.\n.8.......", 26, "Sudoku has more 1 solution"},
 };
 
 static size_t currentTest = 0;
@@ -55,7 +59,7 @@ static int CheckFromArray(void) {
         return -1;
     }
     char testOutput[128] = { 0 };
-    int outLines, passed = 1;
+    int passed = 1;
     if ((int)fread(testOutput, sizeof(char), sizeof(testOutput), fl_Out) > testInOut[currentTest].count_symbols) {
         if (feof(fl_Out)) { // проверка, что файл не закрылся
             printf("Premature end of file");
@@ -78,7 +82,7 @@ static int CheckFromArray(void) {
         return -1;
     }
 
-    for (int i = 0; i < outLines; i++) {
+    for (int i = 0; i < outSymbols; i++) {
         if (testInOut[currentTest].out[i] != testOutput[i]) {
             passed = 0;
             break;
@@ -118,6 +122,10 @@ const TLabTest labTests[] = {
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray},
+        {FeedFromArray, CheckFromArray}
 };
 
 TLabTest GetLabTest(int testInd) {
