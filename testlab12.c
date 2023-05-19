@@ -61,7 +61,7 @@ static int CheckFromArray(void) {
     char testOutput[128] = { 0 };
     int passed = 1;
     if ((int)fread(testOutput, sizeof(char), sizeof(testOutput), fl_Out) > testInOut[currentTest].count_symbols) {
-        if (feof(fl_Out)) { // проверка, что файл не закрылся
+        if (!feof(fl_Out)) { // проверка, что файл не закрылся
             printf("Premature end of file");
         } else {
             printf("File read error");
