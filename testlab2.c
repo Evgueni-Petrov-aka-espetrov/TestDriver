@@ -76,10 +76,10 @@ const char* GetTesterName(void) {
     return "Lab 2 Deijkstra permutations";
 }
 
-int GetTestTimeout() {
+int GetTestTimeout(void) {
     return 3000;
 }
 
-size_t GetTestMemoryLimit() {
+size_t GetTestMemoryLimit(void) {
     return MIN_PROCESS_RSS_BYTES;
 }

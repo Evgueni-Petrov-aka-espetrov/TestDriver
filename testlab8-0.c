@@ -31,12 +31,12 @@ const char* GetTesterName(void) {
 }
 
 static int LabTimeout = 3000;
-int GetTestTimeout() {
+int GetTestTimeout(void) {
     return LabTimeout;
 }
 
 static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
-size_t GetTestMemoryLimit() {
+size_t GetTestMemoryLimit(void) {
     return LabMemoryLimit;
 }
 
@@ -233,11 +233,11 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
     }
 }
 
-static unsigned GetVertexCount() {
+static unsigned GetVertexCount(void) {
     return (unsigned)GetFromTestcase(TestcaseIdx, VERTEX_COUNT, IGNORED_EDGE_IDX).Integer;
 }
 
-static unsigned GetEdgeCount() {
+static unsigned GetEdgeCount(void) {
     return (unsigned)GetFromTestcase(TestcaseIdx, EDGE_COUNT, IGNORED_EDGE_IDX).Integer;
 }
 

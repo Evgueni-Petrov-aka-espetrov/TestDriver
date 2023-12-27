@@ -267,11 +267,11 @@ const char* GetTesterName(void) {
     return "Lab 6-1 red-black trees";
 }
 
-int GetTestTimeout() {
+int GetTestTimeout(void) {
     return 6000;
 }
 
 static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
-size_t GetTestMemoryLimit() {
+size_t GetTestMemoryLimit(void) {
     return LabMemoryLimit;
 }
