@@ -27,9 +27,11 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"(-)\n", "syntax error"},
     {"\n", "syntax error"},
     {")\n", "syntax error"},
+    {"0\n", "0"},
     {"1+1)(\n", "syntax error"},
     {"1 1\n", "syntax error"},
     {"1)+(2\n", "syntax error"},
+    {"(1))+((2)\n", "syntax error"},
     {"(1+2))+(3\n", "syntax error"},
     {"1234567890\n", "1234567890"},
     {"(1234567890)\n", "1234567890"},
@@ -84,7 +86,11 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     "1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1"
     "+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+"
     "1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1"
-    "+1+1+1+1+1+1+1+1+1+1+1+99\n", "598"}
+    "+1+1+1+1+1+1+1+1+1+1+1+99\n", "598"},
+#define TEN(a) a a a a a a a a a a
+#define FIFTY(a) TEN(a) TEN(a) TEN(a) TEN(a) TEN(a)
+#define TWO_HUNDRED(a) FIFTY(a) FIFTY(a) FIFTY(a) FIFTY(a)
+    {"(1" TWO_HUNDRED("+1+1+1") "\n", "syntax error"},
 };
 
 static int FeedFromArray(void) {
