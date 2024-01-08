@@ -521,6 +521,7 @@ static int _LaunchLabExecutable(char* labExe)
         }
         int ret = execl(labExe, labExe, NULL);
         assert(ret == -1);
+        (void)ret; // -Wunused-variable for NDEBUG
         ReportSystemError("execl");
         exit(EXIT_FAILURE);
     }
