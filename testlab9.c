@@ -7,6 +7,7 @@ static const struct {const char *const in, *const out1, *const out2, *const out2
     {"0\n0 0\n0\n", "bad vertex"},
     {"5001\n1 1\n1\n1 1 1\n", "bad number of vertices"},
     {"2\n2 2\n4\n1 1 1\n1 2 1\n2 1 1\n2 2 1\n", "bad number of edges"},
+    {"2\n2 2\n2\n1 1 1\n1 2 1\n", "bad number of edges"},
     {"2\n1 2\n1\n1 2 -1\n", "bad length"},
     {"2\n1 2\n0\n", "0 oo", "no path"},
     {"3\n1 3\n2\n1 2 2147483647\n2 3 2147483647\n", "0 2147483647 INT_MAX+", "3 2 1"},
