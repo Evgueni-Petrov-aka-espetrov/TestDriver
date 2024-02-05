@@ -182,7 +182,7 @@ static void ReportTimeout(const char labExe[]) {
 }
 
 static void ReportOutOfMemory(const char labExe[], unsigned labMem) {
-    PrintWithoutBuffering("\nExecutable file \"%s\" used %dKi > %dKi\n", labExe, RoundUptoThousand(labMem) / 1000, RoundUptoThousand(GetMemoryLimit()) / 1000);
+    PrintWithoutBuffering("\nExecutable file \"%s\" used %dKB > %dKB\n", labExe, RoundUptoThousand(labMem) / 1000, RoundUptoThousand(GetMemoryLimit()) / 1000);
 }
 
 static void ReportException(const char labExe[]) {
