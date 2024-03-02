@@ -87,10 +87,14 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     "+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+"
     "1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1"
     "+1+1+1+1+1+1+1+1+1+1+1+99\n", "598"},
-#define TEN(a) a a a a a a a a a a
-#define FIFTY(a) TEN(a) TEN(a) TEN(a) TEN(a) TEN(a)
-#define TWO_HUNDRED(a) FIFTY(a) FIFTY(a) FIFTY(a) FIFTY(a)
-    {"(1" TWO_HUNDRED("+1+1+1") "\n", "syntax error"},
+// #define TEN(a) a a a a a a a a a a
+// #define FIFTY(a) TEN(a) TEN(a) TEN(a) TEN(a) TEN(a)
+// #define TWO_HUNDRED(a) FIFTY(a) FIFTY(a) FIFTY(a) FIFTY(a)
+//     {"(1" TWO_HUNDRED("+1+1+1") "\n", "syntax error"},
+    {"(123)456\n", "syntax error"},
+    {"123(456)\n", "syntax error"},
+    {"(12)(34)\n", "syntax error"},
+    {"(1+40)\n", "41"}, // 40 is code of '('
 };
 
 static int FeedFromArray(void) {
