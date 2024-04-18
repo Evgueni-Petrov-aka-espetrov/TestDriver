@@ -11,6 +11,7 @@
 #endif
 
 static int LaunchLabExecutable(char* labExe);
+static int UserTestAll = 0;
 static int UserMemoryLimit = -1;
 static int UserTimeout = -1;
 
@@ -48,9 +49,14 @@ static const char* GetRunnerCommand(const char* runnerExe, char* labExe) {
 
 int main(int argc, char* argv[])
 {
-    int i;
+    int i, count, fail;
     const char* runnerExe = argv[0];
 
+    if (argc >= 3 && strcmp(argv[1], "-a") == 0) {
+        UserTestAll = 1;
+        argv++;
+        argc--;
+    }
     if (argc >= 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) != 0) {
         UserMemoryLimit = atoi(argv[2])*1024;
         argv += 2;
@@ -74,10 +80,13 @@ int main(int argc, char* argv[])
 
     PrintWithoutBuffering("\nTesting %s...\n", GetTesterName());
 
-    for (i = 0; i < GetTestCount(); i++) {
+    for (i = 0, count = 0, fail = 0; i < GetTestCount(); i++, fail = 0) {
         PrintWithoutBuffering("TEST %d/%d: ", i+1, GetTestCount());
         if (GetLabTest(i).Feeder() != 0) {
-            break;
+            if (!UserTestAll) {
+                break;
+            }
+            fail = 1;
         }
         const char* runnerCommand = GetRunnerCommand(runnerExe, argv[1]);
         if (!runnerCommand) {
@@ -92,11 +101,15 @@ int main(int argc, char* argv[])
         double msElapsed = ((int)(ms1 - ms0) + millisecondsPerDay) % millisecondsPerDay;
         PrintWithoutBuffering("%.0f ms, ", msElapsed);
         if (GetLabTest(i).Checker() != 0) {
-            break;
+            if (!UserTestAll) {
+                break;
+            }
+            fail = 1;
         }
+        count += 1 - fail;
     }
 
-    if (i < GetTestCount()) {
+    if (count < GetTestCount()) {
         PrintWithoutBuffering("\n:-(\n\n"
         "Executable file %s failed for input file in.txt in the current directory.\n"
         "Please fix and try again.\n", argv[1]);
