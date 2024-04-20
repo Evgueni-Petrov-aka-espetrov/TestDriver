@@ -14,19 +14,19 @@ typedef struct {
 #define CalcCompressedLength(abSize, bitsPerChar, charCount) (4+(10*(abSize)+(charCount)*(bitsPerChar)+7)/8+100)
 
 static const TTestCase TestCases[] = {
-    {"0123456789ABCD\r\n" "0123456789ABCD\r\n" "0123456789ABCD\r\n" "0123456789ABCD\r\n"
-    "0123456789ABCD\r\n" "0123456789ABCD\r\n" "0123456789ABCD\r\n" "0123456789ABCD\r\n"
-    "0123456789ABCD\r\n", 16*9, CalcCompressedLength(16, 4, 16*9)}, // 1 2
+    {"0123456789ABCD\xD\xA" "0123456789ABCD\xD\xA" "0123456789ABCD\xD\xA" "0123456789ABCD\xD\xA"
+    "0123456789ABCD\xD\xA" "0123456789ABCD\xD\xA" "0123456789ABCD\xD\xA" "0123456789ABCD\xD\xA"
+    "0123456789ABCD\xD\xA", 16*9, CalcCompressedLength(16, 4, 16*9)}, // 1 2
     {"", 0, CalcCompressedLength(0, 0, 0)}, // 3 4
     {"z", 1, CalcCompressedLength(1, 1, 1)}, // 5 6
     {"zz", 2, CalcCompressedLength(1, 1, 2)}, // 7 8
     {"zzzz", 4, CalcCompressedLength(1, 1, 4)}, // 9 10
     {"\xFF\xFF\xFF\xFF", 4, CalcCompressedLength(1, 1, 4)}, // 11 12
     {"zzzz\xFF\xFF\xFF\xFF", 8, CalcCompressedLength(2, 1, 8)}, // 13 14
-    {"\n\r\n\r", 4, CalcCompressedLength(2, 1, 4)}, // 15 16
-    {"\r\n\r\n", 4, CalcCompressedLength(2, 1, 4)}, // 17 18
-    {"\n\n\n\n", 4, CalcCompressedLength(1, 1, 4)}, // 19 20
-    {"\r\r\r\r", 4, CalcCompressedLength(1, 1, 4)}, // 21 22
+    {"\xA\xD\xA\xD", 4, CalcCompressedLength(2, 1, 4)}, // 15 16
+    {"\xD\xA\xD\xA", 4, CalcCompressedLength(2, 1, 4)}, // 17 18
+    {"\xA\xA\xA\xA", 4, CalcCompressedLength(1, 1, 4)}, // 19 20
+    {"\xD\xD\xD\xD", 4, CalcCompressedLength(1, 1, 4)}, // 21 22
     {"\0\0\0\0", 4, CalcCompressedLength(1, 1, 4)}, // 23 24
     {"\0\1\0\1", 4, CalcCompressedLength(2, 1, 4)}
 };
