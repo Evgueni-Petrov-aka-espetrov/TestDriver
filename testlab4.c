@@ -9,6 +9,8 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"2*2\n", "4"},
     {"bad input\n", "syntax error"},
     {"2.0*2.0\n", "syntax error"},
+    {"(1", "syntax error"},
+    {"(1)", "1"},
     {"123()\n", "syntax error"},
     {"()123\n", "syntax error"},
     {"1*2+3/4\n", "2"},
