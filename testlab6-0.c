@@ -8,14 +8,7 @@ static int testN = 0;
 
 static const struct {const char *const in; const char *const out;} testInOut[] = {
     // Possible errors
-//    {"", "Empty input"},
-//    {" ", "Empty input"},
     {"0\n\n", "0"},
-//    {"1\n0", "1"},
-//    {"1\n1", "1"},
-//    {"-1\n3", "Bad input"},
-//    {"2000002\n2 5", "Bad input"},
-//    {"2000000\n2 5", "Bad input"},
         
     // Small rotates variations
     {"5\n3 5 8 9 10", "3"},
