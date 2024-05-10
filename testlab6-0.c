@@ -4,6 +4,8 @@
 #include <string.h>
 
 static int testN = 0;
+
+
 static const struct {const char *const in; const char *const out;} testInOut[] = {
     // Possible errors
     {"", "Empty input"},
