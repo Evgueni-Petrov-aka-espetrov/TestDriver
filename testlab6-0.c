@@ -9,6 +9,16 @@ static int testN = 0;
 static const struct {const char *const in; const char *const out;} testInOut[] = {
     // Possible errors
     {"0\n\n", "0"},
+    {"1\n25\n", "1"},
+    {"2\n17 25\n", "2"},
+    {"3\n2 -1 4\n", "2"},
+    {"3\n2 4 -1\n", "2"},
+    {"3\n4 2 -1\n", "2"},
+    {"3\n4 -1 2\n", "2"},
+    {"3\n-1 4 2\n", "2"},
+    {"3\n-1 2 4\n", "2"},
+    {"3\n-1 -1 2\n", "2"},
+    {"3\n-1 2 -1\n", "2"},
         
     // Small rotates variations
     {"5\n3 5 8 9 10", "3"},
