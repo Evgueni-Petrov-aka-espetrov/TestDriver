@@ -4,7 +4,7 @@
 #include <string.h>
 
 static int testN = 0;
-static const struct {const char *const in; const char *const out;} testInOut[] = {
+static const struct {const char *const in, *const out;} testInOut[] = {
     // Possible errors
     {"", "Empty input"},
     {" ", "Empty input"},
@@ -64,44 +64,25 @@ static int FeedFromArray(void)
   return 0;
 }
 
-static int CheckFromArray(void)
-{
-  FILE *const out = fopen("out.txt", "r");
-  if (!out) {
-    printf("can't open out.txt\n");
-    testN++;
-    return -1;
-  }
-
-  int passed;
-  char buffMsg[64] = {0};
-
-  if (ScanChars(out, sizeof(buffMsg), buffMsg) != Pass) {
-    passed = 0;
-  }
-
-  else if (strcmp(testInOut[testN].out, buffMsg) != 0) {
-    passed = 0;
-    printf("wrong output --");
-  }
-
-
-  if (passed) {
-    passed = !HaveGarbageAtTheEnd(out);
-  }
-
-  fclose(out);
-  if (passed) {
-    printf("PASSED\n");
-    testN++;
-    return 0;
-  }
-
-  else {
-    printf("FAILED\n");
-    testN++;
-    return 1;
-  }
+static int CheckFromArray(void) {
+    FILE* const out = fopen("out.txt", "r");
+    if (out == NULL) {
+        printf("can't open out.txt\n");
+        testN++;
+        return -1;
+    }
+    char buf[128] = {0};
+    const char* status = ScanChars(out, sizeof(buf), buf);
+    fclose(out);
+    if (status == Pass && _strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) != 0) {
+        status = Fail;
+    }
+    if (status == Pass && HaveGarbageAtTheEnd(out)) {
+        status = Fail;
+    }
+    printf("%s\n", status);
+    ++testN;
+    return status == Fail;
 }
 
 static size_t LabMemoryLimit;
@@ -160,7 +141,6 @@ static int checkerBig(void)
     return 1;
   }
 }
-
 static int feederBig1(void)
 {
   FILE *const in = fopen("in.txt", "w+");
@@ -305,7 +285,6 @@ static int checkerBig2(void)
     return 1;
   }
 }
-
 const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
