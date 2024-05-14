@@ -64,7 +64,8 @@ static int FeedFromArray(void)
   return 0;
 }
 
-static int CheckFromArray(void) {
+static int CheckFromArray(void) 
+{
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
         printf("can't open out.txt\n");
@@ -141,6 +142,7 @@ static int checkerBig(void)
     return 1;
   }
 }
+
 static int feederBig1(void)
 {
   FILE *const in = fopen("in.txt", "w+");
@@ -195,7 +197,6 @@ static int checkerBig1(void)
     return 1;
   }
 }
-
 
 static void genTree(FILE *in, int height, int min, int max)
 {
@@ -285,6 +286,7 @@ static int checkerBig2(void)
     return 1;
   }
 }
+
 const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
@@ -343,3 +345,4 @@ static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
 size_t GetTestMemoryLimit(void) {
   return LabMemoryLimit;
 }
+
