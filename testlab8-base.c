@@ -10,7 +10,7 @@
 #include <math.h>
 
 
-static unsigned TestcaseIdx = 0;    //Â„Ó ÚÓÊÂ ÌÛÊÌÓ ËÁ Ù‡ÈÎ‡ ÏÂÌˇÚ¸ Í‡Í ÚÓ, ‡ ÏÓÊÂÚ Ë ÌÂÚ
+static unsigned TestcaseIdx = 0;   
 
 static int Feed(void);
 static int Check(void);
@@ -32,7 +32,7 @@ TLabTest GetLabTest(int testIdx) {
     }
 }
 
-static const unsigned TestcaseCount = 34;                    //»«Ã≈Õ»À  ŒÀ-¬Œ “≈—“Œ¬ 33 -> 34
+static const unsigned TestcaseCount = 34;       //  33 -> 34         
 int GetTestCount(void) {
     return TestcaseCount;
 }
@@ -48,7 +48,7 @@ const char* GetTesterName(void) {
 }
 
 
-static int LabTimeout = 3000;      //¬–≈Ãﬂ Õ¿ –¿¡Œ“” 
+static int LabTimeout = 3000;      //–æ–±—ã—á–Ω–æ–µ –≤—Ä–µ–º—è —Ä–∞–±–æ—Ç—ã
 int GetTestTimeout(void) { 
     if (TestcaseIdx < 33 ){
         return LabTimeout;
