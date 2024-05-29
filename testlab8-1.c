@@ -68,7 +68,7 @@ int SpecialFeed(void) {
 
 
 
-    Test34Timeout = (int)start + 60000;                                         //ТУТ ВСЕ ЧТО КАСАЕТСЯ ВРЕМЕНИ И ПАМЯТИ
+    Test34Timeout = (int)start + 60000;                                         //ТУТ ВСЕ ЧТО КАСАЕТСЯ ВРЕМЕНИ И ПАМЯТИ, Я НЕ ЗНАЮ СКОЛЬКО НАДО
     Test34MemoryLimit = vertexcount * vertexcount * 4 + MIN_PROCESS_RSS_BYTES;
 
     return 0;
