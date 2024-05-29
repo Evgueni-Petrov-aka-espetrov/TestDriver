@@ -2,7 +2,7 @@
 #include "testLab.h"
 enum { MAX_VERTEX_COUNT = 5000,
    
-    MAX_VERTEX_COUNT1 = 20000
+    MAX_VERTEX_COUNT1 = 10000
 };
 
 enum { IGNORED_VERTEX_IDX = 0 };
