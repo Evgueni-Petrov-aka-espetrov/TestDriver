@@ -68,7 +68,7 @@ int SpecialFeed(void) {
 
 
 
-    Test34Timeout = (int)start + 60000;                                         //“”“ ¬—≈ ◊“Œ  ¿—¿≈“—ﬂ ¬–≈Ã≈Õ» » œ¿Ãﬂ“»
+    Test34Timeout = (int)start + 60000;                                         //–¢–£–¢ –í–°–ï –ß–¢–û –ö–ê–°–ê–ï–¢–°–Ø –í–†–ï–ú–ï–ù–ò –ò –ü–ê–ú–Ø–¢–ò
     Test34MemoryLimit = vertexcount * vertexcount * 4 + MIN_PROCESS_RSS_BYTES;
 
     return 0;
@@ -81,8 +81,7 @@ static unsigned GoodEdge(unsigned a, unsigned b)
         0 < b && b <= VERTEX_FOR_PRIM &&
         a!=b))
     {
-        printf("error1 %u %u\n", a,b);
-
+        
         return IGNORED_EDGE_IDX;
     }
     else if (a != VERTEX_FOR_PRIM && b != VERTEX_FOR_PRIM) {
