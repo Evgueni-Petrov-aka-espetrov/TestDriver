@@ -44,8 +44,8 @@ int SpecialFeed(void) {
     printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);     //ТУТ ВСЕ ЧТО КАСАЕТСЯ ВРЕМЕНИ И ПАМЯТИ
     fflush(stdout);
 
-    Test34Timeout = (int)start + 3000;
-    Test34MemoryLimit = vertexcount * vertexcount * 4 + MIN_PROCESS_RSS_BYTES;
+    Test34Timeout = (int)start + 1000;              //не знаю, надо пробовать
+    Test34MemoryLimit = vertexcount * vertexcount * 4 + MIN_PROCESS_RSS_BYTES;  //тут тоже вопрос есть
 
     return 0;
 }
