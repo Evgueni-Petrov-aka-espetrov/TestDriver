@@ -1,6 +1,9 @@
 #include "testlab8-base.h"
 #include "testLab.h"
 
+enum {
+    VERTEX_FOR_KRUSKAL = 20000
+};
 static int SpecialFeed(void);
 static int SpecialCheck(void);
 
@@ -21,8 +24,8 @@ TLabTest GetSpecialLabTest(void)
 }
 
 int SpecialFeed(void) {
-    static unsigned vertexcount = MAX_VERTEX_COUNT1;
-    static unsigned edgecount = MAX_VERTEX_COUNT1 - 1;
+    static unsigned vertexcount = VERTEX_FOR_KRUSKAL;
+    static unsigned edgecount = VERTEX_FOR_KRUSKAL - 1;
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
@@ -33,7 +36,7 @@ int SpecialFeed(void) {
     unsigned start = GetTickCount();
     unsigned length = 1;
     fprintf(in, "%u\n%u\n", vertexcount, edgecount);
-    for (unsigned begin = 1; begin < MAX_VERTEX_COUNT1; begin++)
+    for (unsigned begin = 1; begin < VERTEX_FOR_KRUSKAL; begin++)
     {
         fprintf(in, "%u %u %u\n", begin, begin + 1, begin);
     }
@@ -41,11 +44,11 @@ int SpecialFeed(void) {
     start = RoundUptoThousand(GetTickCount() - start);
 
 
-    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);     //Ð¢Ð£Ð¢ Ð’Ð¡Ð• Ð§Ð¢Ðž ÐšÐÐ¡ÐÐ•Ð¢Ð¡Ð¯ Ð’Ð Ð•ÐœÐ•ÐÐ˜ Ð˜ ÐŸÐÐœÐ¯Ð¢Ð˜
+    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);     //ÒÓÒ ÂÑÅ ×ÒÎ ÊÀÑÀÅÒÑß ÂÐÅÌÅÍÈ È ÏÀÌßÒÈ
     fflush(stdout);
 
-    Test34Timeout = (int)start + 1000;              //Ð½Ðµ Ð·Ð½Ð°ÑŽ, Ð½Ð°Ð´Ð¾ Ð¿Ñ€Ð¾Ð±Ð¾Ð²Ð°Ñ‚ÑŒ
-    Test34MemoryLimit = vertexcount * vertexcount * 4 + MIN_PROCESS_RSS_BYTES;  //Ñ‚ÑƒÑ‚ Ñ‚Ð¾Ð¶Ðµ Ð²Ð¾Ð¿Ñ€Ð¾Ñ ÐµÑÑ‚ÑŒ
+    Test34Timeout = (int)start + 20000;
+    Test34MemoryLimit = 1700000000 + MIN_PROCESS_RSS_BYTES;  // ÷òîáû çàïóñòèëñÿ ïðèì, êðàñêë ïðîñèò ìåíüøå
 
     return 0;
 }
@@ -53,8 +56,8 @@ int SpecialFeed(void) {
 static unsigned GoodEdge(unsigned a, unsigned b)
 {
     if ((b != a + 1 && a != b + 1) ||               // changes in condition
-        !(0 < a && a < MAX_VERTEX_COUNT1 + 1) ||
-        !(0 < b && b < MAX_VERTEX_COUNT1 + 1)) {
+        !(0 < a && a < VERTEX_FOR_KRUSKAL + 1) ||
+        !(0 < b && b < VERTEX_FOR_KRUSKAL + 1)) {
         return IGNORED_EDGE_IDX;
     }
     else {
@@ -71,10 +74,10 @@ int SpecialCheck(void)
         return -1;
     }
     const char* status = Pass;
-    const unsigned vertexCount = MAX_VERTEX_COUNT1;
-    unsigned vertexParent[MAX_VERTEX_COUNT1];
+    const unsigned vertexCount = VERTEX_FOR_KRUSKAL;
+    unsigned vertexParent[VERTEX_FOR_KRUSKAL];
     unsigned long long length = 0;
-    unsigned long long mst_length = SumRange(1, MAX_VERTEX_COUNT1 - 1);
+    unsigned long long mst_length = SumRange(1, VERTEX_FOR_KRUSKAL - 1);
     InitParent(vertexCount, vertexParent);
     for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
         unsigned a, b;

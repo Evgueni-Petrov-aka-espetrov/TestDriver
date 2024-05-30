@@ -1,9 +1,6 @@
 #pragma once
 #include "testLab.h"
-enum { MAX_VERTEX_COUNT = 5000,
-   
-    MAX_VERTEX_COUNT1 = 5000
-};
+
 
 enum { IGNORED_VERTEX_IDX = 0 };
 static const unsigned IGNORED_EDGE_IDX = (unsigned)-1;

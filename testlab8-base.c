@@ -10,7 +10,13 @@
 #include <math.h>
 
 
-static unsigned TestcaseIdx = 0;   
+enum {
+
+    VERTEX_FOR_LARGES = 5000,
+    MAX_VERTEX_COUNT =20000
+};
+
+static unsigned TestcaseIdx = 0;    //Â„Ó ÚÓÊÂ ÌÛÊÌÓ ËÁ Ù‡ÈÎ‡ ÏÂÌˇÚ¸ Í‡Í ÚÓ, ‡ ÏÓÊÂÚ Ë ÌÂÚ
 
 static int Feed(void);
 static int Check(void);
@@ -32,7 +38,7 @@ TLabTest GetLabTest(int testIdx) {
     }
 }
 
-static const unsigned TestcaseCount = 34;       //  33 -> 34         
+static const unsigned TestcaseCount = 34;                    //»«Ã≈Õ»À  ŒÀ-¬Œ “≈—“Œ¬ 33 -> 34
 int GetTestCount(void) {
     return TestcaseCount;
 }
@@ -48,7 +54,7 @@ const char* GetTesterName(void) {
 }
 
 
-static int LabTimeout = 3000;      //–æ–±—ã—á–Ω–æ–µ –≤—Ä–µ–º—è —Ä–∞–±–æ—Ç—ã
+static int LabTimeout = 3000;      //¬–≈Ãﬂ Õ¿ –¿¡Œ“” 
 int GetTestTimeout(void) { 
     if (TestcaseIdx < 33 ){
         return LabTimeout;
@@ -122,7 +128,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             {2, 1, {{IGNORED_VERTEX_IDX}}, "bad number of lines"},
 
             {0, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
-            {MAX_VERTEX_COUNT1 + 1, 1, {{1, 1, 1}}, "bad number of vertices"},
+            {MAX_VERTEX_COUNT + 1, 1, {{1, 1, 1}}, "bad number of vertices"},
             {2, 4, {{1, 1, 1}, {1, 2, 1}, {2, 1, 1}, {2, 2, 1}}, "bad number of edges"},
             {2, 2, {{1, 2, 2}, {1, 2, 1}}, "bad number of edges"},
             {2, 1, {{1, 2, (unsigned long long) - 1}}, "bad length"},
@@ -179,26 +185,26 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
         switch (dataId) {
         case VERTEX_COUNT:
         case EDGE_COUNT:
-            return MakeInteger(MAX_VERTEX_COUNT);
+            return MakeInteger(VERTEX_FOR_LARGES);
         case EDGE:
-            assert(edgeIdx < MAX_VERTEX_COUNT);
-            return MakeEdge(edgeIdx + 1, (edgeIdx + 1) % MAX_VERTEX_COUNT + 1, edgeIdx + 1);
+            assert(edgeIdx < VERTEX_FOR_LARGES);
+            return MakeEdge(edgeIdx + 1, (edgeIdx + 1) % VERTEX_FOR_LARGES + 1, edgeIdx + 1);
         case ERROR_MESSAGE:
             return MakeString(NULL);
         case MST_LENGTH:
-            return MakeInteger(SumRange(1, MAX_VERTEX_COUNT - 1));
+            return MakeInteger(SumRange(1, VERTEX_FOR_LARGES - 1));
         default:
             abort();
         }
     }
     else if (testcaseIdx == smallTestCount + 1 || testcaseIdx == smallTestCount + 2) {
-        const unsigned partOneEdgeCount = MAX_VERTEX_COUNT - 2;
-        const unsigned partTwoEdgeCount = MAX_VERTEX_COUNT - 3;
+        const unsigned partOneEdgeCount = VERTEX_FOR_LARGES - 2;
+        const unsigned partTwoEdgeCount = VERTEX_FOR_LARGES - 3;
         const int slope = testcaseIdx == 28 ? 1 : -1;
-        const int bias = testcaseIdx == 28 ? 0 : MAX_VERTEX_COUNT + 1;
+        const int bias = testcaseIdx == 28 ? 0 : VERTEX_FOR_LARGES + 1;
         switch (dataId) {
         case VERTEX_COUNT:
-            return MakeInteger(MAX_VERTEX_COUNT);
+            return MakeInteger(VERTEX_FOR_LARGES);
         case EDGE_COUNT:
             return MakeInteger(partOneEdgeCount + partTwoEdgeCount + 1);
         case EDGE:
@@ -210,22 +216,22 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
                 return MakeEdge(1 * slope + bias, (edgeIdx - partOneEdgeCount + 3) * slope + bias, edgeIdx + 3);
             }
             else {
-                return MakeEdge((MAX_VERTEX_COUNT - 1) * slope + bias, MAX_VERTEX_COUNT * slope + bias, 2 * MAX_VERTEX_COUNT - 2);
+                return MakeEdge((VERTEX_FOR_LARGES - 1) * slope + bias, VERTEX_FOR_LARGES * slope + bias, 2 * VERTEX_FOR_LARGES - 2);
             }
         case ERROR_MESSAGE:
             return MakeString(NULL);
         case MST_LENGTH:
-            return MakeInteger(SumRange(1, MAX_VERTEX_COUNT - 2) + 2 * MAX_VERTEX_COUNT - 2);
+            return MakeInteger(SumRange(1, VERTEX_FOR_LARGES - 2) + 2 * VERTEX_FOR_LARGES - 2);
         default:
             abort();
         }
     }
     else if (testcaseIdx == smallTestCount + 3) {
-        const unsigned partOneEdgeCount = MAX_VERTEX_COUNT - 2;
-        const unsigned partTwoEdgeCount = SumRange(MAX_VERTEX_COUNT * 4 / 5, MAX_VERTEX_COUNT - 3);
+        const unsigned partOneEdgeCount = VERTEX_FOR_LARGES - 2;
+        const unsigned partTwoEdgeCount = SumRange(VERTEX_FOR_LARGES * 4 / 5, VERTEX_FOR_LARGES - 3);
         switch (dataId) {
         case VERTEX_COUNT:
-            return MakeInteger(MAX_VERTEX_COUNT);
+            return MakeInteger(VERTEX_FOR_LARGES);
         case EDGE_COUNT:
             return MakeInteger(partOneEdgeCount + partTwoEdgeCount + 1);
         case EDGE:
@@ -235,17 +241,17 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             }
             else if (edgeIdx < partOneEdgeCount + partTwoEdgeCount) {
                 unsigned row, column;
-                CalcRowColumn(edgeIdx - partOneEdgeCount + SumRange(0, MAX_VERTEX_COUNT * 4 / 5 - 1), &row, &column); // row = N * 4 / 5 ... N - 3, column = 0 ... row
-                row = MAX_VERTEX_COUNT - row;
-                return MakeEdge(row - 3, column + row, MAX_VERTEX_COUNT - 1);
+                CalcRowColumn(edgeIdx - partOneEdgeCount + SumRange(0, VERTEX_FOR_LARGES * 4 / 5 - 1), &row, &column); // row = N * 4 / 5 ... N - 3, column = 0 ... row
+                row = VERTEX_FOR_LARGES - row;
+                return MakeEdge(row - 3, column + row, VERTEX_FOR_LARGES - 1);
             }
             else {
-                return MakeEdge(MAX_VERTEX_COUNT - 1, MAX_VERTEX_COUNT, MAX_VERTEX_COUNT);
+                return MakeEdge(VERTEX_FOR_LARGES - 1, VERTEX_FOR_LARGES, VERTEX_FOR_LARGES);
             }
         case ERROR_MESSAGE:
             return MakeString(NULL);
         case MST_LENGTH:
-            return MakeInteger((MAX_VERTEX_COUNT - 1) * (MAX_VERTEX_COUNT - 2) / 2 + MAX_VERTEX_COUNT);
+            return MakeInteger((VERTEX_FOR_LARGES - 1) * (VERTEX_FOR_LARGES - 2) / 2 + VERTEX_FOR_LARGES);
         default:
             abort();
         }
@@ -364,7 +370,7 @@ static int Check(void) {
     }
     else { // test spanning tree
         const unsigned vertexCount = GetVertexCount();
-        unsigned vertexParent[MAX_VERTEX_COUNT];
+        unsigned vertexParent[VERTEX_FOR_LARGES];
         unsigned long long length = 0;
         InitParent(vertexCount, vertexParent);
         for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {

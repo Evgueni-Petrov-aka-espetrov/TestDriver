@@ -68,8 +68,8 @@ int SpecialFeed(void) {
 
 
 
-    Test34Timeout = (int)start + 10000;                                         //РўРЈРў Р’РЎР• Р§РўРћ РљРђРЎРђР•РўРЎРЇ Р’Р Р•РњР•РќР Р РџРђРњРЇРўР, РЇ РќР• Р—РќРђР® РЎРљРћР›Р¬РљРћ РќРђР”Рћ
-    Test34MemoryLimit = vertexcount * vertexcount * 4 + MIN_PROCESS_RSS_BYTES;
+    Test34Timeout = (int)start + 60000;                                         //ТУТ ВСЕ ЧТО КАСАЕТСЯ ВРЕМЕНИ И ПАМЯТИ
+    Test34MemoryLimit = edgecount * 24 + 24 * vertexcount + MIN_PROCESS_RSS_BYTES;   //чтобы запустился краскл, прим просит меньше
 
     return 0;
 
