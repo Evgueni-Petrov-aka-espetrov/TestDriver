@@ -8,7 +8,7 @@ enum {
 static int SpecialFeed(void);
 static int SpecialCheck(void);
 
-static int Test34Timeout = 5000;
+static int Test34Timeout = 3000;
 
 
 int GetSpecialTimeout(void){
@@ -63,13 +63,13 @@ int SpecialFeed(void) {
     start = RoundUptoThousand(GetTickCount() - start);
 
 
-    printf("done in T=%u seconds. Starting exe with timeout T+4 seconds... ", start / 1000);
+    printf("done in T=%u seconds. Starting exe with timeout T+20 seconds... ", start / 1000);
     fflush(stdout);
 
 
 
-    Test34Timeout = (int)start + 60000;                                         //ТУТ ВСЕ ЧТО КАСАЕТСЯ ВРЕМЕНИ И ПАМЯТИ
-    Test34MemoryLimit = edgecount * 24 + 24 * vertexcount + MIN_PROCESS_RSS_BYTES;   //чтобы запустился краскл, прим просит меньше
+    Test34Timeout = (int)start + 20000;                                         
+    Test34MemoryLimit = edgecount * 24 + 24 * vertexcount + MIN_PROCESS_RSS_BYTES;   
 
     return 0;
 
