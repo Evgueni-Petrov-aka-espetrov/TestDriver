@@ -36,7 +36,6 @@ install:
     # скрипт настройки среды и установки зависимостей:
     - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
     - sh: sudo apt-get install -y ninja-build
-    - sh: sudo apt-get install -y libc6
 
 before_build:
     - cmd: cmake -H. -Bbuild
