@@ -34,7 +34,6 @@ int SpecialFeed(void) {
     printf("Creating large text... ");
     fflush(stdout);
     unsigned start = GetTickCount();
-    unsigned length = 1;
     fprintf(in, "%u\n%u\n", vertexcount, edgecount);
     for (unsigned begin = 1; begin < VERTEX_FOR_KRUSKAL; begin++)
     {
@@ -44,18 +43,18 @@ int SpecialFeed(void) {
     start = RoundUptoThousand(GetTickCount() - start);
 
 
-    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);     //ÒÓÒ ÂÑÅ ×ÒÎ ÊÀÑÀÅÒÑß ÂÐÅÌÅÍÈ È ÏÀÌßÒÈ
+    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);   
     fflush(stdout);
 
     Test34Timeout = 1000;
-    Test34MemoryLimit = 1700000000 + MIN_PROCESS_RSS_BYTES;  // ÷òîáû çàïóñòèëñÿ ïðèì, êðàñêë ïðîñèò ìåíüøå
+    Test34MemoryLimit = 1700000000 + MIN_PROCESS_RSS_BYTES; 
 
     return 0;
 }
 
 static unsigned GoodEdge(unsigned a, unsigned b)
 {
-    if ((b != a + 1 && a != b + 1) ||               // changes in condition
+    if ((b != a + 1 && a != b + 1) ||               
         !(0 < a && a < VERTEX_FOR_KRUSKAL + 1) ||
         !(0 < b && b < VERTEX_FOR_KRUSKAL + 1)) {
         return IGNORED_EDGE_IDX;
@@ -70,7 +69,7 @@ int SpecialCheck(void)
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
         printf("can't open out.txt\n");
-        IncreaseTestcaseIdx(); // replace with a function
+        IncreaseTestcaseIdx(); 
         return -1;
     }
     const char* status = Pass;
@@ -115,6 +114,6 @@ int SpecialCheck(void)
 
     fclose(out);
     printf("%s\n", status);
-    IncreaseTestcaseIdx(); // replace with a function
+    IncreaseTestcaseIdx(); 
     return status == Fail;
 }
