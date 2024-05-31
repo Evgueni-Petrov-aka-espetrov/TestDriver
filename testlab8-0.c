@@ -44,11 +44,11 @@ int SpecialFeed(void) {
     start = RoundUptoThousand(GetTickCount() - start);
 
 
-    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);     //ТУТ ВСЕ ЧТО КАСАЕТСЯ ВРЕМЕНИ И ПАМЯТИ
+    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);     //Г’Г“Г’ Г‚Г‘Г… Г—Г’ГЋ ГЉГЂГ‘ГЂГ…Г’Г‘Гџ Г‚ГђГ…ГЊГ…ГЌГ€ Г€ ГЏГЂГЊГџГ’Г€
     fflush(stdout);
 
-    Test34Timeout = (int)start + 20000;
-    Test34MemoryLimit = 1700000000 + MIN_PROCESS_RSS_BYTES;  // чтобы запустился прим, краскл просит меньше
+    Test34Timeout = 1000;
+    Test34MemoryLimit = 1700000000 + MIN_PROCESS_RSS_BYTES;  // Г·ГІГ®ГЎГ» Г§Г ГЇГіГ±ГІГЁГ«Г±Гї ГЇГ°ГЁГ¬, ГЄГ°Г Г±ГЄГ« ГЇГ°Г®Г±ГЁГІ Г¬ГҐГ­ГјГёГҐ
 
     return 0;
 }
