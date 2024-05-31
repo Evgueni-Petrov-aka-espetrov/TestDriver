@@ -16,7 +16,7 @@ enum {
     MAX_VERTEX_COUNT =20000
 };
 
-static unsigned TestcaseIdx = 0;    //Â„Ó ÚÓÊÂ ÌÛÊÌÓ ËÁ Ù‡ÈÎ‡ ÏÂÌˇÚ¸ Í‡Í ÚÓ, ‡ ÏÓÊÂÚ Ë ÌÂÚ
+static unsigned TestcaseIdx = 0;  
 
 static int Feed(void);
 static int Check(void);
@@ -38,7 +38,7 @@ TLabTest GetLabTest(int testIdx) {
     }
 }
 
-static const unsigned TestcaseCount = 34;                    //»«Ã≈Õ»À  ŒÀ-¬Œ “≈—“Œ¬ 33 -> 34
+static const unsigned TestcaseCount = 34;                    
 int GetTestCount(void) {
     return TestcaseCount;
 }
@@ -50,11 +50,11 @@ void IncreaseTestcaseIdx(void)
 
 
 const char* GetTesterName(void) {
-    return "Lab 8-1 Prim Shortest Spanning Tree";
+    return "Lab 8-x Kruskal or Prim Shortest Spanning Tree";
 }
 
 
-static int LabTimeout = 3000;      //¬–≈Ãﬂ Õ¿ –¿¡Œ“” 
+static int LabTimeout = 3000;      
 int GetTestTimeout(void) { 
     if (TestcaseIdx < 33 ){
         return LabTimeout;
