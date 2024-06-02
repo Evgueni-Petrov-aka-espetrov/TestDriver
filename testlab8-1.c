@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 enum {
-    VERTEX_FOR_PRIM =7000
+    VERTEX_FOR_PRIM = 7000
 };
 static int SpecialFeed(void);
 static int SpecialCheck(void);
@@ -11,7 +11,7 @@ static int SpecialCheck(void);
 static int Test34Timeout = 3000;
 
 
-int GetSpecialTimeout(void){
+int GetSpecialTimeout(void) {
     return Test34Timeout;
 }
 
@@ -35,6 +35,7 @@ TLabTest GetSpecialLabTest(void)
 int SpecialFeed(void) {
     const unsigned vertexcount = VERTEX_FOR_PRIM;
     const unsigned edgecount = SumRange(1, VERTEX_FOR_PRIM - 1);
+
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
@@ -42,10 +43,12 @@ int SpecialFeed(void) {
     }
     printf("Creating large text... ");
     fflush(stdout);
+
     unsigned start = GetTickCount();
     unsigned length = SumRange(1, VERTEX_FOR_PRIM - 1);
+
     fprintf(in, "%u\n%u\n", vertexcount, edgecount);
-    for (unsigned begin = 1;begin < VERTEX_FOR_PRIM ;begin++)
+    for (unsigned begin = 1;begin < VERTEX_FOR_PRIM;begin++)
     {
         for (unsigned end = begin + 1; end < VERTEX_FOR_PRIM; end++)
         {
@@ -53,23 +56,24 @@ int SpecialFeed(void) {
             length--;
         }
     }
+
     for (unsigned end = 1;end < VERTEX_FOR_PRIM;end++)
     {
         fprintf(in, "%d %u %u\n", VERTEX_FOR_PRIM, end, length);
         length--;
     }
-    
+
     fclose(in);
     start = RoundUptoThousand(GetTickCount() - start);
 
 
-    printf("done in T=%u seconds. Starting exe with timeout T+20 seconds... ", start / 1000);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+10 seconds... ", start / 1000);
     fflush(stdout);
 
 
 
-    Test34Timeout = (int)start + 20000;                                         
-    Test34MemoryLimit = edgecount * 24 + 24 * vertexcount + MIN_PROCESS_RSS_BYTES;   
+    Test34Timeout = 2*(int)start + 10000;
+    Test34MemoryLimit = (vertexcount + 1) * (vertexcount + 1) * 4 + 25 * (vertexcount + 1) + MIN_PROCESS_RSS_BYTES;
 
     return 0;
 
@@ -77,11 +81,11 @@ int SpecialFeed(void) {
 }
 static unsigned GoodEdge(unsigned a, unsigned b)
 {
-    if (!(0 < a && a <= VERTEX_FOR_PRIM && 
+    if (!(0 < a && a <= VERTEX_FOR_PRIM &&
         0 < b && b <= VERTEX_FOR_PRIM &&
-        a!=b))
+        a != b))
     {
-        
+
         return IGNORED_EDGE_IDX;
     }
     else if (a != VERTEX_FOR_PRIM && b != VERTEX_FOR_PRIM) {
@@ -91,18 +95,18 @@ static unsigned GoodEdge(unsigned a, unsigned b)
         }
     }
     else {
-      
+
         return a == VERTEX_FOR_PRIM ? b : a;
-        
+
     }
-   
+
 }
 
 
 
 static bool Treeisconnected(bool* vertexConnected)
 {
-    for (int i = 1;i < VERTEX_FOR_PRIM ;i++)
+    for (int i = 1;i < VERTEX_FOR_PRIM;i++)
     {
         if (!vertexConnected[i])
         {
@@ -126,7 +130,7 @@ int SpecialCheck(void)
     const char* status = Pass;
     const unsigned vertexCount = VERTEX_FOR_PRIM;
     bool vertexConnected[VERTEX_FOR_PRIM] = { false };
-    unsigned long long length = 0;
+
     for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
         unsigned a, b;
         if (ScanUintUint(out, &a, &b) != Pass) {
