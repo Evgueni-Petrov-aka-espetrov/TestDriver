@@ -24,37 +24,44 @@ TLabTest GetSpecialLabTest(void)
 }
 
 int SpecialFeed(void) {
+
+
     static unsigned vertexcount = VERTEX_FOR_KRUSKAL;
     static unsigned edgecount = VERTEX_FOR_KRUSKAL - 1;
+
+
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
+
+
     printf("Creating large text... ");
     fflush(stdout);
     unsigned start = GetTickCount();
+
     fprintf(in, "%u\n%u\n", vertexcount, edgecount);
     for (unsigned begin = 1; begin < VERTEX_FOR_KRUSKAL; begin++)
     {
         fprintf(in, "%u %u %u\n", begin, begin + 1, begin);
     }
     fclose(in);
+
     start = RoundUptoThousand(GetTickCount() - start);
 
-
-    printf("done in T=%u seconds. Starting exe with timeout T+1 seconds... ", start / 1000);   
+    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", start / 1000);
     fflush(stdout);
 
-    Test34Timeout = 1000;
-    Test34MemoryLimit = 1700000000 + MIN_PROCESS_RSS_BYTES; 
+    Test34Timeout = start + 3000;
+    Test34MemoryLimit = edgecount * 24 + 24 * vertexcount + MIN_PROCESS_RSS_BYTES;
 
     return 0;
 }
 
 static unsigned GoodEdge(unsigned a, unsigned b)
 {
-    if ((b != a + 1 && a != b + 1) ||               
+    if ((b != a + 1 && a != b + 1) ||
         !(0 < a && a < VERTEX_FOR_KRUSKAL + 1) ||
         !(0 < b && b < VERTEX_FOR_KRUSKAL + 1)) {
         return IGNORED_EDGE_IDX;
@@ -69,7 +76,7 @@ int SpecialCheck(void)
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
         printf("can't open out.txt\n");
-        IncreaseTestcaseIdx(); 
+        IncreaseTestcaseIdx();
         return -1;
     }
     const char* status = Pass;
@@ -102,9 +109,9 @@ int SpecialCheck(void)
     }
     if (status == Pass) {
         if (CountRoots(vertexCount, vertexParent) != 1 || length > mst_length) {
-        
-                printf("wrong output -- ");
-           
+
+            printf("wrong output -- ");
+
             status = Fail;
         }
     }
@@ -114,6 +121,6 @@ int SpecialCheck(void)
 
     fclose(out);
     printf("%s\n", status);
-    IncreaseTestcaseIdx(); 
+    IncreaseTestcaseIdx();
     return status == Fail;
 }
