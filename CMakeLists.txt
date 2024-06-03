@@ -55,31 +55,55 @@ add_library(testDriver testDriver.c)
 # EXTENSIONS YES заменяет std=c11 на std=gnu11, что выставляет POSIX макросы
 set_compiler_settings(testDriver EXTENSIONS YES)
 
+set(TEST_LAB_BEGIN "testlab-begin.c")
+set(TEST_LAB_0 "testlab0.c")
+set(TEST_LAB_1-0 "testlab1-0.c")
+set(TEST_LAB_1-1 "testlab1-1.c")
+set(TEST_LAB_1-2 "testlab1-2.c")
+set(TEST_LAB_2 "testlab2.c")
+set(TEST_LAB_3-0 "testlab3-0.c")
+set(TEST_LAB_4 "testlab4.c")
+set(TEST_LAB_5 "testlab5.c")
+set(TEST_LAB_6-0 "testlab6-0.c")
+set(TEST_LAB_6-1 "testlab6-1.c")
+set(TEST_LAB_6-2 "testlab6-2.c")
+set(TEST_LAB_6-3 "testlab6-3.c")
+set(TEST_LAB_7 "testlab7.c")
+set(TEST_LAB_8-0 "testlab8-0.c" "testlab8-base.c" "testlab8-base.h")
+set(TEST_LAB_8-1 "testlab8-1.c" "testlab8-base.c" "testlab8-base.h")
+set(TEST_LAB_9 "testlab9.c")
+set(TEST_LAB_10 "testlab10.c")
+set(TEST_LAB_11 "testlab11.c")
+set(TEST_LAB_12 "testlab12.c")
+set(TEST_LAB_KOSORAJO "testlabKosorajo.c")
+
 set(TEST_LAB_SOURCES
-	testlab-begin.c
-	testlab0.c
-	testlab1-0.c
-	testlab1-1.c
-	testlab1-2.c
-	testlab2.c
-	testlab3-0.c
-	testlab4.c
-	testlab5.c
-	testlab6-0.c
-	testlab6-1.c
-	testlab6-2.c
-	testlab6-3.c
-	testlab7.c
-	testlab8-0.c
-	testlab9.c
-	testlab10.c
-	testlab11.c
-	testlab12.c
- 	testlabKosorajo.c
+	TEST_LAB_BEGIN
+	TEST_LAB_0
+	TEST_LAB_1-0
+	TEST_LAB_1-1
+	TEST_LAB_1-2
+	TEST_LAB_2
+	TEST_LAB_3-0
+	TEST_LAB_4
+	TEST_LAB_5
+	TEST_LAB_6-0
+	TEST_LAB_6-1
+	TEST_LAB_6-2
+	TEST_LAB_6-3
+	TEST_LAB_7
+	TEST_LAB_8-0
+	TEST_LAB_8-1
+	TEST_LAB_9
+	TEST_LAB_10
+	TEST_LAB_11
+	TEST_LAB_12
+ 	TEST_LAB_KOSORAJO
 )
 foreach(source ${TEST_LAB_SOURCES})
-	get_filename_component(target ${source} NAME_WE)
-	add_executable(${target} ${source})
+	list(GET ${source} 0 first)
+	get_filename_component(target ${first} NAME_WE)
+	add_executable(${target} ${${source}})
 	set_compiler_settings(${target} EXTENSIONS NO)
 	target_link_libraries(${target} PRIVATE testDriver)
 
