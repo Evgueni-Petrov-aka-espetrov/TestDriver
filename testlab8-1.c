@@ -7,11 +7,6 @@ enum {
     VERTEX_FOR_PRIM = 7000
 };
 
-
-
-
-
-
 int SpecialFeed()
 {
     FILE* const in = fopen("in.txt", "w+");
@@ -23,12 +18,8 @@ int SpecialFeed()
     const unsigned vertexCount = VERTEX_FOR_PRIM;
     const unsigned edgeCount = SumRange(1, VERTEX_FOR_PRIM - 1);
     fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
-    const int isVerbose = edgeCount > 1000 * 1000;
-    if (isVerbose) {
-        printf("Creating large text... ");
-        fflush(stdout);
-    }
-
+    
+    printf("Creating large text... ");
     unsigned start = GetTickCount();
     
     for (unsigned begin = 1, lenght = 1; begin < vertexCount; begin++)
@@ -41,19 +32,12 @@ int SpecialFeed()
 
     fclose(in);
     start = RoundUptoThousand(GetTickCount() - start);
-
-    if (isVerbose) {
-        printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", start / 1000);
-        fflush(stdout);
-    }
-
+    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", start / 1000);
     LabTimeout = (int)start + 3000;
     LabMemoryLimit = vertexCount * vertexCount * 4 + MIN_PROCESS_RSS_BYTES;
 
     return 0;
 }
-
-
 
 TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx) {
     unsigned partOneEdge = VERTEX_FOR_PRIM - 1;
@@ -73,8 +57,7 @@ TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx) {
             unsigned row, col;
             CalcRowColumn(edgeIdx-partOneEdge, &row, &col);
             row = VERTEX_FOR_PRIM - row + col;
-            col = col + 2;
-
+            col +=2;
             return MakeEdge(row, col, edgeIdx + 1);
         }
     case ERROR_MESSAGE:
