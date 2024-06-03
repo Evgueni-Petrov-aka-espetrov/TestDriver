@@ -7,6 +7,11 @@ enum {
     VERTEX_FOR_PRIM = 7000
 };
 
+char* GetTesterName8_x(void)
+{
+    return "Lab 8-1 Prim Shortest Spanning Tree";
+}
+
 int SpecialFeed()
 {
     FILE* const in = fopen("in.txt", "w+");
@@ -18,13 +23,13 @@ int SpecialFeed()
     const unsigned vertexCount = VERTEX_FOR_PRIM;
     const unsigned edgeCount = SumRange(1, VERTEX_FOR_PRIM - 1);
     fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
-    
+
     printf("Creating large text... ");
     unsigned start = GetTickCount();
-    
+
     for (unsigned begin = 1, lenght = 1; begin < vertexCount; begin++)
     {
-        for (unsigned end = begin+1; end < vertexCount+1;end++,lenght++)
+        for (unsigned end = begin + 1; end < vertexCount + 1;end++, lenght++)
         {
             fprintf(in, "%u %u %u\n", begin, end, lenght);
         }
@@ -47,7 +52,7 @@ TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx) {
     case VERTEX_COUNT:
         return MakeInteger(VERTEX_FOR_PRIM);
     case EDGE_COUNT:
-        return MakeInteger(partOneEdge+partTwoEdge);
+        return MakeInteger(partOneEdge + partTwoEdge);
     case EDGE:
         if (edgeIdx < partOneEdge)
         {
@@ -55,9 +60,9 @@ TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx) {
         }
         else {
             unsigned row, col;
-            CalcRowColumn(edgeIdx-partOneEdge, &row, &col);
+            CalcRowColumn(edgeIdx - partOneEdge, &row, &col);
             row = VERTEX_FOR_PRIM - row + col;
-            col +=2;
+            col += 2;
             return MakeEdge(row, col, edgeIdx + 1);
         }
     case ERROR_MESSAGE:
