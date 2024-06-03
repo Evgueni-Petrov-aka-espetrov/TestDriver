@@ -13,10 +13,10 @@
 enum {
 
     VERTEX_FOR_LARGES = 5000,
-    MAX_VERTEX_COUNT =20000
+    MAX_VERTEX_COUNT = 20000
 };
 
-static unsigned TestcaseIdx = 0;  
+static unsigned TestcaseIdx = 0;
 
 static int Feed(void);
 static int Check(void);
@@ -26,26 +26,56 @@ static int Check(void);
 
 TLabTest GetLabTest(int testIdx) {
 
-    if (testIdx < 33)
-    {
-        TLabTest labTest = { Feed, Check };
-        return labTest;
-    }
-    else
-    {
-        TLabTest labTest = GetSpecialLabTest();
-        return labTest;
-    }
+
+    TLabTest labTest[] =
+    { {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {Feed, Check},
+     {SpecialFeed, Check},
+    };
+    return labTest[testIdx];
+
+
 }
 
-static const unsigned TestcaseCount = 34;                    
+static const unsigned TestcaseCount = 35;
+
 int GetTestCount(void) {
     return TestcaseCount;
 }
-void IncreaseTestcaseIdx(void)
-{
-    TestcaseIdx++;
-}
+
+
 
 
 
@@ -54,41 +84,36 @@ const char* GetTesterName(void) {
 }
 
 
-static int LabTimeout = 3000;      
-int GetTestTimeout(void) { 
-    if (TestcaseIdx < 33 ){
-        return LabTimeout;
-    }
-    else {
-        return GetSpecialTimeout();
-    }
+int LabTimeout = 3000;
+int GetTestTimeout(void) {
+    
+    return LabTimeout;
+    
 }
 
-static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;     
+size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
 size_t GetTestMemoryLimit(void) {
-    if (TestcaseIdx < 33) {
-        return LabMemoryLimit;
-    }
-    else {
-        return GetSpecialMemoryLimit();
-    }
+    
+    return LabMemoryLimit;
+    
+
 }
 
 
 
-static TTestcaseData MakeInteger(unsigned long long integer) {
+ TTestcaseData MakeInteger(unsigned long long integer) {
     TTestcaseData testcaseData;
     testcaseData.Integer = integer;
     return testcaseData;
 }
 
-static TTestcaseData MakeString(const char* string) {
+ TTestcaseData MakeString(const char* string) {
     TTestcaseData testcaseData;
     testcaseData.String = string;
     return testcaseData;
 }
 
-static TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long length) {
+TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long length) {
     TTestcaseData testcaseData;
     testcaseData.Edge.Begin = begin;
     testcaseData.Edge.End = end;
@@ -100,7 +125,7 @@ unsigned SumRange(unsigned begin, unsigned end) {
     return (begin + end) * (end - begin + 1) / 2;
 }
 
-static void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx) {
+void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx) {
     *rowIdx = (unsigned)(sqrt(8 * linearIdx + 1) / 2 - 0.5);
     *columnIdx = linearIdx - SumRange(0, *rowIdx);
 }
@@ -255,6 +280,8 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
         default:
             abort();
         }
+    }else if (testcaseIdx == smallTestCount + 4) {
+        return Lab8SpecialTest(dataId, edgeIdx);
     }
     else {
         abort();
@@ -275,7 +302,7 @@ static int Feed(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-
+   
     const unsigned vertexCount = GetVertexCount();
     const unsigned edgeCount = GetEdgeCount();
     fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
@@ -352,6 +379,7 @@ void InitParent(unsigned vertexCount, unsigned parent[]) {
 }
 
 static int Check(void) {
+   
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
         printf("can't open out.txt\n");
@@ -369,12 +397,14 @@ static int Check(void) {
         }
     }
     else { // test spanning tree
+
         const unsigned vertexCount = GetVertexCount();
-        unsigned vertexParent[VERTEX_FOR_LARGES];
+        unsigned* vertexParent = (unsigned*)malloc(vertexCount * sizeof(int));
         unsigned long long length = 0;
         InitParent(vertexCount, vertexParent);
         for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
             unsigned a, b;
+            
             if (ScanUintUint(out, &a, &b) != Pass) {
                 status = Fail;
                 break;
