@@ -75,6 +75,7 @@ set(TEST_LAB_9 "testlab9.c")
 set(TEST_LAB_10 "testlab10.c")
 set(TEST_LAB_11 "testlab11.c")
 set(TEST_LAB_12 "testlab12.c")
+set(TEST_LAB_KOSORAJO "testlabKosorajo.c")
 
 set(TEST_LAB_SOURCES
 	TEST_LAB_BEGIN
@@ -97,6 +98,7 @@ set(TEST_LAB_SOURCES
 	TEST_LAB_10
 	TEST_LAB_11
 	TEST_LAB_12
+ 	TEST_LAB_KOSORAJO
 )
 foreach(source ${TEST_LAB_SOURCES})
 	list(GET ${source} 0 first)
