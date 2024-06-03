@@ -28,7 +28,7 @@ enum ETestcaseDataId {
 };
 
 void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx);
-
+char* GetTesterName8_x(void);
 
 int SpecialFeed();
 unsigned SumRange(unsigned begin, unsigned end);
@@ -39,7 +39,6 @@ TTestcaseData MakeString(const char* string);
 
 
 TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx);
-
 
 
 
