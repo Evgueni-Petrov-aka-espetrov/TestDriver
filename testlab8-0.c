@@ -17,7 +17,7 @@ int SpecialFeed()
     fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
     
     unsigned start = GetTickCount();
-    for (unsigned begin = 1, lenght = 1; begin < vertexCount; begin++)
+    for (unsigned begin = 1; begin < vertexCount; begin++)
     {
         fprintf(in, "%u %u %u\n", begin, begin + 1, begin);
     }
