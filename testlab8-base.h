@@ -2,6 +2,9 @@
 #include "testLab.h"
 
 
+extern int LabTimeout;
+extern size_t LabMemoryLimit;
+
 enum { IGNORED_VERTEX_IDX = 0 };
 static const unsigned IGNORED_EDGE_IDX = (unsigned)-1;
 struct TEdge {
@@ -24,16 +27,21 @@ enum ETestcaseDataId {
     MST_LENGTH
 };
 
+void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx);
 
 
+int SpecialFeed();
 unsigned SumRange(unsigned begin, unsigned end);
-void InitParent(unsigned vertexCount, unsigned parent[]);
-int CountRoots(unsigned vertexCount, const unsigned parent[]);
-int FindRoot(unsigned vertex, const unsigned parent[]);
-int GetSpecialTimeout(void);
-size_t GetSpecialMemoryLimit(void);
-TLabTest GetSpecialLabTest(void);
-void IncreaseTestcaseIdx(void);
+
+TTestcaseData MakeInteger(unsigned long long integer);
+TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long length);
+TTestcaseData MakeString(const char* string);
+
+
+TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx);
+
+
+
 
 
 
