@@ -4,123 +4,54 @@
 enum {
     VERTEX_FOR_KRUSKAL = 20000
 };
-static int SpecialFeed(void);
-static int SpecialCheck(void);
-
-static int Test34Timeout = 1000;
-int GetSpecialTimeout(void) {
-    return Test34Timeout;
-}
-
-static size_t Test34MemoryLimit = MIN_PROCESS_RSS_BYTES;
-size_t GetSpecialMemoryLimit(void) {
-    return Test34MemoryLimit;
-}
-
-TLabTest GetSpecialLabTest(void)
+int SpecialFeed()
 {
-    TLabTest labTest = { SpecialFeed,SpecialCheck };
-    return labTest;
-}
-
-int SpecialFeed(void) {
-
-
-    static unsigned vertexcount = VERTEX_FOR_KRUSKAL;
-    static unsigned edgecount = VERTEX_FOR_KRUSKAL - 1;
-
-
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
 
+    const unsigned vertexCount = VERTEX_FOR_KRUSKAL;
+    const unsigned edgeCount = VERTEX_FOR_KRUSKAL - 1;
+    fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
+    
 
-    printf("Creating large text... ");
-    fflush(stdout);
     unsigned start = GetTickCount();
 
-    fprintf(in, "%u\n%u\n", vertexcount, edgecount);
-    for (unsigned begin = 1; begin < VERTEX_FOR_KRUSKAL; begin++)
+    for (unsigned begin = 1, lenght = 1; begin < vertexCount; begin++)
     {
         fprintf(in, "%u %u %u\n", begin, begin + 1, begin);
     }
-    fclose(in);
 
+    fclose(in);
     start = RoundUptoThousand(GetTickCount() - start);
 
-    printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", start / 1000);
-    fflush(stdout);
 
-    Test34Timeout = start + 3000;
-    Test34MemoryLimit = edgecount * 24 + 24 * vertexcount + MIN_PROCESS_RSS_BYTES;
+    LabTimeout = (int)start + 3000;
+    LabMemoryLimit = 24 * (vertexCount + 1) * (vertexCount + 1) + 24 * vertexCount + MIN_PROCESS_RSS_BYTES;
 
     return 0;
 }
 
-static unsigned GoodEdge(unsigned a, unsigned b)
-{
-    if ((b != a + 1 && a != b + 1) ||
-        !(0 < a && a < VERTEX_FOR_KRUSKAL + 1) ||
-        !(0 < b && b < VERTEX_FOR_KRUSKAL + 1)) {
-        return IGNORED_EDGE_IDX;
-    }
-    else {
-        return a > b ? b : a;
-    }
-}
 
-int SpecialCheck(void)
-{
-    FILE* const out = fopen("out.txt", "r");
-    if (out == NULL) {
-        printf("can't open out.txt\n");
-        IncreaseTestcaseIdx();
-        return -1;
-    }
-    const char* status = Pass;
-    const unsigned vertexCount = VERTEX_FOR_KRUSKAL;
-    unsigned vertexParent[VERTEX_FOR_KRUSKAL];
-    unsigned long long length = 0;
-    unsigned long long mst_length = SumRange(1, VERTEX_FOR_KRUSKAL - 1);
-    InitParent(vertexCount, vertexParent);
-    for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
-        unsigned a, b;
-        if (ScanUintUint(out, &a, &b) != Pass) {
-            status = Fail;
-            break;
-        }
-        const unsigned edgeIdx = GoodEdge(a, b);
-        if (edgeIdx == IGNORED_EDGE_IDX) {
-            printf("wrong output -- ");
-            status = Fail;
-            break;
-        }
-        const unsigned rootA = FindRoot(a - 1, vertexParent);
-        const unsigned rootB = FindRoot(b - 1, vertexParent);
-        if (rootA == rootB) {
-            printf("wrong output -- ");
-            status = Fail;
-            break;
-        }
-        vertexParent[rootA] = rootB;
-        length += edgeIdx;
-    }
-    if (status == Pass) {
-        if (CountRoots(vertexCount, vertexParent) != 1 || length > mst_length) {
 
-            printf("wrong output -- ");
+TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx) {
+   
 
-            status = Fail;
-        }
-    }
-    if (status == Pass && HaveGarbageAtTheEnd(out)) {
-        status = Fail;
+    switch (dataId) {
+    case VERTEX_COUNT:
+        return MakeInteger(VERTEX_FOR_KRUSKAL);
+    case EDGE_COUNT:
+        return MakeInteger(VERTEX_FOR_KRUSKAL - 1);
+    case EDGE:
+        return MakeEdge(edgeIdx + 1, edgeIdx + 2, edgeIdx + 1);
+    case ERROR_MESSAGE:
+        return MakeString(NULL);
+    case MST_LENGTH:
+        return MakeInteger(SumRange(1, VERTEX_FOR_KRUSKAL - 1));
+    default:
+        abort();
     }
 
-    fclose(out);
-    printf("%s\n", status);
-    IncreaseTestcaseIdx();
-    return status == Fail;
 }
