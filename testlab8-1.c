@@ -1,165 +1,88 @@
 #include "testlab8-base.h"
 #include "testLab.h"
-#include <stdbool.h>
+#include <stdlib.h>
+
 
 enum {
     VERTEX_FOR_PRIM = 7000
 };
-static int SpecialFeed(void);
-static int SpecialCheck(void);
-
-static int Test34Timeout = 3000;
 
 
-int GetSpecialTimeout(void) {
-    return Test34Timeout;
-}
 
 
-static size_t Test34MemoryLimit = MIN_PROCESS_RSS_BYTES;
-size_t GetSpecialMemoryLimit(void) {
-    return Test34MemoryLimit;
-}
 
-TLabTest GetSpecialLabTest(void)
+
+int SpecialFeed()
 {
-    TLabTest labTest = { SpecialFeed,SpecialCheck };
-    return labTest;
-}
-
-
-
-
-
-
-int SpecialFeed(void) {
-    const unsigned vertexcount = VERTEX_FOR_PRIM;
-    const unsigned edgecount = SumRange(1, VERTEX_FOR_PRIM - 1);
-
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    printf("Creating large text... ");
-    fflush(stdout);
 
-    unsigned start = GetTickCount();
-    unsigned length = SumRange(1, VERTEX_FOR_PRIM - 1);
-
-    fprintf(in, "%u\n%u\n", vertexcount, edgecount);
-    for (unsigned begin = 1;begin < VERTEX_FOR_PRIM;begin++)
-    {
-        for (unsigned end = begin + 1; end < VERTEX_FOR_PRIM; end++)
-        {
-            fprintf(in, "%u %u %u\n", begin, end, length);
-            length--;
-        }
+    const unsigned vertexCount = VERTEX_FOR_PRIM;
+    const unsigned edgeCount = SumRange(1, VERTEX_FOR_PRIM - 1);
+    fprintf(in, "%u\n%u\n", vertexCount, edgeCount);
+    const int isVerbose = edgeCount > 1000 * 1000;
+    if (isVerbose) {
+        printf("Creating large text... ");
+        fflush(stdout);
     }
 
-    for (unsigned end = 1;end < VERTEX_FOR_PRIM;end++)
+    unsigned start = GetTickCount();
+    
+    for (unsigned begin = 1, lenght = 1; begin < vertexCount; begin++)
     {
-        fprintf(in, "%d %u %u\n", VERTEX_FOR_PRIM, end, length);
-        length--;
+        for (unsigned end = begin+1; end < vertexCount+1;end++,lenght++)
+        {
+            fprintf(in, "%u %u %u\n", begin, end, lenght);
+        }
     }
 
     fclose(in);
     start = RoundUptoThousand(GetTickCount() - start);
 
+    if (isVerbose) {
+        printf("done in T=%u seconds. Starting exe with timeout T+3 seconds... ", start / 1000);
+        fflush(stdout);
+    }
 
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+10 seconds... ", start / 1000);
-    fflush(stdout);
-
-
-
-    Test34Timeout = 2*(int)start + 10000;
-    Test34MemoryLimit = (vertexcount + 1) * (vertexcount + 1) * 4 + 25 * (vertexcount + 1) + MIN_PROCESS_RSS_BYTES;
+    LabTimeout = (int)start + 3000;
+    LabMemoryLimit = vertexCount * vertexCount * 4 + MIN_PROCESS_RSS_BYTES;
 
     return 0;
-
-
-}
-static unsigned GoodEdge(unsigned a, unsigned b)
-{
-    if (!(0 < a && a <= VERTEX_FOR_PRIM &&
-        0 < b && b <= VERTEX_FOR_PRIM &&
-        a != b))
-    {
-
-        return IGNORED_EDGE_IDX;
-    }
-    else if (a != VERTEX_FOR_PRIM && b != VERTEX_FOR_PRIM) {
-        {
-            printf("error2 %u %u\n", a, b);
-            return IGNORED_EDGE_IDX;
-        }
-    }
-    else {
-
-        return a == VERTEX_FOR_PRIM ? b : a;
-
-    }
-
 }
 
 
 
-static bool Treeisconnected(bool* vertexConnected)
-{
-    for (int i = 1;i < VERTEX_FOR_PRIM;i++)
-    {
-        if (!vertexConnected[i])
+TTestcaseData Lab8SpecialTest(enum ETestcaseDataId dataId, unsigned edgeIdx) {
+    unsigned partOneEdge = VERTEX_FOR_PRIM - 1;
+    unsigned partTwoEdge = SumRange(1, VERTEX_FOR_PRIM - 2);
+
+    switch (dataId) {
+    case VERTEX_COUNT:
+        return MakeInteger(VERTEX_FOR_PRIM);
+    case EDGE_COUNT:
+        return MakeInteger(partOneEdge+partTwoEdge);
+    case EDGE:
+        if (edgeIdx < partOneEdge)
         {
-            printf("not conncted %d\n", i);
-            return false;
+            return MakeEdge(1, edgeIdx + 2, edgeIdx + 1);
         }
-    }
-    return true;
-}
+        else {
+            unsigned row, col;
+            CalcRowColumn(edgeIdx-partOneEdge, &row, &col);
+            row = VERTEX_FOR_PRIM - row + col;
+            col = col + 2;
 
-
-
-int SpecialCheck(void)
-{
-    FILE* const out = fopen("out.txt", "r");
-    if (out == NULL) {
-        printf("can't open out.txt\n");
-        IncreaseTestcaseIdx();
-        return -1;
-    }
-    const char* status = Pass;
-    const unsigned vertexCount = VERTEX_FOR_PRIM;
-    bool vertexConnected[VERTEX_FOR_PRIM] = { false };
-
-    for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
-        unsigned a, b;
-        if (ScanUintUint(out, &a, &b) != Pass) {
-            status = Fail;
-            break;
+            return MakeEdge(row, col, edgeIdx + 1);
         }
-        const unsigned edgeIdx = GoodEdge(a, b);
-        if (edgeIdx == IGNORED_EDGE_IDX) {
-            printf("wrong output1 -- ");
-            status = Fail;
-            break;
-        }
-        vertexConnected[edgeIdx] = true;
+    case ERROR_MESSAGE:
+        return MakeString(NULL);
+    case MST_LENGTH:
+        return MakeInteger(SumRange(1, VERTEX_FOR_PRIM - 1));
+    default:
+        abort();
     }
-    if (status == Pass) {
-        if (!Treeisconnected(vertexConnected))
-        {
-            printf("wrong output2 -- ");
-            status = Fail;
-        }
-    }
-
-    if (status == Pass && HaveGarbageAtTheEnd(out)) {
-        status = Fail;
-    }
-
-    fclose(out);
-    printf("%s\n", status);
-    IncreaseTestcaseIdx();
-    return status == Fail;
 
 }
