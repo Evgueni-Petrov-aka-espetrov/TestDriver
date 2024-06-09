@@ -1,4 +1,5 @@
 #include "testLab.h"
+#include "testlab8-base.h"
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -11,60 +12,60 @@
 enum { MAX_VERTEX_COUNT = 5000 };
 
 static unsigned TestcaseIdx = 0;
+static const unsigned TestcaseCount = 35;
 
 static int Feed(void);
 static int Check(void);
 
 TLabTest GetLabTest(int testIdx) {
-    (void)testIdx;
-    TLabTest labTest = {Feed, Check};
-    return labTest;
+    if (testIdx == 4)
+    {
+        TLabTest labtest = { SpecialFeed,Check };
+        return labtest;
+    }
+    else if ((unsigned)testIdx == TestcaseCount - 1)
+    {
+        TLabTest labtest = { SpecialFeed2, Check };
+        return labtest;
+    }
+    else
+    {
+        TLabTest labtest = { Feed,Check };
+        return labtest;
+    }
 }
 
-static const unsigned TestcaseCount = 33;
 int GetTestCount(void) {
     return TestcaseCount;
 }
 
 const char* GetTesterName(void) {
-    return "Lab 8-x Kruskal or Prim Shortest Spanning Tree";
+    return GetTesterName8_x();
 }
 
-static int LabTimeout = 3000;
+int LabTimeout = 3000;
 int GetTestTimeout(void) {
     return LabTimeout;
 }
 
-static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
 size_t GetTestMemoryLimit(void) {
     return LabMemoryLimit;
 }
 
-struct TEdge {
-    unsigned Begin;
-    unsigned End;
-    unsigned long long Length;
-};
-
-typedef union {
-    struct TEdge Edge;
-    unsigned long long Integer;
-    const char* String;
-} TTestcaseData;
-
-static TTestcaseData MakeInteger(unsigned long long integer) {
+TTestcaseData MakeInteger(unsigned long long integer) {
     TTestcaseData testcaseData;
     testcaseData.Integer = integer;
     return testcaseData;
 }
 
-static TTestcaseData MakeString(const char* string) {
+TTestcaseData MakeString(const char* string) {
     TTestcaseData testcaseData;
     testcaseData.String = string;
     return testcaseData;
 }
 
-static TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long length) {
+TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long length) {
     TTestcaseData testcaseData;
     testcaseData.Edge.Begin = begin;
     testcaseData.Edge.End = end;
@@ -72,25 +73,14 @@ static TTestcaseData MakeEdge(unsigned begin, unsigned end, unsigned long long l
     return testcaseData;
 }
 
-static unsigned SumRange(unsigned begin, unsigned end) {
+unsigned SumRange(unsigned begin, unsigned end) {
     return (begin + end) * (end - begin + 1) / 2;
 }
 
-static void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx) {
+void CalcRowColumn(unsigned linearIdx, unsigned* rowIdx, unsigned* columnIdx) {
     *rowIdx = (unsigned)(sqrt(8 * linearIdx + 1) / 2 - 0.5);
     *columnIdx = linearIdx - SumRange(0, *rowIdx);
 }
-
-enum { IGNORED_VERTEX_IDX = 0 };
-static const unsigned IGNORED_EDGE_IDX = (unsigned)-1;
-
-enum ETestcaseDataId {
-    VERTEX_COUNT,
-    EDGE_COUNT,
-    EDGE,
-    ERROR_MESSAGE,
-    MST_LENGTH
-};
 
 static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId dataId, unsigned edgeIdx) {
     const unsigned smallTestCount = 30;
@@ -109,7 +99,7 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             {2, 1, {{IGNORED_VERTEX_IDX}}, "bad number of lines"},
 
             {0, 0, {{IGNORED_VERTEX_IDX}}, "no spanning tree"},
-            {MAX_VERTEX_COUNT+1, 1, {{1, 1, 1}}, "bad number of vertices"},
+            {MAX_VERTEX_COUNT+1, 1, {{1, 1, 1}}, "bad number of vertices"},  //not used in feeder
             {2, 4, {{1, 1, 1}, {1, 2, 1}, {2, 1, 1}, {2, 2, 1}}, "bad number of edges"},
             {2, 2, {{1, 2, 2}, {1, 2, 1}}, "bad number of edges"},
             {2, 1, {{1, 2, (unsigned long long)-1}}, "bad length"},
@@ -229,7 +219,10 @@ static TTestcaseData GetFromTestcase(unsigned testcaseIdx, enum ETestcaseDataId 
             default:
                 abort();
         }
-    } else {
+    } else if (testcaseIdx == smallTestCount + 4) {
+        return Lab8SpecialTest(dataId, edgeIdx);
+    }
+    else {
         abort();
     }
 }
@@ -343,7 +336,11 @@ static int Check(void) {
         }
     } else { // test spanning tree
         const unsigned vertexCount = GetVertexCount();
-        unsigned vertexParent[MAX_VERTEX_COUNT];
+        unsigned* vertexParent = (unsigned*)malloc(vertexCount * sizeof(int));
+        if (vertexParent == NULL) {
+            printf("malloc returned NULL -- please free ram and re-run tests\n");
+            return 1; // test failed
+        }
         unsigned long long length = 0;
         InitParent(vertexCount, vertexParent);
         for (unsigned idx = 0; idx + 1 < vertexCount; ++idx) {
@@ -374,6 +371,7 @@ static int Check(void) {
                 status = Fail;
             }
         }
+        free(vertexParent);
     }
     if (status == Pass && HaveGarbageAtTheEnd(out)) {
         status = Fail;
