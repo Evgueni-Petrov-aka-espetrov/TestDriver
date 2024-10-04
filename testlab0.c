@@ -42,6 +42,7 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"9 3\n0.0003\n  ", "0.000000100000"},
     {"9 3\n0.00003\n ", "0.000000001000"},
     {"9 3\n0.000003\n", "0.000000000010"},
+    {"3 9\n0.10000000001\n", "0.300003000000"},
 };
 
 static int FeedFromArray(void) {
