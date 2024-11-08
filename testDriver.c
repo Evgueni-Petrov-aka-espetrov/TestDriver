@@ -106,6 +106,9 @@ int main(int argc, char* argv[]) {
             fail = 1;
         }
         count += 1 - fail;
+        if (getenv("STOP_AT") && i+1 == atoi(getenv("STOP_AT"))) {
+            break;
+        }
     }
 
     if (count < GetTestCount()) {
