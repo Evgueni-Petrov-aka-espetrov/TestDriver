@@ -127,7 +127,6 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     { "1\n+ ADD 1\n(1+40)\n", "41" }
 };
 
-
 static int FeedFromArray(void) {
     FILE* const in = fopen("in.txt", "w+");
     if (in == NULL) {
