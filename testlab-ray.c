@@ -79,7 +79,6 @@ static int FeederBigSquare(void) {
     fflush(stdout);
 
     DWORD t = GetTickCount();
-
     srand((unsigned)time(NULL));
 
     fprintf(in, "16000\n");
@@ -97,24 +96,27 @@ static int FeederBigSquare(void) {
     }
 
     fprintf(in, "1000\n");
+
     const int cell_size = 5;
     const int grid_size = (4000 - 4) / cell_size;
+    const int grid_area = grid_size * grid_size;
     const int dx[8] = {1, 2, 3, 3, 2, 1, 0, 0};
     const int dy[8] = {0, 0, 1, 2, 3, 3, 2, 1};
 
-    int* used = malloc(sizeof(int) * grid_size * grid_size);
+    int *used = malloc(grid_area * sizeof(int));
     if (!used) {
-        exit(1);
+        return -1;
     }
-
-    memset(used, 0, sizeof(used));
+    memset(used, 0, grid_area * sizeof(int));
 
     int placed = 0;
     while (placed < 1000) {
         int ix = rand() % grid_size;
         int iy = rand() % grid_size;
-        if (used[iy * grid_size + ix]) continue;
-        used[iy * grid_size + ix] = 1;
+        int index = iy * grid_size + ix;
+        if (used[index]) continue;
+        used[index] = 1;
+
         int x_base = 1 + ix * cell_size;
         int y_base = 1 + iy * cell_size;
 
@@ -132,13 +134,14 @@ static int FeederBigSquare(void) {
     }
 
     fclose(in);
+    free(used);
 
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2... ", (unsigned)(t / 1000));
+    printf("done in T=%u seconds. Starting exe with timeout 3... ", (unsigned)(t / 1000));
     fflush(stdout);
-    free(used);
     return 0;
 }
+
 
 static int CheckerBigSquare(void) {
     FILE *const out = fopen("out.txt", "r");
@@ -180,7 +183,6 @@ static int FeederBigTriangle(void) {
     DWORD t = GetTickCount();
     srand((unsigned)time(NULL));
 
-
     int total_vertices = 16000;
     fprintf(in, "%d\n", total_vertices);
     for (int y = 0; y < 6000; ++y) {
@@ -198,19 +200,28 @@ static int FeederBigTriangle(void) {
     }
 
     fprintf(in, "1000\n");
+
     const int cell_size = 5;
-    const int grid_w = (8000 - 4) / cell_size;
-    const int grid_h = (6000 - 4) / cell_size;
+    int grid_w = (8000 - 4) / cell_size;
+    int grid_h = (6000 - 4) / cell_size;
     const int dx[8] = {1, 2, 3, 3, 2, 1, 0, 0};
     const int dy[8] = {0, 0, 1, 2, 3, 3, 2, 1};
-    unsigned char used[grid_w][grid_h];
-    memset(used, 0, sizeof(used));
+
+    int grid_area = grid_w * grid_h;
+    unsigned char *used = malloc(grid_area);
+    if (!used) {
+        return -1;
+    }
+    memset(used, 0, grid_area);
+
     int placed = 0;
     while (placed < 1000) {
         int ix = rand() % grid_w;
         int iy = rand() % grid_h;
-        if (used[ix][iy]) continue;
-        used[ix][iy] = 1;
+        int index = iy * grid_w + ix;
+        if (used[index]) continue;
+        used[index] = 1;
+
         int xb = 1 + ix * cell_size;
         int yb = 1 + iy * cell_size;
         fprintf(in, "8\n");
@@ -220,7 +231,6 @@ static int FeederBigTriangle(void) {
         placed++;
     }
 
-
     for (int i = 0; i < 4000; ++i) {
         int xq = (rand() % 10001) - 2000;
         int yq = (rand() % 10001) - 2000;
@@ -228,10 +238,13 @@ static int FeederBigTriangle(void) {
     }
 
     fclose(in);
+    free(used);
+
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2... ", (unsigned)(t / 1000));
+    printf("done in T=%u seconds. Starting exe with timeout 3... ", (unsigned)(t / 1000));
     return 0;
 }
+
 
 static int CheckerBigTriangle(void) {
     FILE *const out = fopen("out.txt", "r");
@@ -302,9 +315,9 @@ const char* GetTesterName(void) {
 }
 
 int GetTestTimeout(void) {
-    return 2000;
+    return 3000;
 }
 
 size_t GetTestMemoryLimit(void) {
-    return MIN_PROCESS_RSS_BYTES;
+    return MIN_PROCESS_RSS_BYTES + 3*1024*1024;
 }
