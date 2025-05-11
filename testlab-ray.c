@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 
 static int testN = 0;
 static const struct {const char *const in, *const out[16]; int n;} testInOut[] = {
@@ -101,15 +102,19 @@ static int FeederBigSquare(void) {
     const int dx[8] = {1, 2, 3, 3, 2, 1, 0, 0};
     const int dy[8] = {0, 0, 1, 2, 3, 3, 2, 1};
 
-    unsigned char used[grid_size][grid_size];
+    int* used = malloc(sizeof(int) * grid_size * grid_size);
+    if (!used) {
+        exit(1);
+    }
+
     memset(used, 0, sizeof(used));
 
     int placed = 0;
     while (placed < 1000) {
         int ix = rand() % grid_size;
         int iy = rand() % grid_size;
-        if (used[ix][iy]) continue;
-        used[ix][iy] = 1;
+        if (used[iy * grid_size + ix]) continue;
+        used[iy * grid_size + ix] = 1;
         int x_base = 1 + ix * cell_size;
         int y_base = 1 + iy * cell_size;
 
@@ -131,6 +136,7 @@ static int FeederBigSquare(void) {
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2... ", (unsigned)(t / 1000));
     fflush(stdout);
+    free(used);
     return 0;
 }
 
