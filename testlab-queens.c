@@ -373,6 +373,7 @@ static int CheckFromArray(void) {
     }
 
     char line[5];
+
     fgets(line, sizeof(line), out);
 
     if (testInOut[testN].out == 0) {
