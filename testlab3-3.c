@@ -24,7 +24,7 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"4\n1 2 3 4\n", "1 && 2 => 1 2\n3 && 4 => 3 4\n1 2 && 3 4 => 1 2 3 4\n1 2 3 4\n"},
     {"4\n1 2 4 3\n", "1 && 2 => 1 2\n4 && 3 => 3 4\n1 2 && 3 4 => 1 2 3 4\n1 2 3 4\n"}
 };
-static int TestN = 0;
+static int testN = 0;
 
 
 static int FeedFromArray(void)
