@@ -7,9 +7,6 @@
 static int testN = 0;
 static size_t LabMemoryLimit;
 
-static const char* Pass = "PASS";
-static const char* Fail = "FAIL";
-
 static const struct {
     const char* in;
     const char* out1;
