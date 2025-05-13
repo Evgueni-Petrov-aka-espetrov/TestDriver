@@ -7,45 +7,46 @@
 static int testN = 0;
 static const struct {const char* const in, *const out;} testInOut[] = {
     // bad input
-    {"\n", "bad input"},
-    {"0 2", "bad input"},
-    {"1 2", "bad input"},
-    {"1000000000 2", "bad input"}, // не уверен, что идея лабороторной как-то связанна с проверкой N
+    {"\n", "bad input"}, // 1
+    {"0 2", "bad input"}, // 2
+    {"1 2", "bad input"}, // 3
+    // не уверен, что идея лабороторной как-то связанна с проверкой N
+    {"1000000000 2", "bad input"}, // 4
     // small mod (uint8_t)
-    {"1 2\n1", "1"},
-    {"2 2\n1 0\n0 1", "1"},
-    {"2 2\n0 0\n0 0", "0"},
-    {"2 2\n1 1\n1 1", "0"},
-    {"2 2\n1 1\n0 0", "0"},
-    {"2 2\n0 1\n1 0", "1"},
-    {"2 3\n0 1\n1 0", "2"},
-    {"3 11\n1 2 3\n4 5 6\n7 8 9", "0"},
-    {"3 2\n1 0 1\n0 1 0\n1 0 1", "0"},
-    {"3 229\n100 101 0\n228 1 227\n156 5 138", "203"},
-    {"3 251\n111 117 70\n95 212 202\n5 116 238", "4"},
+    {"1 2\n1", "1"}, // 5
+    {"2 2\n1 0\n0 1", "1"}, // 6
+    {"2 2\n0 0\n0 0", "0"}, // 7
+    {"2 2\n1 1\n1 1", "0"}, // 8
+    {"2 2\n1 1\n0 0", "0"}, // 9
+    {"2 2\n0 1\n1 0", "1"}, // 10
+    {"2 3\n0 1\n1 0", "2"}, // 11
+    {"3 11\n1 2 3\n4 5 6\n7 8 9", "0"}, // 12
+    {"3 2\n1 0 1\n0 1 0\n1 0 1", "0"}, // 13
+    {"3 229\n100 101 0\n228 1 227\n156 5 138", "203"}, // 14
+    {"3 251\n111 117 70\n95 212 202\n5 116 238", "4"}, // 15
     // mid mod (uint16_t)
-    {"1 48611\n10", "10"},
-    {"2 7919\n1 0\n0 1", "1"},
-    {"2 4973\n0 0\n0 0", "0"},
-    {"2 5903\n0 1\n1 0", "5902"},
-    {"2 30911\n1 1\n1 1", "0"},
-    {"2 17627\n1 1\n1 0", "17626"},
-    {"3 60013\n1 2 3\n4 5 6\n7 8 9", "0"},
-    {"3 65521\n36077 65346 8810\n35619 7729 62614\n6647 11922 16501", "20278"},
+    {"1 48611\n10", "10"}, // 16
+    {"2 7919\n1 0\n0 1", "1"}, // 17
+    {"2 4973\n0 0\n0 0", "0"}, // 18
+    {"2 5903\n0 1\n1 0", "5902"}, // 19
+    {"2 30911\n1 1\n1 1", "0"}, // 20
+    {"2 17627\n1 1\n1 0", "17626"}, // 21
+    {"3 60013\n1 2 3\n4 5 6\n7 8 9", "0"}, // 22
+    {"3 65521\n36077 65346 8810\n35619 7729 62614\n6647 11922 16501", "20278"}, // 23
     // big mod (uint32_t)
-    {"1 79357\n10", "10"},
-    {"2 2038074743\n1 0\n0 1", "1"},
-    {"2 3188776067\n0 0\n0 0", "0"},
-    {"2 4294967291\n0 1\n1 0", "4294967290"},
-    {"2 685957033\n1 1\n1 1", "0"},
-    {"2 2127107077\n1 1\n1 0", "2127107076"},
-    {"3 4259878741\n1 2 3\n4 5 6\n7 8 9", "0"},
-    {"3 2300618137\n1939394573 566833575 435023098\n1592112954 1638375196 2289248927\n279481876 561856566 1649552576", "889189530"}
+    {"1 79357\n10", "10"}, // 24
+    {"2 2038074743\n1 0\n0 1", "1"}, // 25
+    {"2 3188776067\n0 0\n0 0", "0"}, // 26
+    {"2 4294967291\n0 1\n1 0", "4294967290"}, // 27
+    {"2 685957033\n1 1\n1 1", "0"}, // 28
+    {"2 2127107077\n1 1\n1 0", "2127107076"}, // 29
+    {"3 4259878741\n1 2 3\n4 5 6\n7 8 9", "0"}, // 30
+    {"3 2300618137\n1939394573 566833575 435023098\n1592112954 1638375196 2289248927\n279481876 561856566 1649552576", "889189530"} // 31
 };
 
 static int FeedFromArray(void) {
-  FILE *const in = fopen("in.txt", "w+");
-  if (!in) {
+  FILE* const in = fopen("in.txt", "w+");
+  if (in == NULL) {
     printf("can't create in.txt. No space on disk?\n");
     return -1;
   }
@@ -68,11 +69,11 @@ static int CheckFromArray(void) {
     char buf[128] = {0};
     const char* status = ScanChars(out, sizeof(buf), buf);
     if (status == Pass && _strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) != 0) {
+        printf("wrong output -- ");
         status = Fail;
     }
-    if (status == Pass && HaveGarbageAtTheEnd(out)) {
+    if (status == Pass && HaveGarbageAtTheEnd(out))
         status = Fail;
-    }
     fclose(out);
     printf("%s\n", status);
     ++testN;
@@ -90,8 +91,8 @@ static inline uint32_t s_rand(void) {
 }
 
 static int feederBig(uint32_t seed, int n, uint32_t mod) {
-    FILE *const in = fopen("in.txt", "w+");
-    if (!in) {
+    FILE* const in = fopen("in.txt", "w+");
+    if (in == NULL) {
       printf("can't create in.txt. No space on disk?\n");
       return -1;
     }
@@ -110,13 +111,13 @@ static int feederBig(uint32_t seed, int n, uint32_t mod) {
     return 0;
 }
 
-static const char* ScanU32(FILE* out, uint32_t* a) {
+static const char* ScanU32(FILE* out, uint32_t* a) { // стандартная функция ScanInt не подходит из-за типа
     int status = fscanf(out, "%u", a);
     if (status < 0) {
-        puts("output too short -- ");
+        printf("output too short -- "); // PrintWithoutBuffering - static
         return Fail;
     } else if (status < 1) {
-        puts("bad output format -- ");
+        printf("bad output format -- ");
         return Fail;
     }
     return Pass;
@@ -130,8 +131,10 @@ static int checkerBig(uint32_t det_ans) {
     }
     uint32_t det;
     const char* status = ScanU32(out, &det);
-    if (status == Pass && det != det_ans)
+    if (status == Pass && det != det_ans) {
+        printf("wrong output -- ");
         status = Fail;
+    }
     if (status == Pass && HaveGarbageAtTheEnd(out))
         status = Fail;
     fclose(out);
@@ -180,7 +183,7 @@ static int checkerBig4(void) {
 }
 
 static int feederBig5(void) { // первый и второй столбец линейно зависимы и полностью считать опеределитель не надо, основное время - чтение матрицы
-    LabTimeout = 1500;
+    LabTimeout = 1500; // будет округленно до 2000
     LabMemoryLimit = 5000 * 5000 * sizeof(uint32_t) + MIN_PROCESS_RSS_BYTES;
 
     __seed = 784538u;
