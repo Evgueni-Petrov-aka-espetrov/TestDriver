@@ -364,6 +364,7 @@ static int FeedFromArray(void)
 }
 
 static int CheckFromArray(void) {
+
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
         printf("can't open out.txt\n");
@@ -378,11 +379,13 @@ static int CheckFromArray(void) {
 
         if (strcmp(line, "NO\n") != 0) {
             printf("FAILED\n");
+            fclose(out);
             testN++;
             return 1;
         }
 
         printf("PASSED\n");
+        fclose(out);
         testN++;
         return 0;
     }
@@ -391,6 +394,7 @@ static int CheckFromArray(void) {
 
         if (strcmp(line, "YES\n") != 0) {
             printf("FAILED\n");
+            fclose(out);
             testN++;
             return 1;
         }
@@ -401,11 +405,13 @@ static int CheckFromArray(void) {
 
         if (checkOutput()) {
             printf("PASSED\n");
+            fclose(out);
             testN++;
             return 0;
         }
 
         printf("FAILED\n");
+        fclose(out);
         testN++;
         return 1;
 
