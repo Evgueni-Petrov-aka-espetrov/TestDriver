@@ -360,7 +360,6 @@ static int FeedFromArray(void)
     }
 
     fclose(in);
-
     return 0;
 }
 
