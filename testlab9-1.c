@@ -207,10 +207,13 @@ const TLabTest LabTests[] = {
         {feederBig2, checkerBig2}
 };
 
-int GetTestCount(void) {
-    return sizeof(LabTests)/sizeof(LabTests[0]);
+TLabTest GetLabTest(int testIdx) {
+    return LabTests[testIdx];
 }
 
+int GetTestCount(void) {
+    return (int)sizeof(LabTests)/sizeof(LabTests[0]);
+}
 const char* GetTesterName(void) {
     return "Lab 9-1 Lee Algorithm";
 }
