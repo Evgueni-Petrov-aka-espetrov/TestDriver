@@ -219,7 +219,7 @@ const char* GetTesterName(void) {
 }
 
 int GetTestTimeout(void) {
-    return 30000;
+    return 3000;
 }
 
 size_t GetTestMemoryLimit(void) {
