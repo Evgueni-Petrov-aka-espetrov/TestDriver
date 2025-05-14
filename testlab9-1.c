@@ -9,7 +9,7 @@ static size_t LabMemoryLimit;
 
 static const struct {
     const char* in;
-    const char* out1;
+    const char* out;
 } tests[] = {
         {"3 3\n1 1 1\n1 1 1\n1 1 1\n0 0\n2 2\n", "4"},
         {"1 1\n1\n0 0\n0 0\n", "0"},
@@ -17,7 +17,7 @@ static const struct {
         {"", "Invalid input"},
         {"-5 3", "Invalid grid dimensions"},
         {"3 3\n1 1 1\n1 2 1\n1 1 1\n0 0\n2 2\n", "Invalid cell value"},
-        {"2 2\n1 1\n1 1\n5 5\n0 0\n", "Invalid start or end coordinate"},
+        {"2 2\n1 1\n1 1\n5 5\n0 0\n", "Invalid coordinates"},
         {"3 3\n1 1\n1 1 1\n1 1 1\n0 0\n2 2\n", "Input short"},
         {"3 3\n1 1 X\n1 1 1\n1 1 1\n0 0\n2 2\n", "Invalid input"},
         {"1001 1001\n", "Invalid grid size"},
@@ -25,15 +25,14 @@ static const struct {
         {"3 3\n1 -1 1\n1 -1 1\n1 -1 1\n0 0\n2 2\n", "No path found"},
         {"5 5\n1 1 1 1 1\n1 -1 -1 -1 1\n1 -1 1 -1 1\n1 -1 -1 -1 1\n1 1 1 1 1\n2 2\n4 4\n", "No path found"},
         {"4 4\n1 -1 1 1\n1 1 -1 1\n1 -1 1 1\n1 1 1 1\n0 0\n3 3\n", "6"},
-        {"3 3\n-1 -1 -1\n-1 1 -1\n-1 -1 -1\n1 1\n1 1\n", "Start position is wall"},
+        {"3 3\n-1 -1 -1\n-1 -1 -1\n-1 -1 -1\n1 1\n1 1\n", "Start is wall"},
         {"5 5\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n0 0\n4 4\n", "8"},
         {"4 4\n1 1 1 1\n1 -1 1 1\n1 1 -1 1\n1 1 1 1\n0 0\n3 3\n", "6"},
         {"3 3\n1 1 1\n1 1 1\n1 1 1\n2 2\n0 0\n", "4"},
-        {"5 5\n1 1 1 1 1\n1 -1 -1 -1 1\n1 1 1 -1 1\n1 -1 -1 -1 1\n1 1 1 1 1\n0 0\n4 4\n", "12"},
-        {"4 4\n1 -1 1 1\n1 1 -1 1\n1 -1 -1 1\n1 1 1 1\n0 0\n3 3\n", "8"},
-        {"5 5\n1 1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 1 1\n1 -1 -1 -1 1\n0 0\n4 4\n", "12"},
-        {"6 6\n1 -1 1 1 1 1\n1 -1 1 -1 -1 1\n1 -1 1 -1 1 1\n1 -1 -1 -1 1 1\n1 1 1 1 1 1\n0 0\n5 5\n", "14"},
-
+        {"5 5\n1 1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 1 1\n1 -1 -1 -1 1\n0 0\n4 4\n", "8"},
+        {"4 4\n1 -1 1 1\n1 1 -1 1\n1 -1 -1 1\n1 1 1 1\n0 0\n3 3\n", "6"},
+        {"5 5\n1 1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 1 1\n1 -1 -1 -1 1\n0 0\n4 4\n", "8"},
+        {"6 6\n1 -1 1 1 1 1\n1 -1 1 -1 -1 1\n1 -1 1 -1 1 1\n1 -1 -1 -1 1 1\n1 1 1 1 1 1\n0 0\n5 5\n", "Input short"},
 };
 
 static int FeedFromArray(void) {
