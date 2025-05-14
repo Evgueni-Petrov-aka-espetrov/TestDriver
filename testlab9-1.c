@@ -47,34 +47,30 @@ static int FeedFromArray(void) {
 }
 
 static int CheckFromArray(void) {
-    FILE* const out = fopen("out.txt", "r");
+    FILE* out = fopen("out.txt", "r");
     if (!out) {
-        printf("can't open out.txt\n");
         testN++;
         return -1;
     }
 
-    const char* result = Pass;
     char buf[256] = {0};
+    fgets(buf, sizeof(buf), out);
+    char* result = strtok(buf, "\n");
+
+    int match = result && strcmp(result, tests[testN].out) == 0;
+
     int c;
-
-    if (!fgets(buf, sizeof(buf), out) || strcmp(strtok(buf, "\n"), tests[testN].out1) != 0) {
-        printf("wrong output -- ");
-        result = Fail;
-    }
-
     while ((c = fgetc(out)) != EOF) {
         if (!isspace(c)) {
-            printf("wrong output -- ");
-            result = Fail;
+            match = 0;
             break;
         }
     }
 
     fclose(out);
-    printf("%s\n", result);
+    printf("%s\n", match ? "PASS" : "FAIL");
     testN++;
-    return result == Fail ? -1 : 0;
+    return match ? 0 : -1;
 }
 
 static int feederBig1(void) {
