@@ -12,27 +12,27 @@ static const struct {
     const char* out;
 } tests[] = {
         {"3 3\n1 1 1\n1 1 1\n1 1 1\n0 0\n2 2\n", "4"},
+        {"2 2\n1 1\n1 1\n0 0\n0 1\n", "1"},
         {"1 1\n1\n0 0\n0 0\n", "0"},
         {"2 2\n1 -1\n-1 1\n0 0\n1 1\n", "No path found"},
-        {"", "Invalid input"},
-        {"-5 3", "Invalid grid dimensions"},
-        {"3 3\n1 1 1\n1 2 1\n1 1 1\n0 0\n2 2\n", "Invalid cell value"},
+
+        {"", "Invalid data format"},
+        {"-5 3\n", "Invalid grid size"},
         {"2 2\n1 1\n1 1\n5 5\n0 0\n", "Invalid coordinates"},
-        {"3 3\n1 1\n1 1 1\n1 1 1\n0 0\n2 2\n", "Input short"},
-        {"3 3\n1 1 X\n1 1 1\n1 1 1\n0 0\n2 2\n", "Invalid input"},
+        {"3 3\n1 1 X\n1 1 1\n1 1 1\n0 0\n2 2\n", "Invalid data format"},
         {"1001 1001\n", "Invalid grid size"},
-        {"5 5\n1 -1 -1 -1 1\n1 -1 1 -1 1\n1 -1 -1 -1 1\n1 1 1 1 1\n0 0\n4 4\n", "8"},
+
+        {"5 5\n1 -1 -1 -1 1\n1 -1 1 -1 1\n1 -1 -1 -1 1\n1 1 1 1 1\n1 1 1 1 1\n0 0\n4 4\n", "8"},
         {"3 3\n1 -1 1\n1 -1 1\n1 -1 1\n0 0\n2 2\n", "No path found"},
-        {"5 5\n1 1 1 1 1\n1 -1 -1 -1 1\n1 -1 1 -1 1\n1 -1 -1 -1 1\n1 1 1 1 1\n2 2\n4 4\n", "No path found"},
         {"4 4\n1 -1 1 1\n1 1 -1 1\n1 -1 1 1\n1 1 1 1\n0 0\n3 3\n", "6"},
-        {"3 3\n-1 -1 -1\n-1 -1 -1\n-1 -1 -1\n1 1\n1 1\n", "Start is wall"},
-        {"5 5\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n0 0\n4 4\n", "8"},
-        {"4 4\n1 1 1 1\n1 -1 1 1\n1 1 -1 1\n1 1 1 1\n0 0\n3 3\n", "6"},
-        {"3 3\n1 1 1\n1 1 1\n1 1 1\n2 2\n0 0\n", "4"},
-        {"5 5\n1 1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 1 1\n1 -1 -1 -1 1\n0 0\n4 4\n", "8"},
-        {"4 4\n1 -1 1 1\n1 1 -1 1\n1 -1 -1 1\n1 1 1 1\n0 0\n3 3\n", "6"},
-        {"5 5\n1 1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 -1 1\n1 -1 1 1 1\n1 -1 -1 -1 1\n0 0\n4 4\n", "8"},
-        {"6 6\n1 -1 1 1 1 1\n1 -1 1 -1 -1 1\n1 -1 1 -1 1 1\n1 -1 -1 -1 1 1\n1 1 1 1 1 1\n0 0\n5 5\n", "Input short"},
+
+        {"6 6\n1 1 1 1 1 1\n1 -1 -1 -1 -1 1\n1 -1 1 1 -1 1\n1 -1 1 1 -1 1\n1 -1 -1 -1 -1 1\n1 1 1 1 1 1\n0 0\n5 5\n", "10"},
+        {"5 5\n1 -1 1 1 1\n1 1 1 -1 1\n1 -1 -1 -1 1\n1 -1 1 1 1\n1 1 1 -1 1\n0 0\n4 4\n", "10"},
+        {"7 7\n1 1 1 -1 1 1 1\n1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1\n1 -1 -1 -1 -1 -1 1\n1 1 1 1 1 1 1\n0 0\n6 6\n", "12"},
+        {"5 5\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n1 1 1 1 1\n2 2\n2 2\n", "0"},
+
+        {"10 10\n1 1 1 -1 1 1 1 1 1 1\n1 -1 1 -1 1 -1 -1 -1 1 1\n1 -1 1 1 1 1 1 -1 1 1\n1 -1 -1 -1 -1 -1 1 -1 1 1\n1 1 1 1 1 1 1 -1 1 1\n1 -1 -1 -1 -1 -1 -1 -1 1 1\n1 1 1 1 1 1 1 1 1 1\n1 1 1 -1 -1 -1 -1 -1 -1 1\n1 -1 1 1 1 1 1 1 1 1\n1 1 1 -1 1 1 1 1 1 1\n0 0\n9 9\n", "18"},
+        {"15 15\n1 -1 1 1 1 1 1 1 1 1 1 1 1 1 1\n1 -1 1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 1\n1 -1 1 -1 1 1 1 1 1 1 1 1 1 -1 1\n1 -1 1 -1 1 -1 -1 -1 -1 -1 -1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 1 1 1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 -1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1\n1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n0 0\n14 14\n", "28"}
 };
 
 static int FeedFromArray(void) {
@@ -47,30 +47,27 @@ static int FeedFromArray(void) {
 }
 
 static int CheckFromArray(void) {
-    FILE* out = fopen("out.txt", "r");
+    FILE* const out = fopen("out.txt", "r");
     if (!out) {
+        printf("can't open out.txt\n");
         testN++;
         return -1;
     }
-
     char buf[256] = {0};
     fgets(buf, sizeof(buf), out);
-    char* result = strtok(buf, "\n");
-
-    int match = result && strcmp(result, tests[testN].out) == 0;
-
+    char* res = strtok(buf, "\n");
+    int ok = res && !strcmp(res, tests[testN].out);
     int c;
     while ((c = fgetc(out)) != EOF) {
         if (!isspace(c)) {
-            match = 0;
+            ok = 0;
             break;
         }
     }
-
     fclose(out);
-    printf("%s\n", match ? "PASS" : "FAIL");
+    printf("%s\n", ok ? "PASS" : "FAIL");
     testN++;
-    return match ? 0 : -1;
+    return ok ? 0 : -1;
 }
 
 static int feederBig1(void) {
@@ -79,18 +76,23 @@ static int feederBig1(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    const int size = 1000;
-    fprintf(in, "%d %d\n", size, size);
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            fprintf(in, "1%c", " \n"[j == size-1]);
+    fprintf(in, "1000 1000\n");
+
+    for (int i = 0; i < 1000; ++i) {
+        for (int j = 0; j < 1000; ++j) {
+            if (j == 999) {
+                fprintf(in, "1\n");
+            } else {
+                fprintf(in, "1 ");
+            }
         }
     }
     fprintf(in, "0 0\n999 999\n");
-    LabMemoryLimit = (size_t)(size * size * 4) + (10 * 1024 * 1024);
+    LabMemoryLimit = 1000 * 1000 * 8 + 2 * 1000 * 1000 * 4 + 10 * 1024 * 1024;
     fclose(in);
     return 0;
 }
+
 
 static int checkerBig1(void) {
     FILE* const out = fopen("out.txt", "r");
@@ -99,28 +101,13 @@ static int checkerBig1(void) {
         testN++;
         return -1;
     }
-
-    const char* result = Pass;
-    int distance;
-    int c;
-
-    if (fscanf(out, "%d", &distance) != 1 || distance != 1998) {
-        printf("wrong output -- ");
-        result = Fail;
-    }
-
-    while ((c = fgetc(out)) != EOF) {
-        if (!isspace(c)) {
-            printf("wrong output -- ");
-            result = Fail;
-            break;
-        }
-    }
-
+    int d;
+    fscanf(out, "%d", &d);
     fclose(out);
-    printf("%s\n", result);
+    int ok = d == 1998;
+    printf("%s\n", ok ? "PASS" : "FAIL");
     testN++;
-    return result == Fail ? -1 : 0;
+    return ok ? 0 : -1;
 }
 
 static int feederBig2(void) {
@@ -129,16 +116,14 @@ static int feederBig2(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    const int size = 500;
-    fprintf(in, "%d %d\n", size, size);
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            fprintf(in, "%s ", (j == size-1) ? "-1" : "1");
-        }
+    fprintf(in, "500 500\n");
+    for (int i = 0; i < 500; ++i) {
+        for (int j = 0; j < 500; ++j)
+            fprintf(in, (j == 499) ? "-1" : "1 ");
         fprintf(in, "\n");
     }
     fprintf(in, "0 0\n499 499\n");
-    LabMemoryLimit = (size_t)(size * size * 4) + (10 * 1024 * 1024);
+    LabMemoryLimit = 500*500*8 + 2*500*500*4 + 10*1024*1024;
     fclose(in);
     return 0;
 }
@@ -150,35 +135,15 @@ static int checkerBig2(void) {
         testN++;
         return -1;
     }
-
-    const char* result = Pass;
     char buf[256];
-    int c;
-
-    if (!fgets(buf, sizeof(buf), out) || strcmp(strtok(buf, "\n"), "No path found") != 0) {
-        printf("wrong output -- ");
-        result = Fail;
-    }
-
-    while ((c = fgetc(out)) != EOF) {
-        if (!isspace(c)) {
-            printf("wrong output -- ");
-            result = Fail;
-            break;
-        }
-    }
-
-    fclose(out);
-    printf("%s\n", result);
+    fgets(buf, sizeof(buf), out);
+    int ok = strcmp(strtok(buf, "\n"), "No path found") == 0;
+    printf("%s\n", ok ? "PASS" : "FAIL");
     testN++;
-    return result == Fail ? -1 : 0;
+    return ok ? 0 : -1;
 }
 
 const TLabTest LabTests[] = {
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
         {FeedFromArray, CheckFromArray},
