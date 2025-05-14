@@ -165,7 +165,6 @@ static int CheckerBig(void) {
         snprintf(question, sizeof(question), "Вопрос на уровне %d? (да/нет): \n", (1 << level) - 1);
         strcat(expected, question);
     }
-
     char last_question[100];
     snprintf(last_question, sizeof(last_question), "Это Персонаж %d? (да/нет): The character is guessed\n", (1 << (max_depth - 1)) - 1);
     strcat(expected, last_question);
