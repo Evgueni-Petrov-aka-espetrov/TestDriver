@@ -1,11 +1,11 @@
 #include "testLab.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
 
 static int testN = 0;
-static size_t LabMemoryLimit;
+static size_t LabMemoryLimit = 10 * 1024 * 1024;
+static int LabTimeout = 3000;
 
 static const struct {
     const char* in;
@@ -89,10 +89,10 @@ static int feederBig1(void) {
     }
     fprintf(in, "0 0\n999 999\n");
     LabMemoryLimit = 1000 * 1000 * 8 + 2 * 1000 * 1000 * 4 + 10 * 1024 * 1024;
+    LabTimeout = 10000;
     fclose(in);
     return 0;
 }
-
 
 static int checkerBig1(void) {
     FILE* const out = fopen("out.txt", "r");
@@ -110,6 +110,7 @@ static int checkerBig1(void) {
     return ok ? 0 : -1;
 }
 
+
 static int feederBig2(void) {
     FILE* const in = fopen("in.txt", "w");
     if (!in) {
@@ -124,6 +125,7 @@ static int feederBig2(void) {
     }
     fprintf(in, "0 0\n499 499\n");
     LabMemoryLimit = 500*500*8 + 2*500*500*4 + 10*1024*1024;
+    LabTimeout = 8000;
     fclose(in);
     return 0;
 }
@@ -180,7 +182,7 @@ const char* GetTesterName(void) {
 }
 
 int GetTestTimeout(void) {
-    return 3000;
+    return LabTimeout;
 }
 
 size_t GetTestMemoryLimit(void) {
