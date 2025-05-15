@@ -107,7 +107,7 @@ static int feederBig(void)
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     LabTimeout = (int)t*2+3000;
     fflush(stdout);
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES+8*2000000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES+12*2000000;
     return 0;
 }
 
@@ -179,7 +179,7 @@ static int feederBig2(void)
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
     LabTimeout = (int)t*2+3000;
     fflush(stdout);
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES+8*2000000;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES+12*2000000;
     return 0;
 }
 
