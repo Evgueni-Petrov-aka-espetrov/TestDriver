@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+static int testN = 0;
 static const struct {const char *const in, *const out;} testInOut[] = {
     {"0\n", "bad input"},
     {"2000001\n", "bad input"},
@@ -27,8 +28,6 @@ static const struct {const char *const in, *const out;} testInOut[] = {
     {"6\n5 4 3 2 1 0\n", "5 && 4 => 4 5 | 3 && 2 => 2 3 | 1 && 0 => 0 1 | 4 5 && 2 3 => 2 3 4 5 | 2 3 4 5 && 0 1 => 0 1 2 3 4 5 | 0 1 2 3 4 5"},
     {"9\n13 3 8 1 15 2 3 7 4\n","13 && 3 => 3 13 | 8 && 1 => 1 8 | 15 && 2 => 2 15 | 3 && 7 => 3 7 | 3 13 && 1 8 => 1 3 8 13 | 2 15 && 3 7 => 2 3 7 15 | 1 3 8 13 && 2 3 7 15 => 1 2 3 3 7 8 13 15 | 1 2 3 3 7 8 13 15 && 4 => 1 2 3 3 4 7 8 13 15 | 1 2 3 3 4 7 8 13 15"}
 };
-static int testN = 0;
-
 
 static int FeedFromArray(void)
 {
@@ -37,39 +36,47 @@ static int FeedFromArray(void)
     printf("can't create in.txt. No space on disk?\n");
     return -1;
   }
-  if (fprintf(in, "%s", testInOut[testN].in) < 0) {
-    printf("can't create in.txt. No space on disk?\n");
-    fclose(in);
-    return -1;
-  }
+  fprintf(in, "%s", testInOut[testN].in);
   fclose(in);
   return 0;
 }
-static int CheckFromArray(void) 
-{
-    FILE* const out = fopen("out.txt", "rb");
-    if (out == NULL) {
+static int CheckFromArray(void) {
+    FILE *out = fopen("out.txt", "r");
+    if (!out) {
         printf("can't open out.txt\n");
-        testN++;
+        ++testN;
         return -1;
     }
 
-    char buf[256] = {0};
-    const char* status = ScanChars(out, sizeof(buf), buf);
+    char actual[1024] = {0};
+    size_t idx = 0;
+    int c;
+    while ((c = fgetc(out)) != EOF && idx < sizeof(actual)-1) {
+        actual[idx++] = (char)c;
+    }
+    actual[idx] = '\0';
+
+    if (idx > 0 && actual[idx-1] == '\n') {
+        actual[--idx] = '\0';
+    }
+
+    const char *expected = testInOut[testN].out;
+
+    int passed = 1;
+    if (strcmp(actual, expected) != 0) {
+        passed = 0;
+    }
+
+    if (passed && HaveGarbageAtTheEnd(out)) {
+        passed = 0;
+    }
+
     fclose(out);
-    for (int i = 0; i < 256; i++) {
-        printf("%c", buf[i]);
-    }
-    if (status == Pass && _strnicmp(testInOut[testN].out, buf, strlen(testInOut[testN].out)) != 0) {
-        status = Fail;
-    }
-    if (status == Pass && HaveGarbageAtTheEnd(out)) {
-        status = Fail;
-    }
-    printf("%s\n", status);
+    printf("%s\n", passed ? Pass : Fail);
     ++testN;
-    return status == Fail;
+    return passed ? 0 : 1;
 }
+
 
 static int LabTimeout;
 static size_t LabMemoryLimit;
