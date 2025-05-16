@@ -8,11 +8,11 @@ find_library(MATH_LIBRARY m)
 
 function(SET_COMPILER_SETTINGS target)
 	cmake_parse_arguments(
-			SET_COMPILER_SETTINGS
-			""
-			"EXTENSIONS"
-			""
-			${ARGN}
+		SET_COMPILER_SETTINGS
+		""
+		"EXTENSIONS"
+		""
+		${ARGN}
 	)
 
 	set_target_properties(${target} PROPERTIES
