@@ -74,7 +74,7 @@ set(TEST_LAB_SOURCES
 		testlab9.c
 		testlab10.c
 		testlab11.c
-		testlab12.c
+		testlab12.
 		testlabKosorajo.c
 		testlab-ray.c
 )
