@@ -72,8 +72,9 @@ static int CheckFromArray(void) {
         printf("wrong output -- ");
         status = Fail;
     }
-    if (status == Pass && HaveGarbageAtTheEnd(out))
+    if (status == Pass && HaveGarbageAtTheEnd(out)) {
         status = Fail;
+    }
     fclose(out);
     printf("%s\n", status);
     ++testN;
@@ -99,29 +100,19 @@ static int feederBig(uint32_t seed, int n, uint32_t mod) {
     __seed = seed;
     fprintf(in, "%d %u\n", n, mod);
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++)
+        for(int j = 0; j < n; j++) {
             if (fprintf(in, "%u ", s_rand() % mod) < 0) {
                 printf("can't create in.txt. No space on disk?\n");
                 fclose(in);
                 return -1;
             }
+        }
         fprintf(in, "\n");  
     }
     fclose(in);
     return 0;
 }
 
-static const char* ScanU32(FILE* out, uint32_t* a) { // стандартная функция ScanInt не подходит из-за типа
-    int status = fscanf(out, "%u", a);
-    if (status < 0) {
-        printf("output too short -- "); // PrintWithoutBuffering - static
-        return Fail;
-    } else if (status < 1) {
-        printf("bad output format -- ");
-        return Fail;
-    }
-    return Pass;
-}
 static int checkerBig(uint32_t det_ans) {
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
@@ -135,8 +126,9 @@ static int checkerBig(uint32_t det_ans) {
         printf("wrong output -- ");
         status = Fail;
     }
-    if (status == Pass && HaveGarbageAtTheEnd(out))
+    if (status == Pass && HaveGarbageAtTheEnd(out)) {
         status = Fail;
+    }
     fclose(out);
     printf("%s\n", status);
     ++testN;
@@ -187,10 +179,10 @@ static int feederBig5(void) { // первый и второй столбец л�
     LabMemoryLimit = 5000 * 5000 * sizeof(uint32_t) + MIN_PROCESS_RSS_BYTES;
 
     __seed = 784538u;
-    #define n 5000 // приколы MSVC, не поддерживает динамические массивы (ln 196, 197)
+    enum {n = 5000}; // приколы MSVC, не поддерживает динамические массивы (ln 196, 197)
     uint32_t mod = 1986141617u;
 
-    FILE *const in = fopen("in.txt", "w+");
+    FILE* const in = fopen("in.txt", "w+");
     if (!in) {
       printf("can't create in.txt. No space on disk?\n");
       return -1;
@@ -217,16 +209,16 @@ static int feederBig5(void) { // первый и второй столбец л�
             fclose(in);
             return -1;
         }
-        for(int j = 2; j < n; j++)
+        for(int j = 2; j < n; j++) {
             if (fprintf(in, "%u ", s_rand() % mod) < 0) {
                 printf("can't create in.txt. No space on disk?\n");
                 fclose(in);
                 return -1;
             }
+        }
         fprintf(in, "\n");  
     }
     fclose(in);
-    #undef n
     return 0;
 }
 
@@ -235,12 +227,12 @@ static int checkerBig5(void) {
 }
 
 static int feederBigBig(void) {
-    LabTimeout = 8000;
-    LabMemoryLimit = 3000 * 3000 * sizeof(uint8_t) + MIN_PROCESS_RSS_BYTES;
-    return feederBig(3465077311u, 3000, 251u);
+    LabTimeout = 10000;
+    LabMemoryLimit = 3500 * 3500 * sizeof(uint8_t) + MIN_PROCESS_RSS_BYTES;
+    return feederBig(3465077311u, 3500, 251u);
 }
 static int checkerBigBig(void) {
-    return checkerBig(43u);
+    return checkerBig(142u);
 }
 
 const TLabTest LabTests[] = {
@@ -288,7 +280,7 @@ TLabTest GetLabTest(int testIdx) {
 }
 
 int GetTestCount(void) {
-    return sizeof(LabTests)/sizeof(LabTests[0]);
+    return sizeof(LabTests) / sizeof(LabTests[0]);
 }
 
 const char* GetTesterName(void) {

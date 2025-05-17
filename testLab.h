@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdint.h>
 
 typedef struct {
     int (*Feeder)(void);
@@ -20,6 +21,7 @@ extern const char Pass[];
 extern const char Fail[];
 const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b);
 const char* ScanIntInt(FILE* out, int* a, int* b);
+const char* ScanU32(FILE* out, uint32_t* a);
 const char* ScanInt(FILE* out, int* a);
 const char* ScanChars(FILE* out, size_t bufferSize, char* buffer);
 
