@@ -4,15 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX_SIZE 14
-char output[MAX_SIZE][MAX_SIZE];
-
-int directions[4][2] = {
-    {-1, -1},
-    {-1, 1},
-    {1, -1},
-    {1, 1}
-};
+enum { MAX_SIZE = 14 };
 
 static int testN = 0;
 
@@ -269,13 +261,24 @@ static const TestCase testInOut[] = {
     }, 1}
 };
 
-bool goodMove(int row, int col) {
+bool goodMove(int row, int col, char output[MAX_SIZE][MAX_SIZE]) {
+    int directions[4][2] = {
+        {-1, -1},
+        {-1, 1},
+        {1, -1},
+        {1, 1}
+    };
+
     for (int i = 0; i < testInOut[testN].rows; i++) {
-        if (output[i][col] == 'A') return false;
+        if (output[i][col] == 'A') {
+            return false;
+        }
     }
 
     for (int i = 0; i < testInOut[testN].cols; i++) {
-        if (output[row][i] == 'A') return false;
+        if (output[row][i] == 'A') {
+            return false;
+        }
     }
 
     for (int i = 0; i < 4; i++) {
@@ -283,26 +286,29 @@ bool goodMove(int row, int col) {
         int y = col + directions[i][1];
 
         while (x >= 0 && x < testInOut[testN].rows && y >= 0 && y < testInOut[testN].cols) {
-            if (output[x][y] == 'A') return false;
+            if (output[x][y] == 'A') {
+                return false;
+            }
 
             x += directions[i][0];
             y += directions[i][1];
         }
     }
+
     return true;
 }
 
-bool queenTour(int row) {
+bool queenTour(int row, char output[MAX_SIZE][MAX_SIZE]) {
     if (row == testInOut[testN].rows) {
         return true;
     }
 
     for (int col = 0; col < testInOut[testN].cols; col++) {
         if (output[row][col] == 'X') {
-            if (goodMove(row, col)) {
+            if (goodMove(row, col, output)) {
                 output[row][col] = 'A';
 
-                if (queenTour(row + 1)) {
+                if (queenTour(row + 1, output)) {
                     return true;
                 }
 
@@ -314,13 +320,13 @@ bool queenTour(int row) {
     return false;
 }
 
-bool checkOutput() {
-    int X_count;
+bool checkOutput(char output[MAX_SIZE][MAX_SIZE]) {
+    int xCount;
     for (int i = 0; i < testInOut[testN].rows; i++) {
-        X_count = 0;
+        xCount = 0;
         for (int j = 0; j < testInOut[testN].cols; j++) {
             if (output[i][j] == 'X') {
-                X_count++;
+                xCount++;
                 if (testInOut[testN].in[i][j] != '?') {
                     return false;
                 }
@@ -329,12 +335,12 @@ bool checkOutput() {
                 return false;
             }
         }
-        if (X_count != 1) {
+        if (xCount != 1) {
             return false;
         }
     }
 
-    return queenTour(0);
+    return queenTour(0, output);
 }
 
 static int FeedFromArray(void)
@@ -399,11 +405,12 @@ static int CheckFromArray(void) {
             return 1;
         }
 
+        char output[MAX_SIZE][MAX_SIZE];
         for (int i = 0; i < testInOut[testN].rows; i++) {
             fgets(output[i], MAX_SIZE, out);
         }
 
-        if (checkOutput()) {
+        if (checkOutput(output)) {
             printf("PASSED\n");
             fclose(out);
             testN++;
@@ -414,8 +421,8 @@ static int CheckFromArray(void) {
         fclose(out);
         testN++;
         return 1;
-
     }
+
     return -1;
 }
 
@@ -453,7 +460,7 @@ TLabTest GetLabTest(int testIdx) {
 }
 
 int GetTestCount(void) {
-    return sizeof(LabTests)/sizeof(LabTests[0]);
+    return sizeof(LabTests) / sizeof(LabTests[0]);
 }
 
 const char* GetTesterName(void) {
