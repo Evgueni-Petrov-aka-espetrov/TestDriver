@@ -76,6 +76,7 @@ set(TEST_LAB_SOURCES
 	testlab10.c
 	testlab11.c
 	testlab12.c
+	testlab-queens.c
  	testlabKosorajo.c
 )
 foreach(source ${TEST_LAB_SOURCES})
