@@ -31,6 +31,23 @@ static const struct {const char *const in, *const out[16]; int n;} testInOut[] =
     {"7\n6 3\n1 5\n2 9\n1 11\n7 11\n5 8\n4 6\n2\n4\n4 7\n3 8\n3 10\n5 10\n4\n4 4\n2 5\n3 7\n4 5\n3 5\n3 6\n2 8\n2 10\n3 11\n4 9\n3 9\n4 10\n5 1", {"OUT", "OUT","IN","IN","IN","OUT","OUT","OUT","OUT"},9},
 };
 
+static unsigned int g_randomSeed = 0;
+
+static void InitializeAndPrintRandomSeed(void) {
+    unsigned int seed_val = 0;
+    const char* seed_str_env = getenv("RANDOM_SEED");
+
+    if (seed_str_env != NULL) {
+        seed_val = (unsigned int)strtoul(seed_str_env, NULL, 10);
+    } else {
+        seed_val = (unsigned int)time(NULL);
+    }
+    printf("using random seed: %u... ", seed_val);
+
+    g_randomSeed = seed_val;
+    srand(g_randomSeed);
+}
+
 static int FeedFromArray(void) {
     FILE *const in = fopen("in.txt", "w+");
     if (in == NULL) {
@@ -75,11 +92,11 @@ static int FeederBigSquare(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    printf("Creating large text... ");
+    printf("Creating large test ");
     fflush(stdout);
 
     DWORD t = GetTickCount();
-    srand((unsigned)time(NULL));
+    InitializeAndPrintRandomSeed();
 
     fprintf(in, "16000\n");
     for (int y = 0; y < 4000; ++y) {
@@ -177,11 +194,11 @@ static int FeederBigTriangle(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    printf("Creating large text... ");
+    printf("Creating large test ");
     fflush(stdout);
 
     DWORD t = GetTickCount();
-    srand((unsigned)time(NULL));
+    InitializeAndPrintRandomSeed();
 
     int total_vertices = 16000;
     fprintf(in, "%d\n", total_vertices);
