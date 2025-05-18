@@ -33,7 +33,7 @@ static const struct {const char *const in, *const out[16]; int n;} testInOut[] =
 
 static unsigned int g_randomSeed = 0;
 
-static void InitializeAndPrintRandomSeed(void) {
+static void InitializeRandomSeed(void) {
     unsigned int seed_val = 0;
     const char* seed_str_env = getenv("RANDOM_SEED");
 
@@ -42,7 +42,6 @@ static void InitializeAndPrintRandomSeed(void) {
     } else {
         seed_val = (unsigned int)time(NULL);
     }
-    printf("using random seed: %u... ", seed_val);
 
     g_randomSeed = seed_val;
     srand(g_randomSeed);
@@ -96,7 +95,7 @@ static int FeederBigSquare(void) {
     fflush(stdout);
 
     DWORD t = GetTickCount();
-    InitializeAndPrintRandomSeed();
+    InitializeRandomSeed();
 
     fprintf(in, "16000\n");
     for (int y = 0; y < 4000; ++y) {
@@ -183,6 +182,9 @@ static int CheckerBigSquare(void) {
     }
 
     fclose(out);
+    if (status == Fail) {
+        printf("To reproduce this failure locally, set env var RANDOM_SEED to %u before running tests\n", g_randomSeed );
+    }
     printf("%s\n", status);
     ++testN;
     return status == Fail;
@@ -198,7 +200,7 @@ static int FeederBigTriangle(void) {
     fflush(stdout);
 
     DWORD t = GetTickCount();
-    InitializeAndPrintRandomSeed();
+    InitializeRandomSeed();
 
     int total_vertices = 16000;
     fprintf(in, "%d\n", total_vertices);
@@ -286,6 +288,9 @@ static int CheckerBigTriangle(void) {
     }
 
     fclose(out);
+    if (status == Fail) {
+        printf("To reproduce this failure locally, set env var RANDOM_SEED to %u before running tests\n", g_randomSeed);
+    }
     printf("%s\n", status);
     ++testN;
     return status == Fail;
