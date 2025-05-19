@@ -91,11 +91,12 @@ static int FeederBigSquare(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    printf("Creating large test ");
     fflush(stdout);
 
     DWORD t = GetTickCount();
     InitializeRandomSeed();
+
+    printf("Creating large test, to reproduce failure locally, set env var RANDOM_SEED to %u before running tests, ", g_randomSeed);
 
     fprintf(in, "16000\n");
     for (int y = 0; y < 4000; ++y) {
@@ -182,9 +183,7 @@ static int CheckerBigSquare(void) {
     }
 
     fclose(out);
-    if (status == Fail) {
-        printf("To reproduce this failure locally, set env var RANDOM_SEED to %u before running tests\n", g_randomSeed );
-    }
+
     printf("%s\n", status);
     ++testN;
     return status == Fail;
@@ -196,11 +195,12 @@ static int FeederBigTriangle(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    printf("Creating large test ");
     fflush(stdout);
 
     DWORD t = GetTickCount();
     InitializeRandomSeed();
+
+    printf("Creating large test, to reproduce failure locally, set env var RANDOM_SEED to %u before running tests, ", g_randomSeed);
 
     int total_vertices = 16000;
     fprintf(in, "%d\n", total_vertices);
@@ -288,9 +288,7 @@ static int CheckerBigTriangle(void) {
     }
 
     fclose(out);
-    if (status == Fail) {
-        printf("To reproduce this failure locally, set env var RANDOM_SEED to %u before running tests\n", g_randomSeed);
-    }
+
     printf("%s\n", status);
     ++testN;
     return status == Fail;
