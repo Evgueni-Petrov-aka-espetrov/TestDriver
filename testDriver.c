@@ -47,8 +47,7 @@ static const char* GetRunnerCommand(const char* runnerExe, char* labExe) {
     return runnerCommand;
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     int i, count, fail;
     const char* runnerExe = argv[0];
 
@@ -156,6 +155,18 @@ const char* ScanIntInt(FILE* out, int* a, int* b) {
         return Pass;
     }
     return Fail;
+}
+
+const char* ScanU32(FILE* out, uint32_t* a) {
+    int status = fscanf(out, "%u", a);
+    if (status < 0) {
+        PrintWithoutBuffering("output too short -- ");
+        return Fail;
+    } else if (status < 1) {
+        PrintWithoutBuffering("bad output format -- ");
+        return Fail;
+    }
+    return Pass;
 }
 
 const char* ScanInt(FILE* out, int* a) {

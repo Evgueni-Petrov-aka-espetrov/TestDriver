@@ -81,6 +81,7 @@ set(TEST_LAB_SOURCES
  	testlabKosorajo.c
 	testlab-akinator.c
 	testlab-ray.c
+	testlab-gauss.c
 )
 foreach(source ${TEST_LAB_SOURCES})
 	get_filename_component(target ${source} NAME_WE)
