@@ -37,7 +37,9 @@ CMakeLists.txt -- описание сборки тестировщиков
 
 ## Локальная сборка и отладка тестировщиков
 
-Для компиляции тестовщиков под убунту можно использовать такой докер файл:
+### Для компиляции тестовщиков под убунту
+
+Можно использовать такой докер файл:
 
 ``
 FROM ubuntu:18.04 as build-env
@@ -46,3 +48,12 @@ FROM ubuntu:18.04 as build-env
 ``
 RUN apt-get update && apt-get -y install gcc git
 ``
+
+### Для сборки тестировщиков под винду
+
+На хосте WSL или Ubuntu можно использовать пакет `mingw`:
+```sh
+sudo apt install gcc-mingw-w64-i686
+LDFLAGS=-s CFLAGS=-Os cmake -B bw -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
+cmake --build bw -j
+```
