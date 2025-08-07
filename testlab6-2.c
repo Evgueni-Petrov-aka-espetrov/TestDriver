@@ -303,6 +303,77 @@ static int checkerBig2(void)
     }
 }
 
+static int feedSeq(int d, int n)
+{
+    FILE *const in = fopen("in.txt", "w+");
+    if (!in) {
+        printf("can't create in.txt. No space on disk?\n");
+        return -1;
+    }
+    fprintf(in, "%d\n%d\n", d, n);
+    for (int i = 0; i < n; ++i) {
+        if (fprintf(in, "%d\n", i) < 0) {
+            printf("can't create in.txt. No space on disk?\n");
+            fclose(in);
+            exit(1);
+        }
+    }
+    fclose(in);
+    size_t numNodes = n / (d - 1);
+    LabMemoryLimit = (
+        numNodes * (sizeof(int) + 2 * GetLabPointerSize()) +
+        numNodes * (2 * d - 1) * sizeof(int) +
+        numNodes * (2 * d) * GetLabPointerSize()
+    ) + MIN_PROCESS_RSS_BYTES;
+    return 0;
+}
+
+static int checkSeq(int h)
+{
+    FILE *const out = fopen("out.txt", "r");
+    int passed = 1;
+    if (!out) {
+        printf("can't open out.txt\n");
+        testN++;
+        return -1;
+    }
+    {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
+            passed = 0;
+        } else if (h != n) {
+            passed = 0;
+            printf("wrong output -- ");
+        }
+    }
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
+    }
+    fclose(out);
+    if (passed) {
+        printf("PASSED\n");
+        testN++;
+        return 0;
+    } else {
+        printf("FAILED\n");
+        testN++;
+        return 1;
+    }
+}
+
+static int feederBig43() { return feedSeq(4, 129); }
+static int checkerBig43() { return checkSeq(3); }
+static int feederBig44() { return feedSeq(4, 130); }
+static int checkerBig44() { return checkSeq(4); }
+static int feederBig48() { return feedSeq(4, 524295); }
+static int checkerBig48() { return checkSeq(9); }
+static int feederBig49() { return feedSeq(4, 524926); }
+static int checkerBig49() { return checkSeq(10); }
+static int feederBig58() { return feedSeq(5, 781256); }
+static int checkerBig58() { return checkSeq(8); }
+static int feederBig59() { return feedSeq(5, 781257); }
+static int checkerBig59() { return checkSeq(9); }
+
 const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
@@ -347,6 +418,12 @@ const TLabTest LabTests[] = {
     {feederBig, checkerBig},
     {feederBig1, checkerBig1},
     {feederBig2, checkerBig2},
+    {feederBig43, checkerBig43},
+    {feederBig44, checkerBig44},
+    {feederBig48, checkerBig48},
+    {feederBig49, checkerBig49},
+    {feederBig59, checkerBig59},
+    {feederBig58, checkerBig58},
 };
 
 TLabTest GetLabTest(int testIdx) {
