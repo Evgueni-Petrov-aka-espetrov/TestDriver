@@ -1,11 +1,14 @@
 #include "testLab.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 static int testN = 0;
 static const struct {const char *const in; int n, out[32];} testInOut[] = {
     {"example\nthis is simple example", 14, {7, 14, 13, 12, 11, 10, 20, 22, 21, 20, 19, 18, 17, 16}},
     {"x\n", 0, {0}},
+    {"x\ny", 1, {1}},
+    {"x\ny\n", 2, {1, 2}},
     {"0123456789abcdef\n0123456789abcdef", 16, {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}},
     {"0123\n01230123", 8, {4, 3, 2, 1, 8, 7, 6, 5}},
     {"0123\n0123x0123", 9, {4, 3, 2, 1, 8, 9, 8, 7, 6}},
@@ -226,6 +229,72 @@ static int checkerBig1(void)
     }
 }
 
+static int feederBig2(void)
+{
+    FILE *const in = fopen("in.txt", "w+");
+    int i, err;
+    DWORD t;
+    if (!in) {
+        printf("can't create in.txt. No space on disk?\n");
+        return -1;
+    }
+    printf("Creating large text... ");
+    fflush(stdout);
+    t = GetTickCount();
+    fprintf(in, "abcdefghijklmnop\n");
+    const char sel[] = " _\377";
+    const size_t nsel = 1 + strlen(sel); // want use '\0' occasionally
+    for (err = 0, i = 1; err >= 0 && i < 16*1000*1000; i++) {
+        err = fputc(sel[rand() % nsel], in);
+        if (err < 0) {
+            printf("can't create in.txt. No space on disk?\n");
+            fclose(in);
+            return -1;
+        }
+    }
+    fclose(in);
+    t = RoundUptoThousand(GetTickCount() - t);
+    printf("done in T=%u seconds. Starting exe with timeout 2*T... ", (unsigned)t/1000);
+    LabTimeout = (int)t*2;
+    fflush(stdout);
+    return 0;
+}
+
+static int checkerBig2(void)
+{
+    FILE *const out = fopen("out.txt", "r");
+    long long int i, passed = 1;
+    if (!out) {
+        printf("can't open out.txt\n");
+        testN++;
+        return -1;
+    }
+    for (i = 16; i < 1000*1000*16; i += 16) {
+        int n;
+        if (ScanInt(out, &n) != Pass) {
+            passed = 0;
+            break;
+        } else if (i != n) {
+            passed = 0;
+            printf("wrong output -- ");
+            break;
+        }
+    }
+    if (passed) {
+        passed = !HaveGarbageAtTheEnd(out);
+    }
+    fclose(out);
+    if (passed) {
+        printf("PASSED\n");
+        testN++;
+        return 0;
+    } else {
+        printf("FAILED\n");
+        testN++;
+        return 1;
+    }
+}
+
 const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
@@ -246,8 +315,11 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
     {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
+    {FeedFromArray, CheckFromArray},
     {feederBig, checkerBig},
-    {feederBig1, checkerBig1}
+    {feederBig1, checkerBig1},
+    {feederBig2, checkerBig2},
 };
 
 TLabTest GetLabTest(int testIdx) {
