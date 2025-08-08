@@ -90,6 +90,7 @@ static int CheckFromArray(void) {
         if (!tree) {
             printf("can't open tree.txt\n");
             testN++;
+            fclose(out);
             return -1;
         }
         char treeBuf[1024] = {0};
@@ -115,6 +116,7 @@ static int CheckFromArray(void) {
 
     printf("%s\n", status == Pass ? "PASSED" : "FAILED");
     testN++;
+    fclose(out);
     return status == Fail;
 }
 
@@ -196,6 +198,7 @@ static int CheckerBig(void) {
 
     printf("%s\n", status == Pass ? "PASSED" : "FAILED");
     testN++;
+    fclose(out);
     return status == Fail;
 }
 

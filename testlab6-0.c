@@ -64,7 +64,7 @@ static int FeedFromArray(void)
   return 0;
 }
 
-static int CheckFromArray(void) 
+static int CheckFromArray(void)
 {
     FILE* const out = fopen("out.txt", "r");
     if (out == NULL) {
@@ -345,4 +345,3 @@ static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
 size_t GetTestMemoryLimit(void) {
   return LabMemoryLimit;
 }
-
