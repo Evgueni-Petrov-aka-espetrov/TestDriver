@@ -78,7 +78,7 @@ set(TEST_LAB_SOURCES
 	testlab11.c
 	testlab12.c
 	testlab-queens.c
- 	testlabKosorajo.c
+    testlabkosorajo.c
 	testlab-akinator.c
 	testlab-ray.c
 	testlab-gauss.c
