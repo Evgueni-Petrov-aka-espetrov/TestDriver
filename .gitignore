@@ -3,3 +3,4 @@ build/
 cmake-build-*/
 .dockerignore
 Dockerfile
+.cache/
