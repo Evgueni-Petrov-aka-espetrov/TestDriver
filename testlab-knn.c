@@ -33,6 +33,9 @@ static const struct {const char *const in; const char* const out;} testInOut[] =
     {"15 20\n3\n10 10\n20 20\n15 21", "15 21"}
 };
 
+static int LabTimeout = 3000;
+static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
+
 static int FeedFromArray(void) {
     FILE *const in = fopen("in.txt", "w+");
     if (!in) {
@@ -263,17 +266,38 @@ static int checkerBig3(void) {
     fclose(out);
     printf("%s\n", status);
     ++testN;
-    return status;
+    return status == Fail;
 }
 
-static int LabTimeout;
-static size_t LabMemoryLimit;
-
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},          
+    {FeedFromArray, CheckFromArray},  
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},     
+    {FeedFromArray, CheckFromArray},             
     {feederBig1, checkerBig1},  
-    {feederBig2, checkerBig1},          
-    {feederBig3, checkerBig1},  
+    {feederBig2, checkerBig2},          
+    {feederBig3, checkerBig3},  
 };
 
 TLabTest GetLabTest(int testIdx) {
@@ -281,7 +305,7 @@ TLabTest GetLabTest(int testIdx) {
 }
 
 int GetTestCount(void) {
-    return sizeof(testInOut) / sizeof(testInOut[0]);
+    return sizeof(LabTests) / sizeof(LabTests[0]);
 }
 
 const char* GetTesterName(void) {
@@ -289,9 +313,9 @@ const char* GetTesterName(void) {
 }
 
 int GetTestTimeout(void) {
-    return 3000;
+    return LabTimeout;
 }
 
 size_t GetTestMemoryLimit(void) {
-    return MIN_PROCESS_RSS_BYTES;
+    return LabMemoryLimit;
 }
