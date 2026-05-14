@@ -88,14 +88,14 @@ static int feederBig1(void) {
     fflush(stdout);
     t = GetTickCount();
     
-    fprintf(in, "0 0 1\n");
+    fprintf(in, "0 0\n");
     
     fprintf(in, "%d\n", N);
     
-    fprintf(in, "1 1 0\n");
+    fprintf(in, "1 1\n");
 
     for (int i = 1; i < N; i++) {
-        if (fprintf(in, "%d %d 0\n", 100000 + i, 100000 + i) == EOF) {
+        if (fprintf(in, "%d %d\n", 100000 + i, 100000 + i) == EOF) {
             printf("can't write to in.txt. No space on disk?\n");
             fclose(in);
             return -1;
@@ -104,8 +104,8 @@ static int feederBig1(void) {
     fclose(in);
     
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    LabTimeout = (int)t*2 + 3000;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t / 1000);
+    LabTimeout = (int)t * 2 + 3000;
     fflush(stdout);
     LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 24 * N;
     return 0;
@@ -152,14 +152,14 @@ static int feederBig2(void) {
     fflush(stdout);
     t = GetTickCount();
     
-    fprintf(in, "%d %d 1\n", 100000, 100000);
+    fprintf(in, "%d %d\n", 100000, 100000);
     
     int total = 445 * 445;
     fprintf(in, "%d\n", total);
     
-    for (int i = 0; i < 445; i++) {
-        for (int j = 0; j < 445; j++) {
-            if (fprintf(in, "%d %d 0\n", i*1000, j*1000) == EOF) {
+    for (int i = 0; i < 445; ++i) {
+        for (int j = 0; j < 445; ++j) {
+            if (fprintf(in, "%d %d\n", i*1000, j*1000) == EOF) {
                 printf("can't write to in.txt. No space on disk?\n");
                 fclose(in);
                 return -1;
@@ -169,8 +169,8 @@ static int feederBig2(void) {
     fclose(in);
     
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    LabTimeout = (int)t*2 + 3000;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t / 1000);
+    LabTimeout = (int)t * 2 + 3000;
     fflush(stdout);
     LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 24 * total;
     return 0;
@@ -216,12 +216,12 @@ static int feederBig3(void) {
     fflush(stdout);
     t = GetTickCount();
     
-    fprintf(in, "50001 50000 1\n");
+    fprintf(in, "50001 50000\n");
     
     fprintf(in, "%d\n", 150000);
     
-    for (int i = 0; i < 150000; i++) {
-        if (fprintf(in, "%d %d 0\n", i, i) == EOF) {
+    for (int i = 0; i < 150000; ++i) {
+        if (fprintf(in, "%d %d\n", i, i) == EOF) {
             printf("can't write to in.txt. No space on disk?\n");
             fclose(in);
             return -1;
@@ -230,8 +230,8 @@ static int feederBig3(void) {
     fclose(in);
     
     t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t/1000);
-    LabTimeout = (int)t*2 + 3000;
+    printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t / 1000);
+    LabTimeout = (int)t * 2 + 3000;
     fflush(stdout);
     LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 24 * 150000;
     return 0;
@@ -251,7 +251,7 @@ static int checkerBig3(void) {
     if (status == Pass) {
         long long dx = 50001LL - x;
         long long dy = 50000LL - y;
-        long long dist_sq = dx*dx + dy*dy;
+        long long dist_sq = dx * dx + dy * dy;
         
         if (dist_sq != 1) {
             printf("wrong output -- distance^2=%lld (expected 1) -- ", dist_sq);
