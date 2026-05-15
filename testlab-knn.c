@@ -105,7 +105,7 @@ static int feederBig1(void) {
     
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t / 1000);
-    LabTimeout = 1000;
+    LabTimeout = 800;
     fflush(stdout);
     LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 19 * N;
     return 0;
@@ -170,7 +170,7 @@ static int feederBig2(void) {
     
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t / 1000);
-    LabTimeout = 1000;
+    LabTimeout = 800;
     fflush(stdout);
     LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 19 * total;
     return 0;
@@ -231,7 +231,7 @@ static int feederBig3(void) {
     
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Starting exe with timeout 2*T+3... ", (unsigned)t / 1000);
-    LabTimeout = 1000;
+    LabTimeout = 800;
     fflush(stdout);
     LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 19 * 150000;
     return 0;
