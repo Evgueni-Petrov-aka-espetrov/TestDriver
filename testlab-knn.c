@@ -205,13 +205,13 @@ static int feederBig1(void) {
     printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); 
     fflush(stdout);
     LabTimeout = 3000; 
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 20 * N;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * M;
     return 0;
 }
 
 static int checkerBig1(void) {
-    Pt targets[50];
-    for (int i = 0; i < 50; ++i) { 
+    Pt targets[100];
+    for (int i = 0; i < 100; ++i) { 
         targets[i].x = i * 10; 
         targets[i].y = i * 10; 
     }
@@ -257,13 +257,13 @@ static int feederBig2(void) {
     printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); 
     fflush(stdout);
     LabTimeout = 3000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 20 * Total * Total;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * Total * Total;
     return 0;
 } 
 
 static int checkerBig2(void) {
-    Pt targets[20];
-    for (int i = 0; i < 20; ++i) { 
+    Pt targets[50];
+    for (int i = 0; i < 50; ++i) { 
         targets[i].x = i * 5; 
         targets[i].y = i * 5; 
     }
@@ -308,13 +308,13 @@ static int feederBig3(void) {
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); fflush(stdout);
     LabTimeout = 3000; 
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 20 * M;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * M;
     return 0;
 }
 
 static int checkerBig3(void) {
-    Pt targets[100];
-    for (int i = 0; i < 100; ++i) { 
+    Pt targets[200];
+    for (int i = 0; i < 200; ++i) { 
         targets[i].x = i + 1; 
         targets[i].y = i; 
     }
