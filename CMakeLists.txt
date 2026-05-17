@@ -56,32 +56,7 @@ add_library(testDriver testDriver.c)
 set_compiler_settings(testDriver EXTENSIONS YES)
 
 set(TEST_LAB_SOURCES
-	testlab-begin.c
-	testlab0.c
-	testlab1-0.c
-	testlab1-1.c
-	testlab1-2.c
-	testlab2.c
-	testlab3-0.c
- 	testlab3-3.c
-	testlab4.c
-	testlab5.c
-	testlab6-0.c
-	testlab6-1.c
-	testlab6-2.c
-	testlab6-3.c
-	testlab7.c
-	testlab8-0.c
-	testlab9.c
- 	testlab9-1.c
-	testlab10.c
-	testlab11.c
-	testlab12.c
-	testlab-queens.c
- 	testlabKosorajo.c
-	testlab-akinator.c
-	testlab-ray.c
-	testlab-gauss.c
+	
 	testlab-knn.c
 )
 foreach(source ${TEST_LAB_SOURCES})

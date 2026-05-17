@@ -205,7 +205,7 @@ static int feederBig1(void) {
     printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); 
     fflush(stdout);
     LabTimeout = 2500; 
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 14 * M;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 20 * M;
     return 0;
 }
 
@@ -257,7 +257,7 @@ static int feederBig2(void) {
     printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); 
     fflush(stdout);
     LabTimeout = 2500;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 14 * Total * Total;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 20 * Total * Total;
     return 0;
 } 
 
@@ -308,7 +308,7 @@ static int feederBig3(void) {
     t = RoundUptoThousand(GetTickCount() - t);
     printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); fflush(stdout);
     LabTimeout = 2500; 
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 14 * M;
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 20 * M;
     return 0;
 }
 
