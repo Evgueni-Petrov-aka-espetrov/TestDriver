@@ -179,11 +179,11 @@ static int CheckerBig(void) {
     for (int level = 1; level <= max_depth; level++) {
         char question[150];
         snprintf(question, sizeof(question), "Вопрос на уровне %d? (да/нет): \n", level);
-        strcat(expected, question);
+        strcat_s(expected, sizeof(expected), question);
     }
     char last_question[150];
     snprintf(last_question, sizeof(last_question), "Это Персонаж %d? (да/нет): The character is guessed\n", max_depth + 1);
-    strcat(expected, last_question);
+    strcat_s(expected, sizeof(expected), last_question);
 
     const char* status = Pass;
     if (_strnicmp(expected, buf, strlen(expected)) != 0) {
