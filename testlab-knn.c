@@ -53,7 +53,8 @@ static int FeedFromArray(void) {
 static int CheckFromArray(void) {
     FILE* const out = fopen("out.txt", "r");
     if (!out) {
-        printf("can't open out.txt\n"); ++testN; 
+        printf("can't open out.txt\n"); 
+        ++testN; 
         return -1; 
     }
 
@@ -86,11 +87,17 @@ static int CheckFromArray(void) {
 typedef struct { 
     int x, y; 
     long long d2; 
-} Pt;
+} Point;
 
-static int cmp_pt(const void* a, const void* b) {
-    const Pt* pa = (const Pt*)a; 
-    const Pt* pb = (const Pt*)b;
+enum TestType {
+    BIG1,
+    BIG2,
+    BIG3
+};
+
+static int ComparePoints(const void* a, const void* b) {
+    const Point* pa = (const Point*)a; 
+    const Point* pb = (const Point*)b;
     if (pa->d2 != pb->d2) {
         return (pa->d2 > pb->d2) - (pa->d2 < pb->d2);        
     }
@@ -100,37 +107,149 @@ static int cmp_pt(const void* a, const void* b) {
     return pa->y - pb->y;
 }
 
-static void generate_base(Pt* base, int m, int type) {
-    if (type == 1 || type == 3) { 
-        for (int i = 0; i < m; ++i) {
-            base[i].x = i;
-            base[i].y = i;
+static void FillPoints(Point* pts, int count, enum TestType type, int isTarget) {
+    if (type == BIG1) {
+        for (int i = 0; i < count; ++i) {
+            int val;
+            if (isTarget) {
+                val = i * 10;
+            } else {
+                val = i;
+            }
+            pts[i].x = val;
+            pts[i].y = val;
         }
-    } else if (type == 2) { 
-        int side = (int)sqrt(m);
-        int idx = 0;
-        for (int i = 0; i < side; ++i) {
-            for (int j = 0; j < side; ++j) {
-                base[idx].x = i * 10;
-                base[idx].y = j * 10;
-                ++idx;
+    } else if (type == BIG2) {
+        if (isTarget) {
+            for (int i = 0; i < count; ++i) {
+                pts[i].x = i * 5;
+                pts[i].y = i * 5;
+            }
+        } else {
+            int side = (int)sqrt(count);
+            int idx = 0;
+            for (int i = 0; i < side; ++i) {
+                for (int j = 0; j < side; ++j) {
+                    if (idx < count) {
+                        pts[idx].x = i * 10;
+                        pts[idx].y = j * 10;
+                        ++idx;
+                    }
+                }
+            }
+        }
+    } else if (type == BIG3) {
+        for (int i = 0; i < count; ++i) {
+            pts[i].x = i;
+            if (isTarget) {
+                pts[i].y = i + 1;    
+            } else {
+                pts[i].y = i;
             }
         }
     }
 }
 
-static int run_checker(int k, int m, int n, int type, Pt* targets) {
+static int WritePointsToFile(FILE* f, const Point* pts, int count) {
+    for (int i = 0; i < count; ++i) {
+        if (fprintf(f, "%d %d\n", pts[i].x, pts[i].y) == EOF) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+static int GenerateAndWrite(FILE* f, int count, enum TestType type, int isTarget) {
+    Point* pts = malloc(count * sizeof(Point));
+    if (pts == NULL) {
+        printf("memory allocation error\n");
+        return -1;
+    }
+
+    FillPoints(pts, count, type, isTarget);
+
+    if (WritePointsToFile(f, pts, count) == -1) {
+        printf("can't write to in.txt. No space on disk?\n");
+        free(pts);
+        return -1;
+    }
+
+    free(pts);
+    return 0;
+}
+
+static int CommonFeeder(int k, int m, int n, enum TestType type, const char* name) {
+    FILE* const in = fopen("in.txt", "w+");
+    if (!in) {
+        printf("can't create in.txt. No space on disk?\n"); 
+        return -1; 
+    }
+
+    printf("%s: M=%d, N=%d... ", name, m, n);
+    fflush(stdout);
+    DWORD t = GetTickCount();
+
+    fprintf(in, "%d %d\n", k, m);
+    if (GenerateAndWrite(in, m, type, 0) == -1) {
+        fclose(in);
+        return -1;
+    }
+
+    fprintf(in, "%d\n", n);
+    if (GenerateAndWrite(in, n, type, 1) == -1) {
+        fclose(in);
+        return -1;
+    }
+
+    fclose(in);
+    t = RoundUptoThousand(GetTickCount() - t);
+    printf("done in T=%u s. ", (unsigned)t / 1000);
+    fflush(stdout);
+    LabTimeout = 4000; 
+    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * m; 
+    return 0;
+}
+
+static const int Big1M = 100000;
+static const int Big1K = 5;
+static const int Big1N = 100;
+
+static int feederBig1(void) {
+    return CommonFeeder(Big1K, Big1M, Big1N, BIG1, "Big1");
+}
+
+static const int Big2M = 90000;
+static const int Big2K = 5;
+static const int Big2N = 50;
+
+static int feederBig2(void) {
+    return CommonFeeder(Big2K, Big2M, Big2N, BIG2, "Big2");
+}
+
+static const int Big3M = 150000;
+static const int Big3K = 2;
+static const int Big3N = 200;
+
+static int feederBig3(void) {
+    return CommonFeeder(Big3K, Big3M, Big3N, BIG3, "Big3");
+}
+
+static int RunChecker(int k, int m, int n, enum TestType type, const Point* targets) {
     FILE* const out = fopen("out.txt", "r");
     if (!out) {
         printf("can't create in.txt. No space on disk?\n"); 
         return -1; 
     }
 
-    Pt* base = malloc(m * sizeof(Pt));
-    generate_base(base, m, type);
+    Point* base = malloc(m * sizeof(Point));
+    if (base == NULL) {
+        fclose(out);
+        printf("memory allocation error\n"); 
+        return -1;
+    }
+    FillPoints(base, m, type, 0); 
 
     const char* status = Pass;
-
     for (int q = 0; q < n; ++q) {
         for (int i = 0; i < m; ++i) {
             long long dx = (long long)base[i].x - targets[q].x;
@@ -138,7 +257,7 @@ static int run_checker(int k, int m, int n, int type, Pt* targets) {
             base[i].d2 = dx * dx + dy * dy;
         }
 
-        qsort(base, m, sizeof(Pt), cmp_pt);
+        qsort(base, m, sizeof(Point), ComparePoints);
 
         for (int i = 0; i < k; ++i) {
             int ax, ay;
@@ -166,159 +285,22 @@ static int run_checker(int k, int m, int n, int type, Pt* targets) {
     return status == Fail;
 }
 
-static int feederBig1(void) {
-    FILE* const in = fopen("in.txt", "w+");
-    DWORD t; 
-    const int M = 100000; 
-    const int K = 5;      
-    const int N = 100;    
-
-    if (!in) {
-        printf("can't create in.txt. No space on disk?\n"); 
-        return -1; 
-    }
-
-    printf("Big1: M=%d, N=%d... ", M, N);
-    fflush(stdout);
-    t = GetTickCount();
-    fprintf(in, "%d %d\n", K, M);
-
-    for (int i = 0; i < M; ++i) {
-        if (fprintf(in, "%d %d\n", i, i) == EOF) {
-            printf("can't write to in.txt. No space on disk?\n"); 
-            fclose(in); 
-            return -1;
-        }   
-    }
-    
-    fprintf(in, "%d\n", N);
-    for (int i = 0; i < N; ++i) {
-        if (fprintf(in, "%d %d\n", i * 10, i * 10) == EOF) {
-            printf("can't write to in.txt. No space on disk?\n"); 
-            fclose(in); 
-            return -1;
-        }
-    }
-
-    fclose(in);
-    t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); 
-    fflush(stdout);
-    LabTimeout = 5000; 
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * M;
-    return 0;
-}
-
 static int checkerBig1(void) {
-    Pt targets[100];
-    for (int i = 0; i < 100; ++i) { 
-        targets[i].x = i * 10; 
-        targets[i].y = i * 10; 
-    }
-    return run_checker(5, 100000, 100, 1, targets);
+    Point targets[Big1N];
+    FillPoints(targets, Big1N, BIG1, 1);
+    return RunChecker(Big1K, Big1M, Big1N, BIG1, targets);
 }
-
-static int feederBig2(void) {
-    FILE *const in = fopen("in.txt", "w+");
-    DWORD t; 
-    const int Total = 300; 
-    const int K = 5;
-    const int N = 50;
-    if (!in) { 
-        printf("can't create in.txt. No space on disk?\n");
-        return -1; 
-    }
-    printf("Big2: Grid %dx%d, N=%d... ", Total, Total, N);
-    fflush(stdout);
-    t = GetTickCount();
-
-    fprintf(in, "%d %d\n", K, Total * Total);
-    for (int i = 0; i < Total; ++i) {
-        for (int j = 0; j < Total; ++j) {
-            if (fprintf(in, "%d %d\n", i * 10, j * 10) == EOF) {
-                printf("can't write to in.txt. No space on disk?\n"); 
-                fclose(in); 
-                return -1;
-            }
-        }
-    }
-
-    fprintf(in, "%d\n", N);
-    for (int i = 0; i < N; ++i) {
-        if (fprintf(in, "%d %d\n", i * 5, i * 5) == EOF) {
-            printf("can't write to in.txt. No space on disk?\n"); 
-            fclose(in); 
-            return -1;
-        }
-    }
-
-    fclose(in);
-    t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); 
-    fflush(stdout);
-    LabTimeout = 5000;
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * Total * Total;
-    return 0;
-} 
 
 static int checkerBig2(void) {
-    Pt targets[50];
-    for (int i = 0; i < 50; ++i) { 
-        targets[i].x = i * 5; 
-        targets[i].y = i * 5; 
-    }
-    return run_checker(5, 90000, 50, 2, targets);
-}
-
-static int feederBig3(void) {
-    FILE *const in = fopen("in.txt", "w+");
-    DWORD t; 
-    const int M = 150000;
-    const int K = 2;
-    const int N = 200; 
-
-    if (!in) { 
-        printf("can't create in.txt. No space on disk?\n");
-        return -1; 
-    }
-
-    printf("Big3: Diagonal M=%d, N=%d... ", M, N);
-    fflush(stdout);
-    t = GetTickCount();
-
-    fprintf(in, "%d %d\n", K, M);
-    for (int i = 0; i < M; ++i) {
-        if (fprintf(in, "%d %d\n", i, i) == EOF) {
-            printf("can't write to in.txt. No space on disk?\n"); 
-            fclose(in); 
-            return -1;
-        }
-    }
-
-    fprintf(in, "%d\n", N);
-    for (int i = 0; i < N; ++i) {
-        if (fprintf(in, "%d %d\n", i, i + 1) == EOF) {
-            printf("can't write to in.txt. No space on disk?\n"); 
-            fclose(in); 
-            return -1;
-        }
-    }
-
-    fclose(in);
-    t = RoundUptoThousand(GetTickCount() - t);
-    printf("done in T=%u seconds. Timeout=100ms... ", (unsigned)t / 1000); fflush(stdout);
-    LabTimeout = 5000; 
-    LabMemoryLimit = MIN_PROCESS_RSS_BYTES + 40 * M;
-    return 0;
+    Point targets[Big2N];
+    FillPoints(targets, Big2N, BIG2, 1);
+    return RunChecker(Big2K, Big2M, Big2N, BIG2, targets);
 }
 
 static int checkerBig3(void) {
-    Pt targets[200];
-    for (int i = 0; i < 200; ++i) { 
-        targets[i].x = i + 1; 
-        targets[i].y = i; 
-    }
-    return run_checker(2, 150000, 200, 3, targets);
+    Point targets[Big3N];
+    FillPoints(targets, Big3N, BIG3, 1);
+    return RunChecker(Big3K, Big3M, Big3N, BIG3, targets);
 }
 
 const TLabTest LabTests[] = {
