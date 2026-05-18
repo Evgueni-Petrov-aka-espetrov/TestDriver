@@ -286,21 +286,42 @@ static int RunChecker(int k, int m, int n, enum TestType type, const Point* targ
 }
 
 static int checkerBig1(void) {
-    Point targets[Big1N];
+    Point* targets = malloc(Big1N * sizeof(Point));
+    if (targets == NULL) {
+        printf("memory allocation error\n"); 
+        return -1;
+    }
     FillPoints(targets, Big1N, BIG1, 1);
-    return RunChecker(Big1K, Big1M, Big1N, BIG1, targets);
+
+    int result = RunChecker(Big1K, Big1M, Big1N, BIG1, targets);
+    free(targets); 
+    return result;
 }
 
 static int checkerBig2(void) {
-    Point targets[Big2N];
+    Point* targets = malloc(Big2N * sizeof(Point));
+    if (targets == NULL) {
+        printf("memory allocation error\n"); 
+        return -1;
+    }
     FillPoints(targets, Big2N, BIG2, 1);
-    return RunChecker(Big2K, Big2M, Big2N, BIG2, targets);
+
+    int result = RunChecker(Big2K, Big2M, Big2N, BIG2, targets);
+    free(targets); 
+    return result;
 }
 
 static int checkerBig3(void) {
-    Point targets[Big3N];
+    Point* targets = malloc(Big3N * sizeof(Point));
+    if (targets == NULL) {
+        printf("memory allocation error\n"); 
+        return -1;
+    }
     FillPoints(targets, Big3N, BIG3, 1);
-    return RunChecker(Big3K, Big3M, Big3N, BIG3, targets);
+
+    int result = RunChecker(Big3K, Big3M, Big3N, BIG3, targets);
+    free(targets); 
+    return result;
 }
 
 const TLabTest LabTests[] = {
