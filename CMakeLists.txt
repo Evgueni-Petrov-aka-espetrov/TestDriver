@@ -51,7 +51,6 @@ function(SET_COMPILER_SETTINGS target)
 	endif()
 endfunction()
 
-add_library(testDriver testDriver.c)
 # EXTENSIONS YES заменяет std=c11 на std=gnu11, что выставляет POSIX макросы
 set_compiler_settings(testDriver EXTENSIONS YES)
 
