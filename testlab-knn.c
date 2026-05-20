@@ -107,24 +107,23 @@ static int ComparePoints(const void* a, const void* b) {
     return pa->y - pb->y;
 }
 
+static void MakeDiag(Point* pts, int count, int x0, int y0, int dx, int dy) {
+    for (int i = 0; i < count; ++i) {
+        pts[i].x = x0 + i * dx;
+        pts[i].y = y0 + i * dy;
+    }
+}
+
 static void FillPoints(Point* pts, int count, enum TestType type, int isTarget) {
     if (type == BIG1) {
-        for (int i = 0; i < count; ++i) {
-            int val;
-            if (isTarget) {
-                val = i * 10;
-            } else {
-                val = i;
-            }
-            pts[i].x = val;
-            pts[i].y = val;
+        if (isTarget) {
+            MakeDiag(pts, count, 0, 0, 10, 10);
+        } else {
+            MakeDiag(pts, count, 0, 0, 1, 1);
         }
     } else if (type == BIG2) {
         if (isTarget) {
-            for (int i = 0; i < count; ++i) {
-                pts[i].x = i * 5;
-                pts[i].y = i * 5;
-            }
+            MakeDiag(pts, count, 0, 0, 5, 5);
         } else {
             int side = (int)sqrt(count);
             int idx = 0;
@@ -139,13 +138,10 @@ static void FillPoints(Point* pts, int count, enum TestType type, int isTarget) 
             }
         }
     } else if (type == BIG3) {
-        for (int i = 0; i < count; ++i) {
-            pts[i].x = i;
-            if (isTarget) {
-                pts[i].y = i + 1;    
-            } else {
-                pts[i].y = i;
-            }
+        if (isTarget) {
+            MakeDiag(pts, count, 0, 1, 1, 1);
+        } else {
+            MakeDiag(pts, count, 0, 0, 1, 1);
         }
     }
 }

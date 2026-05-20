@@ -51,7 +51,7 @@ function(SET_COMPILER_SETTINGS target)
 	endif()
 endfunction()
 
-add_library(testDriver STATIC testDriver.c)
+add_library(testDriver testDriver.c)
 # EXTENSIONS YES заменяет std=c11 на std=gnu11, что выставляет POSIX макросы
 set_compiler_settings(testDriver EXTENSIONS YES)
 
@@ -85,12 +85,9 @@ set(TEST_LAB_SOURCES
 	testlab-knn.c
 )
 
-set(BUILD_SHARED_LIBS OFF)
-
 foreach(source ${TEST_LAB_SOURCES})
 	get_filename_component(target ${source} NAME_WE)
 	add_executable(${target} ${source})
-	target_link_options(${target} PRIVATE -static)
 	set_compiler_settings(${target} EXTENSIONS NO)
 	target_link_libraries(${target} PRIVATE testDriver)
 

@@ -36,11 +36,15 @@ static const char* GetRunnerCommand(const char* runnerExe, char* labExe) {
     int testRunnerSize = snprintf(
         runnerCommand, sizeof(runnerCommand), "%s -m %zu -t %d -e %s",
         runnerExe, (GetMemoryLimit() + 1023) / 1024, GetTimeout(), labExe);
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (testRunnerSize < 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nInternal error: snprintf returned negative value\n");
         return NULL;
     }
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (testRunnerSize == sizeof(runnerCommand) - 1) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nInternal error: snprintf stopped at the end of buffer\n");
         return NULL;
     }
@@ -51,28 +55,38 @@ int main(int argc, char* argv[]) {
     int i, count, fail;
     const char* runnerExe = argv[0];
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (argc >= 3 && strcmp(argv[1], "-a") == 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         UserTestAll = 1;
         argv++;
         argc--;
     }
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (argc >= 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) != 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         UserMemoryLimit = atoi(argv[2])*1024;
         argv += 2;
         argc -= 2;
     }
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (argc >= 4 && strcmp(argv[1], "-t") == 0 && atoi(argv[2]) != 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         UserTimeout = atoi(argv[2]);
         argv += 2;
         argc -= 2;
     }
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (argc >= 3 && strcmp(argv[1], "-e") == 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         return LaunchLabExecutable(argv[2]);
     }
 
     PrintWithoutBuffering("\nKOI FIT NSU Lab Tester (c) 2009-2020 by Evgueni Petrov\n");
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (argc < 2) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nTo test mylab.exe, do %s mylab.exe\n", runnerExe);
         return 1;
     }
@@ -81,26 +95,38 @@ int main(int argc, char* argv[]) {
 
     for (i = 0, count = 0, fail = 0; i < GetTestCount(); i++, fail = 0) {
         PrintWithoutBuffering("TEST %d/%d: ", i+1, GetTestCount());
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (GetLabTest(i).Feeder() != 0) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (!UserTestAll) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 break;
             }
             fail = 1;
         }
         const char* runnerCommand = GetRunnerCommand(runnerExe, argv[1]);
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (!runnerCommand) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             break;
         }
         double ms0 = GetTickCount();
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (system(runnerCommand) != 0) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             break;
         }
         double ms1 = GetTickCount();
         int millisecondsPerDay = 1000 * 60 * 60 * 24;
         double msElapsed = ((int)(ms1 - ms0) + millisecondsPerDay) % millisecondsPerDay;
         PrintWithoutBuffering("%.0f ms, ", msElapsed);
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (GetLabTest(i).Checker() != 0) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (!UserTestAll) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 break;
             }
             fail = 1;
@@ -108,12 +134,15 @@ int main(int argc, char* argv[]) {
         count += 1 - fail;
     }
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (count < GetTestCount()) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\n:-(\n\n"
         "Executable file %s failed for input file in.txt in the current directory.\n"
         "Please fix and try again.\n", argv[1]);
         return 1;
     } else {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\n:-)\n\n"
         "Executable file %s passed all tests.\n"
         "Please review the source code with your teaching assistant.\n", argv[1]);
@@ -125,10 +154,14 @@ int HaveGarbageAtTheEnd(FILE* out) {
     while (1) {
         char c;
         int status = fscanf(out, "%c", &c);
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (status < 0) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             return 0;
         }
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (!strchr(" \t\r\n", c)) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             PrintWithoutBuffering("garbage at the end -- ");
             return 1;
         }
@@ -140,10 +173,13 @@ const char Fail[] = "FAILED";
 
 const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b) {
     int status = fscanf(out, "%u%u", a, b);
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (status < 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("output too short -- ");
         return Fail;
     } else if (status < 2) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("bad output format -- ");
         return Fail;
     }
@@ -151,7 +187,9 @@ const char* ScanUintUint(FILE* out, unsigned* a, unsigned* b) {
 }
 
 const char* ScanIntInt(FILE* out, int* a, int* b) {
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (ScanInt(out, a) == Pass && ScanInt(out, b) == Pass) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         return Pass;
     }
     return Fail;
@@ -159,10 +197,13 @@ const char* ScanIntInt(FILE* out, int* a, int* b) {
 
 const char* ScanU32(FILE* out, uint32_t* a) {
     int status = fscanf(out, "%u", a);
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (status < 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("output too short -- ");
         return Fail;
     } else if (status < 1) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("bad output format -- ");
         return Fail;
     }
@@ -171,10 +212,13 @@ const char* ScanU32(FILE* out, uint32_t* a) {
 
 const char* ScanInt(FILE* out, int* a) {
     int status = fscanf(out, "%d", a);
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (status < 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("output too short -- ");
         return Fail;
     } else if (status < 1) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("bad output format -- ");
         return Fail;
     }
@@ -182,12 +226,16 @@ const char* ScanInt(FILE* out, int* a) {
 }
 
 const char* ScanChars(FILE* out, size_t bufferSize, char* buffer) {
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (fgets(buffer, bufferSize, out) == NULL) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("no output -- ");
         return Fail;
     }
     char* newlinePtr = strchr(buffer, '\n');
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (newlinePtr != NULL) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         *newlinePtr = '\0';
     }
     return Pass;
@@ -290,14 +338,18 @@ int LaunchLabExecutable(char* labExe)
     const HANDLE labJob = CreateJobObject(&labInhertitIO, "labJob");
     size_t labMem0 = SIZE_MAX;
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (labJob == 0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nSystem error: %u in CreateJobObject\n", (unsigned)GetLastError());
         CloseHandle(labIn);
         CloseHandle(labOut);
         return 1;
     }
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (!SetInformationJobObject(labJob, JobObjectExtendedLimitInformation, &labJobLimits, sizeof(labJobLimits))) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nSystem error: %u in SetInformationJobObject\n", (unsigned)GetLastError());
         CloseHandle(labJob);
         CloseHandle(labIn);
@@ -305,6 +357,7 @@ int LaunchLabExecutable(char* labExe)
         return 1;
     }
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (!CreateProcess(NULL, // LPCTSTR lpApplicationName,
         labExe, // __inout_opt  LPTSTR lpCommandLine,
         &labInhertitIO, // __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
@@ -318,6 +371,7 @@ int LaunchLabExecutable(char* labExe)
         &labInfo //__out        LPPROCESS_INFORMATION lpProcessInformation
         ))
     {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nSystem error: %u in CreateProcess\n", (unsigned)GetLastError());
         CloseHandle(labJob);
         CloseHandle(labIn);
@@ -325,7 +379,9 @@ int LaunchLabExecutable(char* labExe)
         return 1;
     }
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (!AssignProcessToJobObject(labJob, labInfo.hProcess)) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nSystem error: %u in AssignProcessToJobObject\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         CloseHandle(labInfo.hThread);
@@ -338,7 +394,9 @@ int LaunchLabExecutable(char* labExe)
 
     {
         BOOL in;
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (!IsProcessInJob(labInfo.hProcess, labJob, &in)) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             PrintWithoutBuffering("\nSystem error: %u in IsProcessInJob\n", (unsigned)GetLastError());
             TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
             CloseHandle(labInfo.hThread);
@@ -364,7 +422,9 @@ int LaunchLabExecutable(char* labExe)
     }
 
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (ResumeThread(labInfo.hThread) == (DWORD)-1) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nSystem error: %u in ResumeThread\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         CloseHandle(labInfo.hThread);
@@ -375,30 +435,39 @@ int LaunchLabExecutable(char* labExe)
         return 1;
     }
 
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     switch (WaitForSingleObject(labInfo.hProcess, GetTimeout())) {
     case WAIT_OBJECT_0:
         {
             DWORD labExit = EXIT_FAILURE;
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (!GetExitCodeProcess(labInfo.hProcess, &labExit)) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 PrintWithoutBuffering("\nSystem error: %u in GetExitCodeProcess\n", (unsigned)GetLastError());
             } else if (labExit >= 0x8000000) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 ReportException(labExe);
             } else if (labExit > 0) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 ReportNonZeroExitCode(labExe);
             } else {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 exitCode = 0; // + check memory footprint after this switch (...) {...}
             }
             break;
         }
     case WAIT_TIMEOUT:
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         ReportTimeout(labExe);
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     case WAIT_FAILED:
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nSystem error: %u in WaitForSingleObject\n", (unsigned)GetLastError());
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
         break;
     default:
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         PrintWithoutBuffering("\nInternal error: WaitForSingleObject returned WAIT_ABANDONED\n");
         TerminateProcess(labInfo.hProcess, EXIT_FAILURE);
     }
@@ -413,7 +482,9 @@ int LaunchLabExecutable(char* labExe)
         //fprintf(stderr, "PeakJobMemoryUsed %d\n", labJobLimits.PeakJobMemoryUsed);
         labMem0 = labJobLimits.PeakProcessMemoryUsed-labMem0;
     }
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if ((long long)labMem0 > GetMemoryLimit()) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         exitCode = 1;
         ReportOutOfMemory(labExe, labMem0);
     }
@@ -452,7 +523,9 @@ DWORD GetTickCount(void) {
 
 static int CheckMemory(struct rusage rusage, size_t * labMem0) {
     *labMem0 = (size_t) rusage.ru_maxrss * RU_MAXRSS_UNITS;
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (GetMemoryLimit() < *labMem0) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         return 1;
     }
     return 0;
@@ -477,13 +550,17 @@ static int LaunchLabExecutable(char* labExe) {
     (void)sigemptyset(&new.sa_mask); // не умеет завершаться неуспешно
     new.sa_flags = SA_NOCLDSTOP; // Не используем SA_RESETHAND, чтобы не зависеть от использования fork вне LaunchLabExecutable
     struct sigaction old;
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (sigaction(SIGCHLD, &new, &old)) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         ReportSystemError("sigaction");
         return -1;
     }
 
     int retCode = _LaunchLabExecutable(labExe);
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (sigaction(SIGCHLD, &old, NULL)) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         ReportSystemError("sigaction");
         return -1;
     }
@@ -497,23 +574,34 @@ static int WaitForProcess(pid_t pid, struct timespec* ts, struct rusage* rusage)
     while (ts->tv_sec > 0 || ts->tv_nsec > 0) {
         int status = 0;
         pid_t child = wait4(pid, &status, WNOHANG, rusage);
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (child == 0) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             int nanosleepStatus = nanosleep(ts, ts);
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (nanosleepStatus == 0) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 return Timeout;
             }
             assert(errno == EINTR);
         } else if (child == -1) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             return WaitError;
         } else if (WIFEXITED(status)) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (WEXITSTATUS(status) == 0) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 return OK;
             } else {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 return NonZeroStatus;
             }
         } else if (WIFSIGNALED(status)) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             return Exception;
         } else {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             return WaitError;
         }
     }
@@ -525,21 +613,30 @@ static int _LaunchLabExecutable(char* labExe)
     int exitCode = 1;
 
     fflush(stdout);
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (-1 == access(".", R_OK | W_OK | X_OK | F_OK)) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         ReportSystemError("access");
         return exitCode;
     }
     pid_t pid = fork();
+    fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
     if (-1 == pid) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         ReportSystemError("fork");
         return exitCode;
     } else if (0 == pid) {
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         // in forked process
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (!freopen("in.txt", "r", stdin)) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             ReportSystemError("freopen");
             exit(EXIT_FAILURE);
         }
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (!freopen("out.txt", "w", stdout)) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             ReportSystemError("freopen");
             exit(EXIT_FAILURE);
         }
@@ -557,22 +654,33 @@ static int _LaunchLabExecutable(char* labExe)
         rem.tv_nsec = (GetTimeout() % 1000) * 1000000;
         EWaitStatus status = WaitForProcess(pid, &rem, &rusage);
 
+        fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
         if (WaitError == status) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             ReportSystemError("wait4");
         } else if (Timeout == status) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             ReportTimeout(labExe);
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (kill(pid, SIGKILL)) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 ReportSystemError("kill");
             }
         } else if (Exception == status) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             ReportException(labExe);
         } else if (NonZeroStatus == status) {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             ReportNonZeroExitCode(labExe);
         } else {
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             size_t labMem0 = 0;
+            fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
             if (CheckMemory(rusage, &labMem0)) {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 ReportOutOfMemory(labExe, labMem0);
             } else {
+                fprintf(stderr, "function: %s, line: %d\n", __FUNCTION__, __LINE__);
                 exitCode = 0;
             }
         }
