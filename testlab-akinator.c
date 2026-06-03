@@ -116,7 +116,6 @@ static int CheckFromArray(void) {
 
     printf("%s\n", status == Pass ? "PASSED" : "FAILED");
     testN++;
-    fclose(out);
     return status == Fail;
 }
 
@@ -198,7 +197,6 @@ static int CheckerBig(void) {
 
     printf("%s\n", status == Pass ? "PASSED" : "FAILED");
     testN++;
-    fclose(out);
     return status == Fail;
 }
 
