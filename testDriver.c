@@ -334,7 +334,7 @@ int LaunchLabExecutable(const char* labExe, int argc, const char* const * argv)
     labJobLimits.PeakJobMemoryUsed = GetMemoryLimit();
     const HANDLE labJob = CreateJobObject(&labInhertitIO, "labJob");
     size_t labMem0 = SIZE_MAX;
-    LPSTR labCommandLine = LabCommandLine(labExe, argc, argv);
+    LPSTR labCommandLine = LabCommandLine(0, labExe, argc, argv);
 
     if (NULL == labCommandLine) {
         PrintWithoutBuffering("\nSystem error: Cannot create command line for %s\n", labExe);
