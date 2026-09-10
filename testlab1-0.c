@@ -295,31 +295,37 @@ static int checkerBig2(void)
     }
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {feederBig, checkerBig},
-    {feederBig1, checkerBig1},
-    {feederBig2, checkerBig2},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {feederBig, checkerBig, NoArgs},
+    {feederBig1, checkerBig1, NoArgs},
+    {feederBig2, checkerBig2, NoArgs},
 };
 
 TLabTest GetLabTest(int testIdx) {

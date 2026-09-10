@@ -42,20 +42,20 @@ static const struct testInOut
     /*18*/ {7, 11, {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 6}, {1, 3}, {2, 4}, {5, 7}, {3, 6}}, NULL, 6, {1, 2, 3, 4, 5, 6, 7}},
     /*19*/ {8, 13, {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 6}, {1, 5}, {2, 6}, {3, 7}, {4, 8}, {5, 3}}, NULL, 4, {1, 2, 3, 4, 5, 6, 7, 8}},
     /*20*/ {9, 14, {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 9}, {9, 7}, {1, 3}, {2, 4}, {3, 5}, {4, 6}, {5, 7}}, NULL, 7, {1, 2, 3, 4, 5, 6, 7, 8, 9}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*21*/ {12, 13, {{2, 1}, {2, 4}, {2, 6}, {3, 6}, {4, 7}, {5, 2}, {5, 8}, {6, 2}, {7, 11}, {8, 11}, {10, 7}, {11, 9}, {12, 9}}, NULL, 11, {12, 10, 5, 8, 3, 2, 6, 4, 7, 11, 9, 1}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*22*/ {12, 20, {{1, 4}, {2, 4}, {2, 5}, {2, 6}, {2, 3}, {3, 6}, {4, 1}, {4, 5}, {4, 8}, {5, 4}, {7, 4}, {7, 11}, {8, 7}, {8, 5}, {8, 6}, {8, 11}, {8, 12}, {10, 7}, {11, 7}, {11, 12}}, NULL, 7, {10, 9, 2, 3, 1, 4, 5, 7, 8, 11, 12, 6}},
     /*23*/ {13, 18, {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 9}, {9, 10}, {10, 11}, {11, 12}, {12, 13}, {13, 11}, {1, 7}, {2, 8}, {3, 9}, {4, 10}, {5, 11}}, NULL, 11, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*24*/ {18, 27, {{1, 8}, {2, 9}, {3, 6}, {4, 3}, {6, 9}, {6, 10}, {7, 6}, {7, 4}, {8, 5}, {8, 15}, {9, 2}, {9, 6}, {9, 13}, {10, 9}, {10, 13}, {12, 8}, {12, 13}, {13, 12}, {13, 9}, {13, 10}, {14, 18}, {15, 16}, {16, 15}, {16, 17}, {17, 16}, {17, 15}, {18, 15}}, NULL, 11, {14, 18, 11, 7, 4, 3, 2, 6, 9, 10, 12, 13, 1, 8, 15, 16, 17, 5}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*25*/ {18, 28, {{1, 5}, {1, 8}, {1, 15}, {2, 3}, {4, 3}, {4, 7}, {5, 8}, {6, 3}, {6, 5}, {7, 3}, {8, 9}, {9, 6}, {9, 10}, {9, 12}, {10, 7}, {10, 9}, {10, 11}, {11, 4}, {11, 18}, {12, 8}, {13, 12}, {13, 17}, {14, 10}, {16, 13}, {16, 15}, {17, 13}, {17, 14}, {17, 18}}, NULL, 12, {16, 13, 17, 14, 2, 1, 15, 5, 6, 8, 9, 10, 12, 11, 18, 4, 7, 3}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*26*/ {18, 32, {{1, 5}, {1, 15}, {2, 5}, {2, 6}, {3, 4}, {4, 7}, {5, 1}, {5, 2}, {5, 8}, {6, 5}, {6, 7}, {8, 5}, {8, 12}, {8, 15}, {9, 10}, {9, 12}, {10, 7}, {11, 7}, {11, 14}, {12, 8}, {13, 9}, {13, 12}, {13, 14}, {13, 16}, {14, 10}, {14, 13}, {15, 8}, {15, 16}, {16, 12}, {17, 16}, {17, 18}, {18, 11}}, NULL, 10, {17, 18, 11, 13, 14, 9, 10, 3, 4, 1, 2, 5, 6, 8, 12, 15, 16, 7}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*27*/ {18, 34, {{1, 2}, {2, 5}, {2, 6}, {3, 2}, {3, 4}, {4, 18}, {5, 6}, {6, 7}, {6, 9}, {7, 4}, {7, 6}, {7, 9}, {8, 9}, {8, 12}, {8, 15}, {9, 5}, {9, 12}, {10, 7}, {10, 11}, {10, 13}, {11, 4}, {11, 10}, {11, 18}, {13, 12}, {13, 14}, {14, 13}, {14, 18}, {15, 8}, {15, 16}, {16, 12}, {16, 18}, {17, 13}, {17, 18}, {18, 11}}, NULL, 8, {17, 8, 15, 16, 3, 1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 12}},
-    //Attention! This graph has more than one connectivity component*/ 
+    //Attention! This graph has more than one connectivity component*/
     /*28*/ {18, 23, {{1, 8}, {2, 3}, {2, 5}, {2, 6}, {3, 6}, {4, 3}, {5, 1}, {6, 5}, {6, 7}, {7, 4}, {7, 6}, {7, 11}, {8, 1}, {8, 12}, {11, 10}, {13, 12}, {13, 16}, {13, 17}, {14, 17}, {14, 18}, {15, 8}, {16, 17}, {17, 16}}, NULL, 13, {15, 14, 18, 13, 16, 17, 9, 2, 3, 4, 6, 7, 11, 10, 5, 1, 8, 12}}};
 
 static size_t LabMemoryLimit = MIN_PROCESS_RSS_BYTES;
@@ -231,7 +231,7 @@ static int checkerBig(void)
         fact = Fail;
 
     fclose(out);
-    
+
     printf("%s\n", fact);
 
     testN++;
@@ -309,7 +309,7 @@ static int checkerBig1(void)
         fact = Fail;
 
     fclose(out);
-    
+
     printf("%s\n", fact);
 
     testN++;
@@ -317,37 +317,43 @@ static int checkerBig1(void)
     return fact == Fail;
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray}, // 1
-    {FeedFromArray, CheckFromArray}, // 2
-    {FeedFromArray, CheckFromArray}, // 3
-    {FeedFromArray, CheckFromArray}, // 4
-    {FeedFromArray, CheckFromArray}, // 5
-    {FeedFromArray, CheckFromArray}, // 6
-    {FeedFromArray, CheckFromArray}, // 7
-    {FeedFromArray, CheckFromArray}, // 8
-    {FeedFromArray, CheckFromArray}, // 9
-    {FeedFromArray, CheckFromArray}, // 10
-    {FeedFromArray, CheckFromArray}, // 11
-    {FeedFromArray, CheckFromArray}, // 12
-    {FeedFromArray, CheckFromArray}, // 13
-    {FeedFromArray, CheckFromArray}, // 14
-    {FeedFromArray, CheckFromArray}, // 15
-    {FeedFromArray, CheckFromArray}, // 16
-    {FeedFromArray, CheckFromArray}, // 17
-    {FeedFromArray, CheckFromArray}, // 18
-    {FeedFromArray, CheckFromArray}, // 19
-    {FeedFromArray, CheckFromArray}, // 20
-    {FeedFromArray, CheckFromArray}, // 21
-    {FeedFromArray, CheckFromArray}, // 22
-    {FeedFromArray, CheckFromArray}, // 23
-    {FeedFromArray, CheckFromArray}, // 24
-    {FeedFromArray, CheckFromArray}, // 25
-    {FeedFromArray, CheckFromArray}, // 26
-    {FeedFromArray, CheckFromArray}, // 27
-    {FeedFromArray, CheckFromArray}, // 28
-    {feederBig, checkerBig},         // 29
-    {feederBig1, checkerBig1}        // 30
+    {FeedFromArray, CheckFromArray, NoArgs}, // 1
+    {FeedFromArray, CheckFromArray, NoArgs}, // 2
+    {FeedFromArray, CheckFromArray, NoArgs}, // 3
+    {FeedFromArray, CheckFromArray, NoArgs}, // 4
+    {FeedFromArray, CheckFromArray, NoArgs}, // 5
+    {FeedFromArray, CheckFromArray, NoArgs}, // 6
+    {FeedFromArray, CheckFromArray, NoArgs}, // 7
+    {FeedFromArray, CheckFromArray, NoArgs}, // 8
+    {FeedFromArray, CheckFromArray, NoArgs}, // 9
+    {FeedFromArray, CheckFromArray, NoArgs}, // 10
+    {FeedFromArray, CheckFromArray, NoArgs}, // 11
+    {FeedFromArray, CheckFromArray, NoArgs}, // 12
+    {FeedFromArray, CheckFromArray, NoArgs}, // 13
+    {FeedFromArray, CheckFromArray, NoArgs}, // 14
+    {FeedFromArray, CheckFromArray, NoArgs}, // 15
+    {FeedFromArray, CheckFromArray, NoArgs}, // 16
+    {FeedFromArray, CheckFromArray, NoArgs}, // 17
+    {FeedFromArray, CheckFromArray, NoArgs}, // 18
+    {FeedFromArray, CheckFromArray, NoArgs}, // 19
+    {FeedFromArray, CheckFromArray, NoArgs}, // 20
+    {FeedFromArray, CheckFromArray, NoArgs}, // 21
+    {FeedFromArray, CheckFromArray, NoArgs}, // 22
+    {FeedFromArray, CheckFromArray, NoArgs}, // 23
+    {FeedFromArray, CheckFromArray, NoArgs}, // 24
+    {FeedFromArray, CheckFromArray, NoArgs}, // 25
+    {FeedFromArray, CheckFromArray, NoArgs}, // 26
+    {FeedFromArray, CheckFromArray, NoArgs}, // 27
+    {FeedFromArray, CheckFromArray, NoArgs}, // 28
+    {feederBig, checkerBig, NoArgs},         // 29
+    {feederBig1, checkerBig1, NoArgs},       // 30
 };
 
 TLabTest GetLabTest(int testIdx)

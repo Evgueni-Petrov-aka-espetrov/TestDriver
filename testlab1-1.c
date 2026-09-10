@@ -142,26 +142,32 @@ static int checkerBig(void)
     }
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {feederBig, checkerBig}
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {feederBig, checkerBig, NoArgs},
 };
 
 TLabTest GetLabTest(int testIdx) {

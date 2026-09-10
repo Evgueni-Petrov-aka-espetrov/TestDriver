@@ -107,7 +107,7 @@ static int feederBig(uint32_t seed, int n, uint32_t mod) {
                 return -1;
             }
         }
-        fprintf(in, "\n");  
+        fprintf(in, "\n");
     }
     fclose(in);
     return 0;
@@ -187,7 +187,7 @@ static int feederBig5(void) { // первый и второй столбец л�
       printf("can't create in.txt. No space on disk?\n");
       return -1;
     }
-    
+
     uint32_t first_col[n];
     uint32_t second_col[n];
 
@@ -216,7 +216,7 @@ static int feederBig5(void) { // первый и второй столбец л�
                 return -1;
             }
         }
-        fprintf(in, "\n");  
+        fprintf(in, "\n");
     }
     fclose(in);
     return 0;
@@ -231,48 +231,55 @@ static int feederBigBig(void) {
     LabMemoryLimit = 3500 * 3500 * sizeof(uint8_t) + MIN_PROCESS_RSS_BYTES;
     return feederBig(3465077311u, 3500, 251u);
 }
+
 static int checkerBigBig(void) {
     return checkerBig(142u);
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray}, // 1
-    {FeedFromArray, CheckFromArray}, // 2
-    {FeedFromArray, CheckFromArray}, // 3
-    {FeedFromArray, CheckFromArray}, // 4
-    {FeedFromArray, CheckFromArray}, // 5
-    {FeedFromArray, CheckFromArray}, // 6
-    {FeedFromArray, CheckFromArray}, // 7 
-    {FeedFromArray, CheckFromArray}, // 8
-    {FeedFromArray, CheckFromArray}, // 9
-    {FeedFromArray, CheckFromArray}, // 10
-    {FeedFromArray, CheckFromArray}, // 11
-    {FeedFromArray, CheckFromArray}, // 12
-    {FeedFromArray, CheckFromArray}, // 13
-    {FeedFromArray, CheckFromArray}, // 14
-    {FeedFromArray, CheckFromArray}, // 15
-    {FeedFromArray, CheckFromArray}, // 16
-    {FeedFromArray, CheckFromArray}, // 17
-    {FeedFromArray, CheckFromArray}, // 18
-    {FeedFromArray, CheckFromArray}, // 19
-    {FeedFromArray, CheckFromArray}, // 20
-    {FeedFromArray, CheckFromArray}, // 21
-    {FeedFromArray, CheckFromArray}, // 22
-    {FeedFromArray, CheckFromArray}, // 23
-    {FeedFromArray, CheckFromArray}, // 24
-    {FeedFromArray, CheckFromArray}, // 25
-    {FeedFromArray, CheckFromArray}, // 26
-    {FeedFromArray, CheckFromArray}, // 27
-    {FeedFromArray, CheckFromArray}, // 28
-    {FeedFromArray, CheckFromArray}, // 29
-    {FeedFromArray, CheckFromArray}, // 30
-    {FeedFromArray, CheckFromArray}, // 31
-    {feederBig1, checkerBig1},       // 32
-    {feederBig2, checkerBig2},       // 33
-    {feederBig3, checkerBig3},       // 34
-    {feederBig4, checkerBig4},       // 35
-    {feederBig5, checkerBig5},       // 36
-    {feederBigBig, checkerBigBig},   // 37
+    {FeedFromArray, CheckFromArray, NoArgs}, // 1
+    {FeedFromArray, CheckFromArray, NoArgs}, // 2
+    {FeedFromArray, CheckFromArray, NoArgs}, // 3
+    {FeedFromArray, CheckFromArray, NoArgs}, // 4
+    {FeedFromArray, CheckFromArray, NoArgs}, // 5
+    {FeedFromArray, CheckFromArray, NoArgs}, // 6
+    {FeedFromArray, CheckFromArray, NoArgs}, // 7
+    {FeedFromArray, CheckFromArray, NoArgs}, // 8
+    {FeedFromArray, CheckFromArray, NoArgs}, // 9
+    {FeedFromArray, CheckFromArray, NoArgs}, // 10
+    {FeedFromArray, CheckFromArray, NoArgs}, // 11
+    {FeedFromArray, CheckFromArray, NoArgs}, // 12
+    {FeedFromArray, CheckFromArray, NoArgs}, // 13
+    {FeedFromArray, CheckFromArray, NoArgs}, // 14
+    {FeedFromArray, CheckFromArray, NoArgs}, // 15
+    {FeedFromArray, CheckFromArray, NoArgs}, // 16
+    {FeedFromArray, CheckFromArray, NoArgs}, // 17
+    {FeedFromArray, CheckFromArray, NoArgs}, // 18
+    {FeedFromArray, CheckFromArray, NoArgs}, // 19
+    {FeedFromArray, CheckFromArray, NoArgs}, // 20
+    {FeedFromArray, CheckFromArray, NoArgs}, // 21
+    {FeedFromArray, CheckFromArray, NoArgs}, // 22
+    {FeedFromArray, CheckFromArray, NoArgs}, // 23
+    {FeedFromArray, CheckFromArray, NoArgs}, // 24
+    {FeedFromArray, CheckFromArray, NoArgs}, // 25
+    {FeedFromArray, CheckFromArray, NoArgs}, // 26
+    {FeedFromArray, CheckFromArray, NoArgs}, // 27
+    {FeedFromArray, CheckFromArray, NoArgs}, // 28
+    {FeedFromArray, CheckFromArray, NoArgs}, // 29
+    {FeedFromArray, CheckFromArray, NoArgs}, // 30
+    {FeedFromArray, CheckFromArray, NoArgs}, // 31
+    {feederBig1, checkerBig1, NoArgs},       // 32
+    {feederBig2, checkerBig2, NoArgs},       // 33
+    {feederBig3, checkerBig3, NoArgs},       // 34
+    {feederBig4, checkerBig4, NoArgs},       // 35
+    {feederBig5, checkerBig5, NoArgs},       // 36
+    {feederBigBig, checkerBigBig, NoArgs},   // 37
 };
 
 TLabTest GetLabTest(int testIdx) {
