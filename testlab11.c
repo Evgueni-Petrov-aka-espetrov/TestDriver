@@ -95,7 +95,7 @@ static int CheckFromArray(void) {
         printf("Wrong knapsack cost output. Found %d, but excepted %d. -- Failed\n", knapsackCost, TestData.Tests[currentTest].KnapsackCost);
         return 1;
     }
-    
+
     int weight = 0, cost = 0;
     size_t readItemsCount = 0;
     while(fscanf(stream.Out, "%d %d", &weight, &cost) == 2) {
@@ -119,36 +119,15 @@ static int CheckFromArray(void) {
     return 0;
 }
 
-const TLabTest labTests[] = {
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-        {FeedFromArray, CheckFromArray},
-};
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
 
 TLabTest GetLabTest(int testIdx) {
     (void)testIdx;
-    TLabTest labTest = { FeedFromArray, CheckFromArray };
+    TLabTest labTest = { FeedFromArray, CheckFromArray, NoArgs};
     return labTest;
 }
 

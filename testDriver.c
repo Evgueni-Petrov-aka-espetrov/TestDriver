@@ -10,10 +10,11 @@
 #include <sys/resource.h>
 #endif
 
-static int LaunchLabExecutable(char* labExe);
+static int LaunchLabExecutable(const char* labExe, int argc, const char* const * argv);
 static int UserTestAll = 0;
 static int UserMemoryLimit = -1;
 static int UserTimeout = -1;
+static char CommandLineBuffer[4096];
 
 static size_t GetMemoryLimit(void) {
     return UserMemoryLimit < 0 ? GetTestMemoryLimit() : (size_t) UserMemoryLimit;
@@ -31,20 +32,55 @@ static void PrintWithoutBuffering(const char format[], ...) {
     fflush(stdout);
 }
 
-static const char* GetRunnerCommand(const char* runnerExe, char* labExe) {
-    static char runnerCommand[4096] = {0};
-    int testRunnerSize = snprintf(
-        runnerCommand, sizeof(runnerCommand), "%s -m %zu -t %d -e %s",
-        runnerExe, (GetMemoryLimit() + 1023) / 1024, GetTimeout(), labExe);
-    if (testRunnerSize < 0) {
+static char* LabCommandLine(size_t size, const char* labExe, int argc, const char* const * argv)
+{
+    size_t length = strlen(labExe);
+
+    if (length >= sizeof(CommandLineBuffer) - size) {
+        PrintWithoutBuffering("\nInternal error: insufficient buffer size for %s command-line arguments\n", labExe);
+        return NULL;
+    }
+
+    memcpy(CommandLineBuffer + size, labExe, length);
+    size += length;
+
+    for (int i = 0; i < argc && argv[i] != NULL; ++i) {
+        length = strlen(argv[i]);
+
+        if (length + 3 >= sizeof(CommandLineBuffer) - size) {
+            PrintWithoutBuffering("\nInternal error: insufficient buffer size %s the command-line arguments\n", labExe);
+            return NULL;
+        }
+
+        CommandLineBuffer[size] = ' ';
+        CommandLineBuffer[size + 1] = '\"';
+        memcpy(CommandLineBuffer + size + 2, argv[i], length);
+        CommandLineBuffer[size + length + 2] = '\"';
+        size += length + 3;
+    }
+
+    CommandLineBuffer[size] = 0;
+
+    return CommandLineBuffer;
+}
+
+static const char* GetRunnerCommand(const char* runnerExe, const char* labExe, const char* const * args) {
+    int ssize = snprintf(
+        CommandLineBuffer, sizeof(CommandLineBuffer), "%s -m %zu -t %d -e ",
+        runnerExe, (GetMemoryLimit() + 1023) / 1024, GetTimeout());
+    size_t size = (size_t)ssize;
+
+    if (ssize < 0) {
         PrintWithoutBuffering("\nInternal error: snprintf returned negative value\n");
         return NULL;
     }
-    if (testRunnerSize == sizeof(runnerCommand) - 1) {
+
+    if (size == sizeof(CommandLineBuffer) - 1) {
         PrintWithoutBuffering("\nInternal error: snprintf stopped at the end of buffer\n");
         return NULL;
     }
-    return runnerCommand;
+
+    return LabCommandLine(size, labExe, 1000000, args);
 }
 
 int main(int argc, char* argv[]) {
@@ -67,7 +103,10 @@ int main(int argc, char* argv[]) {
         argc -= 2;
     }
     if (argc >= 3 && strcmp(argv[1], "-e") == 0) {
-        return LaunchLabExecutable(argv[2]);
+        const char* labExe = argv[2];
+        argv += 3;
+        argc -= 3;
+        return LaunchLabExecutable(labExe, argc, (const char* const *)argv);
     }
 
     PrintWithoutBuffering("\nKOI FIT NSU Lab Tester (c) 2009-2020 by Evgueni Petrov\n");
@@ -81,13 +120,15 @@ int main(int argc, char* argv[]) {
 
     for (i = 0, count = 0, fail = 0; i < GetTestCount(); i++, fail = 0) {
         PrintWithoutBuffering("TEST %d/%d: ", i+1, GetTestCount());
-        if (GetLabTest(i).Feeder() != 0) {
+        TLabTest testRun = GetLabTest(i);
+
+        if (testRun.Feeder() != 0) {
             if (!UserTestAll) {
                 break;
             }
             fail = 1;
         }
-        const char* runnerCommand = GetRunnerCommand(runnerExe, argv[1]);
+        const char* runnerCommand = GetRunnerCommand(runnerExe, argv[1], testRun.Args());
         if (!runnerCommand) {
             break;
         }
@@ -99,7 +140,7 @@ int main(int argc, char* argv[]) {
         int millisecondsPerDay = 1000 * 60 * 60 * 24;
         double msElapsed = ((int)(ms1 - ms0) + millisecondsPerDay) % millisecondsPerDay;
         PrintWithoutBuffering("%.0f ms, ", msElapsed);
-        if (GetLabTest(i).Checker() != 0) {
+        if (testRun.Checker() != 0) {
             if (!UserTestAll) {
                 break;
             }
@@ -222,7 +263,8 @@ static void ReportNonZeroExitCode(const char labExe[]) {
 
 #if defined _WIN32
 #include <windows.h>
-int LaunchLabExecutable(char* labExe)
+
+int LaunchLabExecutable(const char* labExe, int argc, const char* const * argv)
 {
     SECURITY_ATTRIBUTES labInhertitIO = {sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};
     const HANDLE labIn = CreateFile("in.txt",
@@ -292,6 +334,14 @@ int LaunchLabExecutable(char* labExe)
     labJobLimits.PeakJobMemoryUsed = GetMemoryLimit();
     const HANDLE labJob = CreateJobObject(&labInhertitIO, "labJob");
     size_t labMem0 = SIZE_MAX;
+    LPSTR labCommandLine = LabCommandLine(labExe, argc, argv);
+
+    if (NULL == labCommandLine) {
+        PrintWithoutBuffering("\nSystem error: Cannot create command line for %s\n", labExe);
+        CloseHandle(labIn);
+        CloseHandle(labOut);
+        return 1;
+    }
 
     if (labJob == 0) {
         PrintWithoutBuffering("\nSystem error: %u in CreateJobObject\n", (unsigned)GetLastError());
@@ -309,7 +359,7 @@ int LaunchLabExecutable(char* labExe)
     }
 
     if (!CreateProcess(NULL, // LPCTSTR lpApplicationName,
-        labExe, // __inout_opt  LPTSTR lpCommandLine,
+        labCommandLine, // __inout_opt  LPTSTR labCommandLine,
         &labInhertitIO, // __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
         &labInhertitIO, // __in_opt     LPSECURITY_ATTRIBUTES lpThreadAttributes,
         TRUE, // __in         BOOL bInheritHandles,
@@ -475,9 +525,10 @@ static void SigchldTrap(int signo) {
     (void) signo;
 }
 
-static int _LaunchLabExecutable(char* labExe);
+static int Launch(const char* labExe, char* const * args);
 
-static int LaunchLabExecutable(char* labExe) {
+int LaunchLabExecutable(const char* labExe, int argc, const char* const * argv) {
+    const char* args[16];
     struct sigaction new = {0};
     new.sa_handler = SigchldTrap;
     (void)sigemptyset(&new.sa_mask); // не умеет завершаться неуспешно
@@ -488,7 +539,20 @@ static int LaunchLabExecutable(char* labExe) {
         return -1;
     }
 
-    int retCode = _LaunchLabExecutable(labExe);
+    if (argc + 2 > (int)((sizeof args) / (sizeof args[0]))) {
+        PrintWithoutBuffering("\nInternal error: too many command-line arguments %d\n", argc);
+        return -1;
+    }
+
+    args[0] = labExe;
+
+    for (int i = 0; i < argc; ++i)
+        args[i + 1] = argv[i];
+
+    args[argc + 1] = NULL;
+
+    int retCode = Launch(labExe, (char* const *)args);
+
     if (sigaction(SIGCHLD, &old, NULL)) {
         ReportSystemError("sigaction");
         return -1;
@@ -526,7 +590,7 @@ static int WaitForProcess(pid_t pid, struct timespec* ts, struct rusage* rusage)
     return Timeout;
 }
 
-static int _LaunchLabExecutable(char* labExe)
+int Launch(const char* labExe, char* const * args)
 {
     int exitCode = 1;
 
@@ -549,10 +613,10 @@ static int _LaunchLabExecutable(char* labExe)
             ReportSystemError("freopen");
             exit(EXIT_FAILURE);
         }
-        int ret = execl(labExe, labExe, NULL);
+        int ret = execv(labExe, args);
         assert(ret == -1);
         (void)ret; // -Wunused-variable for NDEBUG
-        ReportSystemError("execl");
+        ReportSystemError("execv");
         exit(EXIT_FAILURE);
     }
     {

@@ -294,32 +294,38 @@ static int CheckerBigTriangle(void) {
     return status == Fail;
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray}, //1
-    {FeedFromArray, CheckFromArray}, //2
-    {FeedFromArray, CheckFromArray}, //3
-    {FeedFromArray, CheckFromArray}, //4
-    {FeedFromArray, CheckFromArray}, //5
-    {FeedFromArray, CheckFromArray}, //6
-    {FeedFromArray, CheckFromArray}, //7
-    {FeedFromArray, CheckFromArray}, //8
-    {FeedFromArray, CheckFromArray}, //9
-    {FeedFromArray, CheckFromArray}, //10
-    {FeedFromArray, CheckFromArray}, //11
-    {FeedFromArray, CheckFromArray}, //12
-    {FeedFromArray, CheckFromArray}, //13
-    {FeedFromArray, CheckFromArray}, //14
-    {FeedFromArray, CheckFromArray}, //15
-    {FeedFromArray, CheckFromArray}, //16
-    {FeedFromArray, CheckFromArray}, //17
-    {FeedFromArray, CheckFromArray}, //18
-    {FeedFromArray, CheckFromArray}, //19
-    {FeedFromArray, CheckFromArray}, //20
-    {FeedFromArray, CheckFromArray}, //21
-    {FeedFromArray, CheckFromArray}, //22
-    {FeedFromArray, CheckFromArray}, //23
-    {FeederBigSquare, CheckerBigSquare}, //24
-    {FeederBigTriangle, CheckerBigTriangle} //25
+    {FeedFromArray, CheckFromArray, NoArgs}, //1
+    {FeedFromArray, CheckFromArray, NoArgs}, //2
+    {FeedFromArray, CheckFromArray, NoArgs}, //3
+    {FeedFromArray, CheckFromArray, NoArgs}, //4
+    {FeedFromArray, CheckFromArray, NoArgs}, //5
+    {FeedFromArray, CheckFromArray, NoArgs}, //6
+    {FeedFromArray, CheckFromArray, NoArgs}, //7
+    {FeedFromArray, CheckFromArray, NoArgs}, //8
+    {FeedFromArray, CheckFromArray, NoArgs}, //9
+    {FeedFromArray, CheckFromArray, NoArgs}, //10
+    {FeedFromArray, CheckFromArray, NoArgs}, //11
+    {FeedFromArray, CheckFromArray, NoArgs}, //12
+    {FeedFromArray, CheckFromArray, NoArgs}, //13
+    {FeedFromArray, CheckFromArray, NoArgs}, //14
+    {FeedFromArray, CheckFromArray, NoArgs}, //15
+    {FeedFromArray, CheckFromArray, NoArgs}, //16
+    {FeedFromArray, CheckFromArray, NoArgs}, //17
+    {FeedFromArray, CheckFromArray, NoArgs}, //18
+    {FeedFromArray, CheckFromArray, NoArgs}, //19
+    {FeedFromArray, CheckFromArray, NoArgs}, //20
+    {FeedFromArray, CheckFromArray, NoArgs}, //21
+    {FeedFromArray, CheckFromArray, NoArgs}, //22
+    {FeedFromArray, CheckFromArray, NoArgs}, //23
+    {FeederBigSquare, CheckerBigSquare, NoArgs},    //24
+    {FeederBigTriangle, CheckerBigTriangle, NoArgs} //25
 };
 
 TLabTest GetLabTest(int testIdx) {

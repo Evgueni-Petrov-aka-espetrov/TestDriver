@@ -4,7 +4,7 @@
 #include <string.h>
 #define MAX_POINT_COUNT 100000
 
-typedef struct 
+typedef struct
 {
     int x, y;
 } TPoint;
@@ -82,7 +82,7 @@ static int CheckFromArray(void)
                 printf("short output -- %s\n", Fail);
                 return 1;
             }
-            
+
             for (int j = 0; j < testInOut[testN].pointCount; ++j) {
                 if (point.x == testInOut[testN].outPoints[j].x && point.y == testInOut[testN].outPoints[j].y) {
                     if (found[j] == 1) {
@@ -90,35 +90,35 @@ static int CheckFromArray(void)
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
-                    
+
                     ++found[j];
                     ++foundCount;
                     break;
                 }
             }
         }
-        
+
         if (foundCount != testInOut[testN].pointCount) {
             fclose(out);
             printf("wrong output -- %s\n", Fail);
             return 1;
         }
-    }   
+    }
     else if (testInOut[testN].outError != NULL) {
         char error[128] = {0};
         const char* status = ScanChars(out, sizeof(error), error);
-        
+
         if (status == Pass &&  _strnicmp(testInOut[testN].outError, error, strlen(error)) != 0) {
             status = Fail;
         }
-        
+
         if (status == Fail) {
             fclose(out);
             printf("wrong output -- ");
             return 1;
         }
     }
-    
+
     passed = !HaveGarbageAtTheEnd(out);
     ++testN;
     fclose(out);
@@ -153,7 +153,7 @@ static int FeederBigSegment(void)
         if (bigSegmentsN != 1) {
             y = i;
         }
-        
+
         if (fprintf(in, "%d %d\n", x, y) < 2) {
                 fclose(in);
                 printf("%s\n", "can't create in.txt. No space on disk?\n");
@@ -168,7 +168,7 @@ static int FeederBigSegment(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigSegment(void)
@@ -195,7 +195,7 @@ static int CheckerBigSegment(void)
             fclose(out);
             printf("short output -- %s\n", Fail);
             return 1;
-        }  
+        }
 
         for (int j = 0; j < 2; ++j) {
             if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
@@ -204,14 +204,14 @@ static int CheckerBigSegment(void)
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
-                
+
                 ++found[j];
                 ++foundCount;
                 break;
             }
         }
     }
-    
+
     if (foundCount != 2) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
@@ -265,7 +265,7 @@ static int FeederBigTriangle(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigTriangle(void)
@@ -282,7 +282,7 @@ static int CheckerBigTriangle(void)
     }
     else if (bigTrianglesN == 2) {
         pointOut[2].x = INT_MAX - MAX_POINT_COUNT + 2;
-    } 
+    }
 
     int found[3] = { 0 };
     int foundCount = 0;
@@ -301,14 +301,14 @@ static int CheckerBigTriangle(void)
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
-                
+
                 ++found[j];
                 ++foundCount;
                 break;
             }
         }
     }
-    
+
     if (foundCount != 3) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
@@ -384,7 +384,7 @@ static int FeederBigParabol(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigParabol(void)
@@ -446,7 +446,7 @@ static int CheckerBigParabol(void)
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
-                    
+
                     ++found[j];
                     ++foundCount;
                     break;
@@ -469,47 +469,53 @@ static int CheckerBigParabol(void)
     return !passed;
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray}, // 1
-    {FeedFromArray, CheckFromArray}, // 2
-    {FeedFromArray, CheckFromArray}, // 3
-    {FeedFromArray, CheckFromArray}, // 4
-    {FeedFromArray, CheckFromArray}, // 5
-    {FeedFromArray, CheckFromArray}, // 6
-    {FeedFromArray, CheckFromArray}, // 7
-    {FeedFromArray, CheckFromArray}, // 8  
-    {FeedFromArray, CheckFromArray}, // 9
-    {FeedFromArray, CheckFromArray}, // 10
-    {FeedFromArray, CheckFromArray}, // 11
-    {FeedFromArray, CheckFromArray}, // 12    
-    {FeedFromArray, CheckFromArray}, // 13
-    {FeedFromArray, CheckFromArray}, // 14
-    {FeedFromArray, CheckFromArray}, // 15
-    {FeedFromArray, CheckFromArray}, // 16    
-    {FeedFromArray, CheckFromArray}, // 17
-    {FeedFromArray, CheckFromArray}, // 18
-    {FeedFromArray, CheckFromArray}, // 19
-    {FeedFromArray, CheckFromArray}, // 20   
-    {FeedFromArray, CheckFromArray}, // 21
-    {FeedFromArray, CheckFromArray}, // 22
-    {FeedFromArray, CheckFromArray}, // 23
-    {FeedFromArray, CheckFromArray}, // 24
-    {FeedFromArray, CheckFromArray}, // 25
-    {FeedFromArray, CheckFromArray}, // 26
-    {FeedFromArray, CheckFromArray}, // 27
-    {FeedFromArray, CheckFromArray}, // 28
-    {FeedFromArray, CheckFromArray}, // 29
-    {FeedFromArray, CheckFromArray}, // 30
-    {FeedFromArray, CheckFromArray}, // 31
-    {FeederBigSegment, CheckerBigSegment}, // 32
-    {FeederBigSegment, CheckerBigSegment}, // 33
-    {FeederBigSegment, CheckerBigSegment}, // 34
-    {FeederBigTriangle, CheckerBigTriangle}, // 35
-    {FeederBigTriangle, CheckerBigTriangle}, // 36
-    {FeederBigParabol, CheckerBigParabol}, // 37
-    {FeederBigParabol, CheckerBigParabol}, // 38
-    {FeederBigParabol, CheckerBigParabol}, // 39
-    {FeederBigParabol, CheckerBigParabol}  // 40
+    {FeedFromArray, CheckFromArray, NoArgs}, // 1
+    {FeedFromArray, CheckFromArray, NoArgs}, // 2
+    {FeedFromArray, CheckFromArray, NoArgs}, // 3
+    {FeedFromArray, CheckFromArray, NoArgs}, // 4
+    {FeedFromArray, CheckFromArray, NoArgs}, // 5
+    {FeedFromArray, CheckFromArray, NoArgs}, // 6
+    {FeedFromArray, CheckFromArray, NoArgs}, // 7
+    {FeedFromArray, CheckFromArray, NoArgs}, // 8
+    {FeedFromArray, CheckFromArray, NoArgs}, // 9
+    {FeedFromArray, CheckFromArray, NoArgs}, // 10
+    {FeedFromArray, CheckFromArray, NoArgs}, // 11
+    {FeedFromArray, CheckFromArray, NoArgs}, // 12
+    {FeedFromArray, CheckFromArray, NoArgs}, // 13
+    {FeedFromArray, CheckFromArray, NoArgs}, // 14
+    {FeedFromArray, CheckFromArray, NoArgs}, // 15
+    {FeedFromArray, CheckFromArray, NoArgs}, // 16
+    {FeedFromArray, CheckFromArray, NoArgs}, // 17
+    {FeedFromArray, CheckFromArray, NoArgs}, // 18
+    {FeedFromArray, CheckFromArray, NoArgs}, // 19
+    {FeedFromArray, CheckFromArray, NoArgs}, // 20
+    {FeedFromArray, CheckFromArray, NoArgs}, // 21
+    {FeedFromArray, CheckFromArray, NoArgs}, // 22
+    {FeedFromArray, CheckFromArray, NoArgs}, // 23
+    {FeedFromArray, CheckFromArray, NoArgs}, // 24
+    {FeedFromArray, CheckFromArray, NoArgs}, // 25
+    {FeedFromArray, CheckFromArray, NoArgs}, // 26
+    {FeedFromArray, CheckFromArray, NoArgs}, // 27
+    {FeedFromArray, CheckFromArray, NoArgs}, // 28
+    {FeedFromArray, CheckFromArray, NoArgs}, // 29
+    {FeedFromArray, CheckFromArray, NoArgs}, // 30
+    {FeedFromArray, CheckFromArray, NoArgs}, // 31
+    {FeederBigSegment, CheckerBigSegment, NoArgs},   // 32
+    {FeederBigSegment, CheckerBigSegment, NoArgs},   // 33
+    {FeederBigSegment, CheckerBigSegment, NoArgs},   // 34
+    {FeederBigTriangle, CheckerBigTriangle, NoArgs}, // 35
+    {FeederBigTriangle, CheckerBigTriangle, NoArgs}, // 36
+    {FeederBigParabol, CheckerBigParabol, NoArgs},   // 37
+    {FeederBigParabol, CheckerBigParabol, NoArgs},   // 38
+    {FeederBigParabol, CheckerBigParabol, NoArgs},   // 39
+    {FeederBigParabol, CheckerBigParabol, NoArgs},   // 40
 };
 
 TLabTest GetLabTest(int testIdx) {

@@ -15,9 +15,15 @@ static unsigned TestcaseIdx = 0;
 static int Feed(void);
 static int Check(void);
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 TLabTest GetLabTest(int testIdx) {
     (void)testIdx;
-    TLabTest labTest = {Feed, Check};
+    TLabTest labTest = {Feed, Check, NoArgs};
     return labTest;
 }
 
