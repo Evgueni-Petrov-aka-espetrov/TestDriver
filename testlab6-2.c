@@ -361,69 +361,81 @@ static int checkSeq(int h)
     }
 }
 
-static int feederBig43() { return feedSeq(4, 129); }
-static int checkerBig43() { return checkSeq(3); }
-static int feederBig44() { return feedSeq(4, 130); }
-static int checkerBig44() { return checkSeq(4); }
-static int feederBig48() { return feedSeq(4, 524295); }
-static int checkerBig48() { return checkSeq(9); }
-static int feederBig49() { return feedSeq(4, 524926); }
-static int checkerBig49() { return checkSeq(10); }
-static int feederBig58() { return feedSeq(5, 781256); }
-static int checkerBig58() { return checkSeq(8); }
-static int feederBig59() { return feedSeq(5, 781257); }
-static int checkerBig59() { return checkSeq(9); }
+static int feederBig43(void) { return feedSeq(4, 129); }
+static int checkerBig43(void) { return checkSeq(3); }
+static int feederBig44(void) { return feedSeq(4, 130); }
+static int checkerBig44(void) { return checkSeq(4); }
+static int feederBig48(void) { return feedSeq(4, 524295); }
+static int checkerBig48(void) { return checkSeq(9); }
+static int feederBig49(void) { return feedSeq(4, 524926); }
+static int checkerBig49(void) { return checkSeq(10); }
+static int feederBig58(void) { return feedSeq(5, 781256); }
+static int checkerBig58(void) { return checkSeq(8); }
+static int feederBig59(void) { return feedSeq(5, 781257); }
+static int checkerBig59(void) { return checkSeq(9); }
+
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
 
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {feederBig, checkerBig},
-    {feederBig1, checkerBig1},
-    {feederBig2, checkerBig2},
-    {feederBig43, checkerBig43},
-    {feederBig44, checkerBig44},
-    {feederBig48, checkerBig48},
-    {feederBig49, checkerBig49},
-    {feederBig59, checkerBig59},
-    {feederBig58, checkerBig58},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {feederBig, checkerBig, NoArgs},
+    {feederBig1, checkerBig1, NoArgs},
+    {feederBig2, checkerBig2, NoArgs},
+    {feederBig43, checkerBig43, NoArgs},
+    {feederBig44, checkerBig44, NoArgs},
+    {feederBig48, checkerBig48, NoArgs},
+    {feederBig49, checkerBig49, NoArgs},
+    {feederBig59, checkerBig59, NoArgs},
+    {feederBig58, checkerBig58, NoArgs},
 };
 
 TLabTest GetLabTest(int testIdx) {

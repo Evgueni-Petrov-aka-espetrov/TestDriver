@@ -93,9 +93,15 @@ static int CheckFromArray(void) {
     return !passed;
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 TLabTest GetLabTest(int testInd) {
     (void)testInd;
-    TLabTest rv = {FeedFromArray, CheckFromArray};
+    TLabTest rv = {FeedFromArray, CheckFromArray, NoArgs};
     return rv;
 }
 
