@@ -107,7 +107,7 @@ static bool GenerateSequence(FILE *out, int startInd, int len, char *output) {
     bool res = true;
     if (len > 0) {
         for (int i = 0; i < ALPHABET_SIZE; i++) {
-            output[startInd] = 'a' + i;
+            output[startInd] = (char)('a' + i);
             res = GenerateSequence(out, startInd + 1, len - 1, output);
         }
     }
@@ -270,7 +270,7 @@ static int FeederBig3(void) {
     for (int i = 0; i < ALPHABET_SIZE; i++) {
         char output[MAX_WORD_LENGTH / 5 + 1] = "";
         for (int j = 0; j < MAX_WORD_LENGTH / 5; j++) {
-            output[j] = 'a' + i;
+            output[j] = (char)('a' + i);
             if (fprintf(in, "%s\n", output) < 0) {
                 printf("can't create in.txt. No space on disk?\n");
                 return -1;
@@ -422,38 +422,44 @@ static int CheckerBig5(void) {
     }
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeedFromArray, CheckFromArray},
-    {FeederBig1, CheckerBig1},
-    {FeederBig2, CheckerBig2},
-    {FeederBig3, CheckerBig3},
-    {FeederBig4, CheckerBig4},
-    {FeederBig5, CheckerBig5},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeedFromArray, CheckFromArray, NoArgs},
+    {FeederBig1, CheckerBig1, NoArgs},
+    {FeederBig2, CheckerBig2, NoArgs},
+    {FeederBig3, CheckerBig3, NoArgs},
+    {FeederBig4, CheckerBig4, NoArgs},
+    {FeederBig5, CheckerBig5, NoArgs},
 };
 
 TLabTest GetLabTest(int testIdx) {
