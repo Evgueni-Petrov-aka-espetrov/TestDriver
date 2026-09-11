@@ -75,9 +75,15 @@ static int CheckFromArray(void) {
     return status == Fail;
 }
 
+static const char *const * NoArgs(void) {
+    static const char *const No_Args[] = {NULL};
+
+    return No_Args;
+}
+
 TLabTest GetLabTest(int testIdx) {
     (void)testIdx;
-    TLabTest labTest = {FeedFromArray, CheckFromArray};
+    TLabTest labTest = {FeedFromArray, CheckFromArray, NoArgs};
     return labTest;
 }
 

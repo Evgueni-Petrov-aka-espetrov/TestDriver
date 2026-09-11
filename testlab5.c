@@ -47,9 +47,9 @@ static int IsInputTooLarge(size_t inputLength) {
     return 0;
 }
 
-static int FeedData(char mode, const unsigned char* data, size_t count) {
+static int FeedData(const unsigned char* data, size_t count) {
     FILE *const input = fopen("in.txt", "wb");
-    int error = input == NULL || fprintf(input, "%c", mode) != 1 || fwrite(data, 1, count, input) != count;
+    int error = input == NULL || fwrite(data, 1, count, input) != count;
     fclose(input);
     if (error) {
         printf("can't create in.txt. No space on disk?\n");
@@ -62,7 +62,7 @@ static int FeedCompress(void) {
         printf("Tester error: compression test must preceed decompression test\n");
         return 1;
     }
-    return FeedData('c', Input, InputLength);
+    return FeedData(Input, InputLength);
 }
 
 static int CheckAtMost(int gotBytes, int expectedBytes) {
@@ -112,7 +112,7 @@ static int FeedDecompress(void) {
         printf("Tester error: compression test must preceed decompression test\n");
         return 1;
     }
-    return FeedData('d', LabOutput, LabOutputLength);
+    return FeedData(LabOutput, LabOutputLength);
 }
 
 static int CheckSame(int gotBytes, int expectedBytes) {
@@ -218,47 +218,59 @@ static int CheckCompressBig3(void) {
     return CheckCompress(4+(9+256*256*256+7)/8);
 }
 
+static const char *const * CompressArgs(void) {
+    static const char *const Compress_Args[] = {"c", NULL};
+
+    return Compress_Args;
+}
+
+static const char *const * DecompressArgs(void) {
+    static const char *const Decompress_Args[] = {"d", NULL};
+
+    return Decompress_Args;
+}
+
 const TLabTest LabTests[] = {
-    {FeedCompressFromArray, CheckCompressFromArray}, // 1
-    {FeedDecompress, CheckDecompress}, // 2
-    {FeedCompressFromArray, CheckCompressFromArray}, // 3
-    {FeedDecompress, CheckDecompress}, // 4
-    {FeedCompressFromArray, CheckCompressFromArray}, // 5
-    {FeedDecompress, CheckDecompress}, // 6
-    {FeedCompressFromArray, CheckCompressFromArray}, // 7
-    {FeedDecompress, CheckDecompress}, // 8
-    {FeedCompressFromArray, CheckCompressFromArray}, // 9
-    {FeedDecompress, CheckDecompress}, // 10
-    {FeedCompressFromArray, CheckCompressFromArray}, // 11
-    {FeedDecompress, CheckDecompress}, // 12
-    {FeedCompressFromArray, CheckCompressFromArray}, // 13
-    {FeedDecompress, CheckDecompress}, // 14
-    {FeedCompressFromArray, CheckCompressFromArray}, // 15
-    {FeedDecompress, CheckDecompress}, // 16
-    {FeedCompressFromArray, CheckCompressFromArray}, // 17
-    {FeedDecompress, CheckDecompress}, // 18
-    {FeedCompressFromArray, CheckCompressFromArray}, // 19
-    {FeedDecompress, CheckDecompress}, // 20
-    {FeedCompressFromArray, CheckCompressFromArray}, // 21
-    {FeedDecompress, CheckDecompress}, // 22
-    {FeedCompressFromArray, CheckCompressFromArray}, // 23
-    {FeedDecompress, CheckDecompress}, // 24
-    {FeedCompressFromArray, CheckCompressFromArray}, // 25
-    {FeedDecompress, CheckDecompress}, // 26
-    {FeedCompressBig1, CheckCompressBig1}, // 27 n=16
-    {FeedDecompress, CheckDecompress}, // 28
-    {FeedCompressBig2, CheckCompressBig2}, // 29
-    {FeedDecompress, CheckDecompress}, // 30
-    {FeedCompressBig3, CheckCompressBig3}, // 31
-    {FeedDecompress, CheckDecompress}, // 32
-    {FeedCompressBig1, CheckCompressBig1}, // 33 n=21
-    {FeedDecompress, CheckDecompress}, // 34
-    {FeedCompressBig1, CheckCompressBig1}, // 35 n=26
-    {FeedDecompress, CheckDecompress}, // 36
-    {FeedCompressBig1, CheckCompressBig1}, // 37 n=31
-    {FeedDecompress, CheckDecompress}, // 38
-    {FeedCompressBig1, CheckCompressBig1}, // 39 n=35
-    {FeedDecompress, CheckDecompress}, // 40
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 1
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 2
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 3
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 4
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 5
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 6
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 7
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 8
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 9
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 10
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 11
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 12
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 13
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 14
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 15
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 16
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 17
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 18
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 19
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 20
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 21
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 22
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 23
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 24
+    {FeedCompressFromArray, CheckCompressFromArray, CompressArgs}, // 25
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 26
+    {FeedCompressBig1, CheckCompressBig1, CompressArgs}, // 27 n=16
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 28
+    {FeedCompressBig2, CheckCompressBig2, CompressArgs}, // 29
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 30
+    {FeedCompressBig3, CheckCompressBig3, CompressArgs}, // 31
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 32
+    {FeedCompressBig1, CheckCompressBig1, CompressArgs}, // 33 n=21
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 34
+    {FeedCompressBig1, CheckCompressBig1, CompressArgs}, // 35 n=26
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 36
+    {FeedCompressBig1, CheckCompressBig1, CompressArgs}, // 37 n=31
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 38
+    {FeedCompressBig1, CheckCompressBig1, CompressArgs}, // 39 n=35
+    {FeedDecompress, CheckDecompress, DecompressArgs}, // 40
 };
 
 TLabTest GetLabTest(int testIdx) {

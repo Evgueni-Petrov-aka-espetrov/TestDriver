@@ -7,6 +7,7 @@
 typedef struct {
     int (*Feeder)(void);
     int (*Checker)(void);
+    const char* const * (*Args)(void);
 } TLabTest;
 
 TLabTest GetLabTest(int testIdx);
