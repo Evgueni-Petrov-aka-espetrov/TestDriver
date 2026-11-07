@@ -138,10 +138,12 @@ foreach(source ${TEST_LAB_SOURCES})
 endforeach()
 
 add_custom_target(testlab3-1 ALL
+	COMMAND ${CMAKE_COMMAND} -E remove -f testlab3-1${CMAKE_EXECUTABLE_SUFFIX}
 	COMMAND ${CMAKE_COMMAND} -E copy
 		testlab3-0${CMAKE_EXECUTABLE_SUFFIX} testlab3-1${CMAKE_EXECUTABLE_SUFFIX})
 add_dependencies(testlab3-1 testlab3-0)
 add_custom_target(testlab8-1 ALL
+	COMMAND ${CMAKE_COMMAND} -E remove -f testlab8-1${CMAKE_EXECUTABLE_SUFFIX}
 	COMMAND ${CMAKE_COMMAND} -E copy
 		testlab8-0${CMAKE_EXECUTABLE_SUFFIX} testlab8-1${CMAKE_EXECUTABLE_SUFFIX})
 add_dependencies(testlab8-1 testlab8-0)
