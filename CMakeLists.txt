@@ -98,6 +98,7 @@ set(TEST_LAB_SOURCES
 	testlab1-2.c
 	testlab2.c
 	testlab3-0.c
+	testlab3-1.c
  	testlab3-3.c
 	testlab4.c
 	testlab5.c
@@ -107,6 +108,7 @@ set(TEST_LAB_SOURCES
 	testlab6-3.c
 	testlab7.c
 	testlab8-0.c
+	testlab8-1.c
 	testlab9.c
  	testlab9-1.c
 	testlab10.c
@@ -136,14 +138,3 @@ foreach(source ${TEST_LAB_SOURCES})
 		COMMAND "$<TARGET_FILE:${target}>"
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/${test}$<$<BOOL:${WIN32}>:.exe>")
 endforeach()
-
-add_custom_target(testlab3-1 ALL
-	COMMAND ${CMAKE_COMMAND} -E remove -f testlab3-1${CMAKE_EXECUTABLE_SUFFIX}
-	COMMAND ${CMAKE_COMMAND} -E copy
-		testlab3-0${CMAKE_EXECUTABLE_SUFFIX} testlab3-1${CMAKE_EXECUTABLE_SUFFIX})
-add_dependencies(testlab3-1 testlab3-0)
-add_custom_target(testlab8-1 ALL
-	COMMAND ${CMAKE_COMMAND} -E remove -f testlab8-1${CMAKE_EXECUTABLE_SUFFIX}
-	COMMAND ${CMAKE_COMMAND} -E copy
-		testlab8-0${CMAKE_EXECUTABLE_SUFFIX} testlab8-1${CMAKE_EXECUTABLE_SUFFIX})
-add_dependencies(testlab8-1 testlab8-0)
