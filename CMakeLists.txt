@@ -50,6 +50,7 @@ function(SET_COMPILER_SETTINGS target)
 		-Wno-missing-field-initializers
 		-pedantic
 		-pedantic-errors
+		-Werror
 		>
 		$<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:
 		-Weverything
@@ -58,6 +59,7 @@ function(SET_COMPILER_SETTINGS target)
 		>
 		$<$<C_COMPILER_ID:MSVC>:
 		/W4
+		/WX
 		>)
 
 	target_compile_definitions(${target} PRIVATE
