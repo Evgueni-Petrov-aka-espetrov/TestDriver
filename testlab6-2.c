@@ -361,18 +361,18 @@ static int checkSeq(int h)
     }
 }
 
-static int feederBig43() { return feedSeq(4, 129); }
-static int checkerBig43() { return checkSeq(3); }
-static int feederBig44() { return feedSeq(4, 130); }
-static int checkerBig44() { return checkSeq(4); }
-static int feederBig48() { return feedSeq(4, 524295); }
-static int checkerBig48() { return checkSeq(9); }
-static int feederBig49() { return feedSeq(4, 524926); }
-static int checkerBig49() { return checkSeq(10); }
-static int feederBig58() { return feedSeq(5, 781256); }
-static int checkerBig58() { return checkSeq(8); }
-static int feederBig59() { return feedSeq(5, 781257); }
-static int checkerBig59() { return checkSeq(9); }
+static int feederBig43(void) { return feedSeq(4, 129); }
+static int checkerBig43(void) { return checkSeq(3); }
+static int feederBig44(void) { return feedSeq(4, 130); }
+static int checkerBig44(void) { return checkSeq(4); }
+static int feederBig48(void) { return feedSeq(4, 524295); }
+static int checkerBig48(void) { return checkSeq(9); }
+static int feederBig49(void) { return feedSeq(4, 524926); }
+static int checkerBig49(void) { return checkSeq(10); }
+static int feederBig58(void) { return feedSeq(5, 781256); }
+static int checkerBig58(void) { return checkSeq(8); }
+static int feederBig59(void) { return feedSeq(5, 781257); }
+static int checkerBig59(void) { return checkSeq(9); }
 
 const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray},

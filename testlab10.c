@@ -5,7 +5,7 @@
 #include <string.h>
 #define MAX_POINT_COUNT 100000
 
-typedef struct 
+typedef struct
 {
     int x, y;
 } TPoint;
@@ -95,7 +95,7 @@ static int CheckFromArray(void)
                 printf("short output -- %s\n", Fail);
                 return 1;
             }
-            
+
             for (int j = 0; j < testInOut[testN].pointCount; ++j) {
                 if (point.x == testInOut[testN].outPoints[j].x && point.y == testInOut[testN].outPoints[j].y) {
                     if (found[j] == 1) {
@@ -103,35 +103,35 @@ static int CheckFromArray(void)
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
-                    
+
                     ++found[j];
                     ++foundCount;
                     break;
                 }
             }
         }
-        
+
         if (foundCount != testInOut[testN].pointCount) {
             fclose(out);
             printf("wrong output -- %s\n", Fail);
             return 1;
         }
-    }   
+    }
     else if (testInOut[testN].outError != NULL) {
         char error[128] = {0};
         const char* status = ScanChars(out, sizeof(error), error);
-        
+
         if (status == Pass &&  _strnicmp(testInOut[testN].outError, error, strlen(error)) != 0) {
             status = Fail;
         }
-        
+
         if (status == Fail) {
             fclose(out);
             printf("wrong output -- ");
             return 1;
         }
     }
-    
+
     passed = !HaveGarbageAtTheEnd(out);
     ++testN;
     fclose(out);
@@ -166,7 +166,7 @@ static int FeederBigSegment(void)
         if (bigSegmentsN != 1) {
             y = i;
         }
-        
+
         if (fprintf(in, "%d %d\n", x, y) < 2) {
                 fclose(in);
                 printf("%s\n", "can't create in.txt. No space on disk?\n");
@@ -181,7 +181,7 @@ static int FeederBigSegment(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigSegment(void)
@@ -208,7 +208,7 @@ static int CheckerBigSegment(void)
             fclose(out);
             printf("short output -- %s\n", Fail);
             return 1;
-        }  
+        }
 
         for (int j = 0; j < 2; ++j) {
             if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
@@ -217,14 +217,14 @@ static int CheckerBigSegment(void)
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
-                
+
                 ++found[j];
                 ++foundCount;
                 break;
             }
         }
     }
-    
+
     if (foundCount != 2) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
@@ -278,7 +278,7 @@ static int FeederBigTriangle(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigTriangle(void)
@@ -295,7 +295,7 @@ static int CheckerBigTriangle(void)
     }
     else if (bigTrianglesN == 2) {
         pointOut[2].x = INT_MAX - MAX_POINT_COUNT + 2;
-    } 
+    }
 
     int found[3] = { 0 };
     int foundCount = 0;
@@ -314,14 +314,14 @@ static int CheckerBigTriangle(void)
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
-                
+
                 ++found[j];
                 ++foundCount;
                 break;
             }
         }
     }
-    
+
     if (foundCount != 3) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
@@ -397,7 +397,7 @@ static int FeederBigParabol(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigParabol(void)
@@ -439,7 +439,7 @@ static int CheckerBigParabol(void)
         }
     }
     else if (bigParabolsN == 4){
-        int x = MAX_POINT_COUNT / 4;
+        const int x = MAX_POINT_COUNT / 4;
         TPoint pointOut[4] =  { {x, x*x}, {x, -x*x}, {-x, x*x}, {-x, -x*x} };
 
         int found[4] = { 0 };
@@ -459,7 +459,7 @@ static int CheckerBigParabol(void)
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
-                    
+
                     ++found[j];
                     ++foundCount;
                     break;
@@ -490,19 +490,19 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray}, // 5
     {FeedFromArray, CheckFromArray}, // 6
     {FeedFromArray, CheckFromArray}, // 7
-    {FeedFromArray, CheckFromArray}, // 8  
+    {FeedFromArray, CheckFromArray}, // 8
     {FeedFromArray, CheckFromArray}, // 9
     {FeedFromArray, CheckFromArray}, // 10
     {FeedFromArray, CheckFromArray}, // 11
-    {FeedFromArray, CheckFromArray}, // 12    
+    {FeedFromArray, CheckFromArray}, // 12
     {FeedFromArray, CheckFromArray}, // 13
     {FeedFromArray, CheckFromArray}, // 14
     {FeedFromArray, CheckFromArray}, // 15
-    {FeedFromArray, CheckFromArray}, // 16    
+    {FeedFromArray, CheckFromArray}, // 16
     {FeedFromArray, CheckFromArray}, // 17
     {FeedFromArray, CheckFromArray}, // 18
     {FeedFromArray, CheckFromArray}, // 19
-    {FeedFromArray, CheckFromArray}, // 20   
+    {FeedFromArray, CheckFromArray}, // 20
     {FeedFromArray, CheckFromArray}, // 21
     {FeedFromArray, CheckFromArray}, // 22
     {FeedFromArray, CheckFromArray}, // 23

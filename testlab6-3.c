@@ -107,7 +107,7 @@ static bool GenerateSequence(FILE *out, int startInd, int len, char *output) {
     bool res = true;
     if (len > 0) {
         for (int i = 0; i < ALPHABET_SIZE; i++) {
-            output[startInd] = 'a' + i;
+            output[startInd] = (char)('a' + i);
             res = GenerateSequence(out, startInd + 1, len - 1, output);
         }
     }
@@ -270,7 +270,7 @@ static int FeederBig3(void) {
     for (int i = 0; i < ALPHABET_SIZE; i++) {
         char output[MAX_WORD_LENGTH / 5 + 1] = "";
         for (int j = 0; j < MAX_WORD_LENGTH / 5; j++) {
-            output[j] = 'a' + i;
+            output[j] = (char)('a' + i);
             if (fprintf(in, "%s\n", output) < 0) {
                 printf("can't create in.txt. No space on disk?\n");
                 return -1;
