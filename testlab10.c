@@ -1,13 +1,26 @@
 #include "testLab.h"
+#include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #define MAX_POINT_COUNT 100000
 
-typedef struct 
+typedef struct
 {
     int x, y;
 } TPoint;
+
+static int PrintPoint(FILE *out, long long x, long long y) {
+#if defined(__MINGW32__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#endif
+    int r = fprintf(out, "%" PRId64 " %" PRId64 "\n", (int64_t)x, (int64_t)y);
+#if defined(__MINGW32__)
+#pragma GCC diagnostic pop
+#endif
+    return r;
+}
 
 static int testN = 0;
 static const struct { const char *const in, *const outError; int pointCount; TPoint outPoints[8]; } testInOut[] = {
@@ -82,7 +95,7 @@ static int CheckFromArray(void)
                 printf("short output -- %s\n", Fail);
                 return 1;
             }
-            
+
             for (int j = 0; j < testInOut[testN].pointCount; ++j) {
                 if (point.x == testInOut[testN].outPoints[j].x && point.y == testInOut[testN].outPoints[j].y) {
                     if (found[j] == 1) {
@@ -90,35 +103,35 @@ static int CheckFromArray(void)
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
-                    
+
                     ++found[j];
                     ++foundCount;
                     break;
                 }
             }
         }
-        
+
         if (foundCount != testInOut[testN].pointCount) {
             fclose(out);
             printf("wrong output -- %s\n", Fail);
             return 1;
         }
-    }   
+    }
     else if (testInOut[testN].outError != NULL) {
         char error[128] = {0};
         const char* status = ScanChars(out, sizeof(error), error);
-        
+
         if (status == Pass &&  _strnicmp(testInOut[testN].outError, error, strlen(error)) != 0) {
             status = Fail;
         }
-        
+
         if (status == Fail) {
             fclose(out);
             printf("wrong output -- ");
             return 1;
         }
     }
-    
+
     passed = !HaveGarbageAtTheEnd(out);
     ++testN;
     fclose(out);
@@ -153,7 +166,7 @@ static int FeederBigSegment(void)
         if (bigSegmentsN != 1) {
             y = i;
         }
-        
+
         if (fprintf(in, "%d %d\n", x, y) < 2) {
                 fclose(in);
                 printf("%s\n", "can't create in.txt. No space on disk?\n");
@@ -168,7 +181,7 @@ static int FeederBigSegment(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigSegment(void)
@@ -195,7 +208,7 @@ static int CheckerBigSegment(void)
             fclose(out);
             printf("short output -- %s\n", Fail);
             return 1;
-        }  
+        }
 
         for (int j = 0; j < 2; ++j) {
             if (point.x == pointOut[j].x && point.y == pointOut[j].y) {
@@ -204,14 +217,14 @@ static int CheckerBigSegment(void)
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
-                
+
                 ++found[j];
                 ++foundCount;
                 break;
             }
         }
     }
-    
+
     if (foundCount != 2) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
@@ -265,7 +278,7 @@ static int FeederBigTriangle(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigTriangle(void)
@@ -282,7 +295,7 @@ static int CheckerBigTriangle(void)
     }
     else if (bigTrianglesN == 2) {
         pointOut[2].x = INT_MAX - MAX_POINT_COUNT + 2;
-    } 
+    }
 
     int found[3] = { 0 };
     int foundCount = 0;
@@ -301,14 +314,14 @@ static int CheckerBigTriangle(void)
                     printf("wrong output -- %s\n", Fail);
                     return 1;
                 }
-                
+
                 ++found[j];
                 ++foundCount;
                 break;
             }
         }
     }
-    
+
     if (foundCount != 3) {
         fclose(out);
         printf("wrong output -- %s\n", Fail);
@@ -340,34 +353,34 @@ static int FeederBigParabol(void)
     for (long long i = 1; i <= MAX_POINT_COUNT / 4; ++i) {
         int printCount = 0;
         if (bigParabolsN == 1) {
-            printCount += fprintf(in, "%lld %lld\n", i, i*i + INT_MIN);
-            printCount += fprintf(in, "%lld %lld\n", -i, i*i + INT_MIN);
+            printCount += PrintPoint(in, i, i*i + INT_MIN);
+            printCount += PrintPoint(in, -i, i*i + INT_MIN);
             i += MAX_POINT_COUNT / 4;
-            printCount += fprintf(in, "%lld %lld\n", i, i*i + INT_MIN);
-            printCount += fprintf(in, "%lld %lld\n", -i, i*i + INT_MIN);
+            printCount += PrintPoint(in, i, i*i + INT_MIN);
+            printCount += PrintPoint(in, -i, i*i + INT_MIN);
             i -= MAX_POINT_COUNT / 4;
         }
         else if (bigParabolsN == 2) {
-            printCount += fprintf(in, "%lld %lld\n", i, -i*i + INT_MAX);
-            printCount += fprintf(in, "%lld %lld\n", -i, -i*i + INT_MAX);
+            printCount += PrintPoint(in, i, -i*i + INT_MAX);
+            printCount += PrintPoint(in, -i, -i*i + INT_MAX);
             i += MAX_POINT_COUNT / 4;
-            printCount += fprintf(in, "%lld %lld\n", i, -i*i + INT_MAX);
-            printCount += fprintf(in, "%lld %lld\n", -i, -i*i + INT_MAX);
+            printCount += PrintPoint(in, i, -i*i + INT_MAX);
+            printCount += PrintPoint(in, -i, -i*i + INT_MAX);
             i -= MAX_POINT_COUNT / 4;
         }
         else if (bigParabolsN == 3) {
-            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, i);
-            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, -i);
+            printCount += PrintPoint(in, i*i + INT_MIN, i);
+            printCount += PrintPoint(in, i*i + INT_MIN, -i);
             i += MAX_POINT_COUNT / 4;
-            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, i);
-            printCount += fprintf(in, "%lld %lld\n", i*i + INT_MIN, -i);
+            printCount += PrintPoint(in, i*i + INT_MIN, i);
+            printCount += PrintPoint(in, i*i + INT_MIN, -i);
             i -= MAX_POINT_COUNT / 4;
         }
         else if (bigParabolsN == 4) {
-            printCount += fprintf(in, "%lld %lld\n", i, i*i);
-            printCount += fprintf(in, "%lld %lld\n", -i, i*i);
-            printCount += fprintf(in, "%lld %lld\n", i, -i*i);
-            printCount += fprintf(in, "%lld %lld\n", -i, -i*i);
+            printCount += PrintPoint(in, i, i*i);
+            printCount += PrintPoint(in, -i, i*i);
+            printCount += PrintPoint(in, i, -i*i);
+            printCount += PrintPoint(in, -i, -i*i);
         }
 
         if (printCount < 4) {
@@ -384,7 +397,7 @@ static int FeederBigParabol(void)
     fflush(stdout);
     fclose(in);
 
-    return 0;    
+    return 0;
 }
 
 static int CheckerBigParabol(void)
@@ -426,8 +439,9 @@ static int CheckerBigParabol(void)
         }
     }
     else if (bigParabolsN == 4){
-        int x = MAX_POINT_COUNT / 4;
+        #define x (MAX_POINT_COUNT / 4) /* not 'const int', please MSVC */
         TPoint pointOut[4] =  { {x, x*x}, {x, -x*x}, {-x, x*x}, {-x, -x*x} };
+        #undef x
 
         int found[4] = { 0 };
         int foundCount = 0;
@@ -446,7 +460,7 @@ static int CheckerBigParabol(void)
                         printf("wrong output -- %s\n", Fail);
                         return 1;
                     }
-                    
+
                     ++found[j];
                     ++foundCount;
                     break;
@@ -477,19 +491,19 @@ const TLabTest LabTests[] = {
     {FeedFromArray, CheckFromArray}, // 5
     {FeedFromArray, CheckFromArray}, // 6
     {FeedFromArray, CheckFromArray}, // 7
-    {FeedFromArray, CheckFromArray}, // 8  
+    {FeedFromArray, CheckFromArray}, // 8
     {FeedFromArray, CheckFromArray}, // 9
     {FeedFromArray, CheckFromArray}, // 10
     {FeedFromArray, CheckFromArray}, // 11
-    {FeedFromArray, CheckFromArray}, // 12    
+    {FeedFromArray, CheckFromArray}, // 12
     {FeedFromArray, CheckFromArray}, // 13
     {FeedFromArray, CheckFromArray}, // 14
     {FeedFromArray, CheckFromArray}, // 15
-    {FeedFromArray, CheckFromArray}, // 16    
+    {FeedFromArray, CheckFromArray}, // 16
     {FeedFromArray, CheckFromArray}, // 17
     {FeedFromArray, CheckFromArray}, // 18
     {FeedFromArray, CheckFromArray}, // 19
-    {FeedFromArray, CheckFromArray}, // 20   
+    {FeedFromArray, CheckFromArray}, // 20
     {FeedFromArray, CheckFromArray}, // 21
     {FeedFromArray, CheckFromArray}, // 22
     {FeedFromArray, CheckFromArray}, // 23

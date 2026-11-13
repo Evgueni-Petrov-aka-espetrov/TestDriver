@@ -71,7 +71,7 @@ static int FeedFromArray(void) {
         printf("can't create in.txt. No space on disk?\n");
         return -1;
     }
-    fprintf(stream.In, "%lu %d\n", TestData.Tests[currentTest].CountItems, TestData.Tests[currentTest].MaxKnapsackWeight);
+    fprintf(stream.In, "%lu %d\n", (unsigned long)TestData.Tests[currentTest].CountItems, TestData.Tests[currentTest].MaxKnapsackWeight);
     for (size_t i = 0; i < TestData.Tests[currentTest].CountItems; ++i) {
         fprintf(stream.In, "%d %d\n", TestData.Tests[currentTest].Items[i].Weight, TestData.Tests[currentTest].Items[i].Cost);
     }

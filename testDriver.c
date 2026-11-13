@@ -31,11 +31,24 @@ static void PrintWithoutBuffering(const char format[], ...) {
     fflush(stdout);
 }
 
+static void PrintUsage(const char* runnerExe) {
+    PrintWithoutBuffering(
+        "Usage: %s [options] TESTEE\n"
+        "\n"
+        "Options:\n"
+        "  -h, --help          Print this help and exit\n"
+        "  -a                  Run all tests, don't stop at the first failure\n"
+        "  -m KB               Set memory limit in 1024-byte units\n"
+        "  -t MS               Set timeout in milliseconds\n"
+        "  -e TESTEE           (internal use) Run the lab executable directly\n",
+        runnerExe);
+}
+
 static const char* GetRunnerCommand(const char* runnerExe, char* labExe) {
     static char runnerCommand[4096] = {0};
     int testRunnerSize = snprintf(
-        runnerCommand, sizeof(runnerCommand), "%s -m %zu -t %d -e %s",
-        runnerExe, (GetMemoryLimit() + 1023) / 1024, GetTimeout(), labExe);
+        runnerCommand, sizeof(runnerCommand), "%s -m %lu -t %d -e %s",
+        runnerExe, (unsigned long)((GetMemoryLimit() + 1023) / 1024), GetTimeout(), labExe);
     if (testRunnerSize < 0) {
         PrintWithoutBuffering("\nInternal error: snprintf returned negative value\n");
         return NULL;
@@ -51,23 +64,28 @@ int main(int argc, char* argv[]) {
     int i, count, fail;
     const char* runnerExe = argv[0];
 
-    if (argc >= 3 && strcmp(argv[1], "-a") == 0) {
-        UserTestAll = 1;
-        argv++;
-        argc--;
-    }
-    if (argc >= 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) != 0) {
-        UserMemoryLimit = atoi(argv[2])*1024;
-        argv += 2;
-        argc -= 2;
-    }
-    if (argc >= 4 && strcmp(argv[1], "-t") == 0 && atoi(argv[2]) != 0) {
-        UserTimeout = atoi(argv[2]);
-        argv += 2;
-        argc -= 2;
-    }
-    if (argc >= 3 && strcmp(argv[1], "-e") == 0) {
-        return LaunchLabExecutable(argv[2]);
+    while (argc >= 2) {
+        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+            PrintUsage(runnerExe);
+            return 0;
+        }
+        if (strcmp(argv[1], "-a") == 0) {
+            UserTestAll = 1;
+            argv++;
+            argc--;
+        } else if (argc >= 3 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) != 0) {
+            UserMemoryLimit = atoi(argv[2])*1024;
+            argv += 2;
+            argc -= 2;
+        } else if (argc >= 3 && strcmp(argv[1], "-t") == 0 && atoi(argv[2]) != 0) {
+            UserTimeout = atoi(argv[2]);
+            argv += 2;
+            argc -= 2;
+        } else if (argc >= 3 && strcmp(argv[1], "-e") == 0) {
+            return LaunchLabExecutable(argv[2]);
+        } else {
+            break;
+        }
     }
 
     PrintWithoutBuffering("\nKOI FIT NSU Lab Tester (c) 2009-2020 by Evgueni Petrov\n");
@@ -416,7 +434,7 @@ int LaunchLabExecutable(char* labExe)
         //fprintf(stderr, "PeakJobMemoryUsed %d\n", labJobLimits.PeakJobMemoryUsed);
         labMem0 = labJobLimits.PeakProcessMemoryUsed-labMem0;
     }
-    if ((long long)labMem0 > GetMemoryLimit()) {
+    if (labMem0 > GetMemoryLimit()) {
         exitCode = 1;
         ReportOutOfMemory(labExe, labMem0);
     }
@@ -456,7 +474,7 @@ DWORD GetTickCount(void) {
 static int CheckMemory(struct rusage rusage, size_t * labMem0) {
     *labMem0 = (size_t) rusage.ru_maxrss * RU_MAXRSS_UNITS;
     if (getenv("SHOW_MEM_USED")) {
-        fprintf(stderr, "LAB USED %ziKiB memory\n", *labMem0 / 1024);
+        fprintf(stderr, "LAB USED %luKiB memory\n", (unsigned long)(*labMem0 / 1024));
     }
     if (GetMemoryLimit() < *labMem0) {
         return 1;

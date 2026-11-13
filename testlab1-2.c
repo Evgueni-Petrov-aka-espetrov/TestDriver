@@ -197,7 +197,7 @@ static int FeederBig(void) {
         return -1;
     }
     for (int i = 0; i < 1024 * 1024 * 8; ++i) {
-        if (fprintf(in, "%s", str) != strlen(str)) {
+        if (fprintf(in, "%s", str) != (int)strlen(str)) {
             printf("can't write in in.txt. No space on disk?\n");
             return -1;
         }

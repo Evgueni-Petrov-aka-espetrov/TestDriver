@@ -265,7 +265,14 @@ static int Feed(void) {
         if (edge.Begin == IGNORED_VERTEX_IDX) {
             break;
         }
-        if (fprintf(in, "%u %u %llu\n", edge.Begin, edge.End, edge.Length) < 3) {
+#if defined(__MINGW32__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#endif
+        if (fprintf(in, "%u %u %" PRIu64 "\n", edge.Begin, edge.End, (uint64_t)edge.Length) < 3) {
+#if defined(__MINGW32__)
+#pragma GCC diagnostic pop
+#endif
             printf("can't create in.txt. No space on disk?\n");
             fclose(in);
             return -1;

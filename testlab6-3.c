@@ -107,7 +107,7 @@ static bool GenerateSequence(FILE *out, int startInd, int len, char *output) {
     bool res = true;
     if (len > 0) {
         for (int i = 0; i < ALPHABET_SIZE; i++) {
-            output[startInd] = 'a' + i;
+            output[startInd] = (char)('a' + i);
             res = GenerateSequence(out, startInd + 1, len - 1, output);
         }
     }
@@ -177,7 +177,7 @@ static int FeederBig1(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%lu seconds. Starting exe with timeout T+3 seconds... ", (unsigned long)(RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC));
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     size_t memoryForTreeNodes = finalAmountVerts * (GetLabPointerSize() + sizeof(int) * 2 + 2 * GetLabPointerSize());
     size_t memoryForChars = (n * 500 * sizeof(char));
@@ -226,7 +226,7 @@ static int FeederBig2(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%lu seconds. Starting exe with timeout T+3 seconds... ", (unsigned long)(RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC));
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     size_t memoryForTreeNodes = finalAmountVerts * (GetLabPointerSize() + sizeof(int) * 2 + 2 * GetLabPointerSize());
     size_t memoryForChars = (n * 500 * sizeof(char));
@@ -270,7 +270,7 @@ static int FeederBig3(void) {
     for (int i = 0; i < ALPHABET_SIZE; i++) {
         char output[MAX_WORD_LENGTH / 5 + 1] = "";
         for (int j = 0; j < MAX_WORD_LENGTH / 5; j++) {
-            output[j] = 'a' + i;
+            output[j] = (char)('a' + i);
             if (fprintf(in, "%s\n", output) < 0) {
                 printf("can't create in.txt. No space on disk?\n");
                 return -1;
@@ -281,7 +281,7 @@ static int FeederBig3(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%lu seconds. Starting exe with timeout T+3 seconds... ", (unsigned long)(RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC));
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     size_t memoryForRecursion = n * (sizeof(void *) * 3);
     size_t memoryForTreeNodes = (n + 1) * (GetLabPointerSize() + sizeof(int) * 2 + 2 * GetLabPointerSize());
@@ -337,7 +337,7 @@ static int FeederBig4(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%lu seconds. Starting exe with timeout T+3 seconds... ", (unsigned long)(RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC));
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     size_t memoryForTreeNodes =  n * ALPHABET_SIZE * (GetLabPointerSize() + sizeof(int) * 2 + 2 * GetLabPointerSize());
     size_t memoryForChars = n * sizeof(char);
@@ -391,7 +391,7 @@ static int FeederBig5(void) {
     clock_t end = clock();
     fclose(in);
     testTimeOut = end - start;
-    printf("done in T=%ld seconds. Starting exe with timeout T+3 seconds... ", RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC);
+    printf("done in T=%lu seconds. Starting exe with timeout T+3 seconds... ", (unsigned long)(RoundUptoThousand(testTimeOut) / CLOCKS_PER_SEC));
     testTimeOut = testTimeOut + CLOCKS_PER_SEC * 3;
     size_t memoryForTreeNodes =  n * (sizeof(char *) + sizeof(int) * 2 + 2 * GetLabPointerSize());
     size_t memoryForChars = n * sizeof(char);
