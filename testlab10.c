@@ -439,8 +439,9 @@ static int CheckerBigParabol(void)
         }
     }
     else if (bigParabolsN == 4){
-        const int x = MAX_POINT_COUNT / 4;
+        #define x (MAX_POINT_COUNT / 4) /* not 'const int', please MSVC */
         TPoint pointOut[4] =  { {x, x*x}, {x, -x*x}, {-x, x*x}, {-x, -x*x} };
+        #undef x
 
         int found[4] = { 0 };
         int foundCount = 0;
